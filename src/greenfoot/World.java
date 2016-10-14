@@ -45,12 +45,6 @@ public World(int aW, int aH, int aCellSize, boolean aValue)
     String iname = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
     if(iname!=null) setBackground(new GreenfootImage(iname));
     else setBackground(new GreenfootImage(aW*aCellSize, aH*aCellSize));
-    
-    // Totally bogus! Because setShowing wasn't working
-    _scn.getEnv().runLater(() -> {
-        _scn.start();
-        _scn.requestFocus();
-    });
 }
 
 /**
