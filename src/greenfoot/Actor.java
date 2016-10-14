@@ -4,7 +4,7 @@ import snap.view.ImageView;
 import java.util.List;
 
 /**
- * A custom class.
+ * An implementation of the GreenFoot Actor class using SnapKit.
  */
 public class Actor {
     
@@ -52,6 +52,15 @@ public int getWidth()  { return _img.getWidth(); }
 public int getHeight()  { return _img.getHeight(); }
 
 /**
+ * Set Location.
+ */
+public void setLocation(int aX, int aY)
+{
+    int cs = _world!=null? _world.getCellSize() : 1, x = aX*cs + cs/2, y = aY*cs + cs/2;
+    _sa.setXY(x - getWidth()/2d, y - getHeight()/2d); _x = aX; _y = aY;
+}
+
+/**
  * Move.
  */
 public void move(int aValue)
@@ -64,19 +73,7 @@ public void move(int aValue)
 /**
  * Turn.
  */
-public void turn(int aDeg)
-{
-    _sa.setRotate(_sa.getRotate() + aDeg);
-}
-
-/**
- * Set Location.
- */
-public void setLocation(int aX, int aY)
-{
-    int cs = _world.getCellSize(), x = aX*cs + cs/2, y = aY*cs + cs/2;
-    _sa.setXY(x - getWidth()/2d, y - getHeight()/2d); _x = aX; _y = aY;
-}
+public void turn(int aDeg)  { _sa.setRotate(_sa.getRotate() + aDeg); }
 
 /**
  * Returns the rotation.
@@ -99,10 +96,14 @@ public GreenfootImage getImage()  { return _img; }
 public void setImage(GreenfootImage anImage)
 {
     if(_img==anImage) return;
-    if(_img!=null) _img._actors.remove(this);
-    _img = anImage;
+    int oldW = _img!=null? _img.getWidth() : 0, oldH = _img!=null? _img.getHeight() : 0;
+    
+    // Update image actor lists and set new image
+    if(_img!=null) _img._actors.remove(this); _img = anImage;
     if(_img!=null) _img._actors.add(this);
-    imageChanged();
+    
+    // Call image changed
+    imageChanged(oldW, oldH);
 }
 
 /**
@@ -113,10 +114,18 @@ public void setImage(String aName)  { setImage(new GreenfootImage(aName)); }
 /**
  * Called when the image changes.
  */
-void imageChanged()
+void imageChanged(int oldW, int oldH)
 {
+    // Set new image and new size
     _sa.setImage(_img._image);
     _sa.setSize(_img._image.getWidth(), _img._image.getHeight());
+    
+    // Shift actor by half image size change to keep it centered about same point
+    if(_world==null) return;
+    int dx = (_img.getWidth() - oldW)/2;
+    int dy = (_img.getHeight() - oldH)/2;
+    //System.out.println("Shift by " + dx + " " + dy);
+    //setLocation(getX() - dx, getY() - dy);
 }
 
 /**

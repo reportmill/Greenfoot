@@ -47,7 +47,7 @@ public static int getRandomNumber(int aNum)  { return _random.nextInt(aNum); }
 /**
  * Returns whether key is down.
  */
-public static boolean isKeyDown(String aName)  { return getWorld()._scn.isKeyDown(aName); }
+public static boolean isKeyDown(String aName)  { return getWorld()._sw.isKeyDown(aName); }
 
 /**
  * Plays a sound.
@@ -96,12 +96,12 @@ public static World getWorld()
 public static void setWorld(World aWorld)
 {
     // Get old world - if there, stop it
-    World oworld = _world; if(oworld!=null) oworld._scn.stop();
+    World oworld = _world; if(oworld!=null) oworld._sw.stop();
     
     // Set world
     _world = aWorld;
-    _shared.setChildren(_world._scn);
-    _world._scn.requestFocus();
+    _shared.setChildren(_world._sw);
+    _world._sw.requestFocus();
     
     // If no props, init greenfoot
     if(_props==null) initGreenfoot();
@@ -111,12 +111,12 @@ public static void setWorld(World aWorld)
     //browser.setURL(_world._scn.getURL());
 }
 
-public static void start()  { if(_world!=null) getWorld()._scn.start(); }
+public static void start()  { if(_world!=null) getWorld()._sw.start(); }
 
 /**
  * Stops Greenfoot from playing.
  */
-public static void stop()  { getWorld()._scn.stop(); }
+public static void stop()  { getWorld()._sw.stop(); }
 
 /**
  * Delays the execution by given number of time steps.
@@ -135,7 +135,7 @@ public static void setSpeed(int aValue)
 {
     long delay = calculateDelay(aValue); _speed = aValue;
     _frate = (int)Math.round(1000000000d/delay);
-    getWorld()._scn.setFrameRate(_frate);
+    getWorld()._sw.setFrameRate(_frate);
 }
 
 /**
@@ -167,7 +167,7 @@ public static MouseInfo getMouseInfo()  { return _mouseInfo; }
  */
 public static boolean mouseClicked(Object anObj)
 {
-   if(anObj==null) return getWorld()!=null? getWorld()._scn.isMouseClicked() : false;
+   if(anObj==null) return getWorld()!=null? getWorld()._sw.isMouseClicked() : false;
    System.out.println("Mouse Clicked not supported"); return false;
 }
     

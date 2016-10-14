@@ -55,7 +55,11 @@ public double getFrameRate()  { return _frameRate; }
 /**
  * Sets the frame rate.
  */
-public void setFrameRate(double aValue)  { _frameRate = aValue; if(isPlaying()) { stop(); start(); } }
+public void setFrameRate(double aValue)
+{
+    _frameRate = aValue;
+    _timer.setPeriod(getFrameDelay());
+}
 
 /**
  * Returns the frame delay in milliseconds.
