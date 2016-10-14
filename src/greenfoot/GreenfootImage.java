@@ -36,8 +36,8 @@ public GreenfootImage(int aWidth, int aHeight)  { _image = Image.get(aWidth, aHe
 public GreenfootImage(String aName)
 {
     _image = _images.get(aName); if(_image!=null) return;
-    _image = Image.get(Greenfoot.getWorld().getClass(), aName);
-    if(_image==null) _image = Image.get(Greenfoot.getWorld().getClass(), "images/" + aName);
+    _image = Image.get(Greenfoot.getWorld().getClass(), "images/" + aName);
+    if(_image==null) _image = Image.get(Greenfoot.getWorld().getClass(), aName);
     if(_image==null) System.err.println("Image not found: " + aName);
     if(_image!=null) _images.put(aName, _image);
 }

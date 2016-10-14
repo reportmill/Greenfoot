@@ -14,7 +14,7 @@ public class GreenfootSound extends Object {
  */
 public GreenfootSound(String aName)
 {
-    _sound = SoundClip.get(Greenfoot.getWorld().getClass(), aName);
+    _sound = SoundClip.get(Greenfoot.getWorld().getClass(), "sounds/" + aName);
     if(_sound==null) System.err.println("Sound not found: " + aName);
 }
 

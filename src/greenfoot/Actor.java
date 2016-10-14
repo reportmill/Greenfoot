@@ -1,6 +1,6 @@
 package greenfoot;
 import snap.gfx.*;
-import snap.viewx.*;
+import snap.view.ImageView;
 import java.util.List;
 
 /**
@@ -9,7 +9,7 @@ import java.util.List;
 public class Actor {
     
     // The snap actor
-    GFSnapActor          _sa;
+    GFSnapActor          _sa = new GFSnapActor(this);
     
     // The actor location
     int                  _x, _y;
@@ -25,12 +25,10 @@ public class Actor {
  */
 public Actor()
 {
-    _sa = new GFSnapActor(); _sa._gfa = this;
-    
     // If project configured image, set image
     String iname = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
-    GreenfootImage image = new GreenfootImage(iname);
-    if(iname!=null) setImage(new GreenfootImage(iname));
+    GreenfootImage img = iname!=null? new GreenfootImage(iname) : null;
+    if(img!=null) setImage(img);
 }
 
 /**
@@ -54,19 +52,22 @@ public int getWidth()  { return _img.getWidth(); }
 public int getHeight()  { return _img.getHeight(); }
 
 /**
- * The Act method.
- */
-public void act()  { }
-
-/**
  * Move.
  */
-public void move(int aValue)  { _sa.moveBy(aValue); }
+public void move(int aValue)
+{
+    double x = getX() + aValue*Math.cos(Math.toRadians(_sa.getRotate()));
+    double y = getY() + aValue*Math.sin(Math.toRadians(_sa.getRotate()));
+    _sa.setXY(x, y);
+}
 
 /**
  * Turn.
  */
-public void turn(int aDeg)  { _sa.turnBy(aDeg); }
+public void turn(int aDeg)
+{
+    _sa.setRotate(_sa.getRotate() + aDeg);
+}
 
 /**
  * Set Location.
@@ -179,6 +180,11 @@ protected Actor getOneObjectAtOffset(int aX, int aY, Class aClass)
 }
 
 /**
+ * The Act method.
+ */
+public void act()  { }
+
+/**
  * Notification for when actor is added to a world.
  */
 protected void addedToWorld(World aWorld)  { }
@@ -186,10 +192,13 @@ protected void addedToWorld(World aWorld)  { }
 /**
  * The Greenfoot SnapActor.
  */
-public static class GFSnapActor extends SnapActor {
+public static class GFSnapActor extends ImageView {
     
     // The Greenfoot actor
     Actor        _gfa;
+    
+    /** Creates a new SnapActor. */
+    public GFSnapActor(Actor anActor)  { _gfa = anActor; }
     
     /** Override to send to Greenfoot Actor. */
     public void act()  { _gfa.act(); }

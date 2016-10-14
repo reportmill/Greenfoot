@@ -65,7 +65,7 @@ public static SoundClip getSound(String aName)
 {
     SoundClip snd = _clips.get(aName); if(snd!=null) return snd;
     Class cls = getWorld().getClass();
-    snd = SoundClip.get(cls, aName);
+    snd = SoundClip.get(cls, "sounds/" + aName);
     _clips.put(aName, snd);
     return snd;
 }

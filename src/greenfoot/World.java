@@ -1,10 +1,7 @@
 package greenfoot;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import snap.gfx.*;
 import snap.view.*;
-import snap.viewx.*;
 import greenfoot.Actor.GFSnapActor;
 
 /**
@@ -13,7 +10,7 @@ import greenfoot.Actor.GFSnapActor;
 public class World {
     
     // The SnapScene
-    GFSnapScene        _scn = new GFSnapScene();
+    SnapWorld          _scn;
     
     // The Width/Height/CellSize
     int                _width, _height, _cellSize = 1;
@@ -34,11 +31,13 @@ public World(int aW, int aH, int aCellSize, boolean aValue)
     // Set sizing info
     _width = aW; _height = aH; _cellSize = aCellSize;
     
+    // Set world
+    _scn = new SnapWorld(this);
+    
     // If first world, manually set it
     if(Greenfoot._world==null) Greenfoot.setWorld(this);
     
     // Set default FrameRate
-    _scn._gfw = this;
     _scn.setFrameRate(Greenfoot.getFrameRate());
     _scn.setSize(_width*_cellSize, _height*_cellSize);
     
@@ -46,6 +45,12 @@ public World(int aW, int aH, int aCellSize, boolean aValue)
     String iname = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
     if(iname!=null) setBackground(new GreenfootImage(iname));
     else setBackground(new GreenfootImage(aW*aCellSize, aH*aCellSize));
+    
+    // Totally bogus! Because setShowing wasn't working
+    _scn.getEnv().runLater(() -> {
+        _scn.start();
+        _scn.requestFocus();
+    });
 }
 
 /**
@@ -79,17 +84,17 @@ public int numberOfObjects()
 /**
  * Adds an object.
  */
-public void addObject(Actor anActor, double anX, double aY)
+public void addObject(Actor anActor, int anX, int aY)
 {
-    _scn.addActor(anActor._sa, anX, aY); anActor._world = this;
-    anActor.setLocation((int)anX, (int)aY);
+    _scn.addChild(anActor._sa); anActor._world = this;
+    anActor.setLocation(anX, aY);
     anActor.addedToWorld(this);
 }
 
 /**
  * Removes an Actor.
  */
-public void removeObject(Actor anActor)  { _scn.removeActor(anActor._sa); }
+public void removeObject(Actor anActor)  { _scn.removeChild(anActor._sa); }
 
 /**
  * Returns the actors of a given class.
@@ -201,7 +206,7 @@ protected List getActorsAt(double aX, double aY, Class aClass)
  */
 protected Actor getActorAt(Shape aShape, Class aClass)
 {
-    for(View child : _scn.getChildren()) { Actor gfa = World.gfa(child); if(gfa==null) continue;
+    for(View child : _scn.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
         if(aClass==null || aClass.isInstance(gfa)) { Shape shp2 = child.parentToLocal(aShape);
             if(child.intersects(shp2))
                 return gfa;
@@ -216,7 +221,7 @@ protected Actor getActorAt(Shape aShape, Class aClass)
 protected List getActorsAt(Shape aShape, Class aClass)
 {
     List hitList = new ArrayList();
-    for(View child : _scn.getChildren()) { Actor gfa = World.gfa(child); if(gfa==null) continue;
+    for(View child : _scn.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
         if(aClass==null || aClass.isInstance(gfa)) { Shape shp2 = child.parentToLocal(aShape);
             if(child.intersects(shp2))
                 hitList.add(gfa);
@@ -228,31 +233,16 @@ protected List getActorsAt(Shape aShape, Class aClass)
 /** This method is called by snap.node.ClassPage to return actual Node. */
 public View getView()  { return _scn; }
 
+/** Returns a Snap ViewOwner for World. */
+public ViewOwner getViewOwner()  { return _scn.getViewOwner(); }
+
 // Convenience to return Greenfoot Actor for Node.
 static Actor gfa(View aView)  { GFSnapActor gfsa = gfsa(aView); return gfsa!=null? gfsa._gfa : null; }
 static GFSnapActor gfsa(View aView)  { return aView instanceof GFSnapActor? (GFSnapActor)aView : null; }
 
 /**
- * The Greenfoot SnapActor.
+ * Sets the window visible.
  */
-public static class GFSnapScene extends SnapScene {
-    
-    // The Greenfoot World
-    World        _gfw;
-    
-    /** Override to send to Greenfoot World. */
-    public void act()  { _gfw.act(); }
-    
-    /** Override to paint background image. */
-    public void paintBack(Painter aPntr)
-    {
-        super.paintBack(aPntr);
-        GreenfootImage gimg = _gfw.getBackground(); Image img = gimg._image;
-        int cs = _gfw.getCellSize(), w = _gfw.getWidth()*cs, h = _gfw.getHeight()*cs;
-        for(int x=0;x<w;x+=gimg.getWidth())
-            for(int y=0;y<h;y+=gimg.getHeight())
-                aPntr.drawImage(img, x, y);
-    }
-}
+public void setWindowVisible(boolean aValue)  { getViewOwner().setWindowVisible(true); }
 
 }
