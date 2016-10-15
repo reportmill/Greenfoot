@@ -95,15 +95,15 @@ public GreenfootImage getImage()  { return _img; }
  */
 public void setImage(GreenfootImage anImage)
 {
+    // If image already set, just return
     if(_img==anImage) return;
-    int oldW = _img!=null? _img.getWidth() : 0, oldH = _img!=null? _img.getHeight() : 0;
     
     // Update image actor lists and set new image
     if(_img!=null) _img._actors.remove(this); _img = anImage;
     if(_img!=null) _img._actors.add(this);
     
     // Call image changed
-    imageChanged(oldW, oldH);
+    imageChanged();
 }
 
 /**
@@ -114,18 +114,12 @@ public void setImage(String aName)  { setImage(new GreenfootImage(aName)); }
 /**
  * Called when the image changes.
  */
-void imageChanged(int oldW, int oldH)
+void imageChanged()
 {
-    // Set new image and new size
+    // Set new image and new size and reset location to make sure new image is centered
     _sa.setImage(_img._image);
     _sa.setSize(_img._image.getWidth(), _img._image.getHeight());
-    
-    // Shift actor by half image size change to keep it centered about same point
-    if(_world==null) return;
-    int dx = (_img.getWidth() - oldW)/2;
-    int dy = (_img.getHeight() - oldH)/2;
-    //System.out.println("Shift by " + dx + " " + dy);
-    //setLocation(getX() - dx, getY() - dy);
+    setLocation(getX(), getY());
 }
 
 /**

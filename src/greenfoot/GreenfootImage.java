@@ -161,7 +161,7 @@ public void scale(int aW, int aH)
     _image = Image.get(aW, aH, true);
     Painter pntr = _image.getPainter();
     pntr.drawImage(img, 0, 0, aW, aH); pntr.flush();
-    imageChanged(img.getPixWidth(), img.getPixHeight());
+    imageChanged();
 }
 
 /** Flips the image so that it points left instead of right. */
@@ -199,6 +199,6 @@ public void clear()
 /**
  * Notifies actors of image change.
  */
-void imageChanged(int oldW, int oldH)  { for(Actor a : _actors) a.imageChanged(oldW, oldH); }
+void imageChanged()  { for(Actor a : _actors) a.imageChanged(); }
 
 }
