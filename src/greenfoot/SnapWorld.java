@@ -30,7 +30,7 @@ public class SnapWorld extends ChildView {
     Set <Integer>      _keyClicks = new HashSet();
     
     // The ViewOwner for world
-    ViewOwner          _vowner = new ViewOwner(this);
+    ViewOwner          _vowner;
     
     // The animation timer    
     ViewTimer          _timer = new ViewTimer(getFrameDelay(), t -> doAct());
@@ -41,10 +41,12 @@ public class SnapWorld extends ChildView {
 public SnapWorld(World aWorld)
 {
     _gfw = aWorld;
-     setPrefSize(720, 405);
-     setFill(Color.WHITE); setBorder(Color.BLACK, 1);
-     enableEvents(MouseEvents); enableEvents(KeyEvents);
-     setFocusable(true); setFocusWhenPressed(true);
+    _vowner = new WorldOwner(aWorld);
+    int csize = aWorld.getCellSize(), width = aWorld.getWidth()*csize, height = aWorld.getHeight()*csize;
+    setPrefSize(width, height); setClip(new Rect(0,0,width,height));
+    setFill(Color.WHITE); setBorder(Color.BLACK, 1);
+    enableEvents(MouseEvents); enableEvents(KeyEvents);
+    setFocusable(true); setFocusWhenPressed(true);
 }
     
 /**
@@ -93,18 +95,6 @@ public boolean isKeyDown(String aKey)
 {
     int kp = KeyCode.get(aKey.toUpperCase());
     return _keyDowns.contains(kp);
-}
-
-/**
- * Override to start greenfoot.
- */
-protected void setShowing(boolean aValue)
-{
-    if(aValue==isShowing()) return; super.setShowing(aValue);
-    if(aValue) {
-        Greenfoot.start();
-        requestFocus();
-    }
 }
 
 /**

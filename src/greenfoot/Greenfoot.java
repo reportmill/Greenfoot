@@ -30,9 +30,6 @@ public class Greenfoot extends ParentView {
     
     // A Random
     static Random      _random = new Random();
-    
-    // Shared Greenfoot node
-    static Greenfoot   _shared = new Greenfoot();
 
 /**
  * Get the most recently pressed key, since the last time this method was called.
@@ -82,13 +79,7 @@ static void initGreenfoot()
 /**
  * Returns a world.
  */
-public static World getWorld()
-{
-    //WebBrowser browser = _world!=null? _world._scn.getBrowser() : null;
-    //WebPage page = browser!=null? browser.getPage() : null;
-    //if(page!=null && page.getPeer() instanceof World) _world = (World)page.getPeer();
-    return _world;
-}
+public static World getWorld()  { return _world; }
 
 /**
  * Sets a world.
@@ -100,15 +91,9 @@ public static void setWorld(World aWorld)
     
     // Set world
     _world = aWorld;
-    _shared.setChildren(_world._sw);
-    _world._sw.requestFocus();
     
     // If no props, init greenfoot
     if(_props==null) initGreenfoot();
-    
-    // Set new world in browser
-    //WebBrowser browser = oworld!=null? oworld._scn.getBrowser() : null; if(browser==null) return;
-    //browser.setURL(_world._scn.getURL());
 }
 
 public static void start()  { if(_world!=null) getWorld()._sw.start(); }
@@ -126,7 +111,7 @@ public static void delay(int aValue)  { }
 /**
  * Returns the speed.
  */
-public int getSpeed()  { return _speed; }
+public static int getSpeed()  { return _speed; }
 
 /**
  * Sets the speed of greenfoot playback.
