@@ -61,6 +61,14 @@ public void setLocation(int aX, int aY)
 }
 
 /**
+ * Set Location.
+ */
+public void setLocation(double aX, double aY)
+{
+    setLocation((int)Math.round(aX), (int)Math.round(aY));
+}
+
+/**
  * Move.
  */
 public void move(int aValue)

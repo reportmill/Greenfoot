@@ -14,7 +14,7 @@ public class Greenfoot extends ParentView {
     static World      _world;
     
     // The current speed
-    static int        _speed = 50, _frate = 62;
+    static int        _speed = 50;
     
     // The last mouse x/y
     static double     _mouseX, _mouseY;
@@ -44,7 +44,7 @@ public static int getRandomNumber(int aNum)  { return _random.nextInt(aNum); }
 /**
  * Returns whether key is down.
  */
-public static boolean isKeyDown(String aName)  { return getWorld()._sw.isKeyDown(aName); }
+public static boolean isKeyDown(String aName)  { return getWorld().getView().isKeyDown(aName); }
 
 /**
  * Plays a sound.
@@ -87,21 +87,22 @@ public static World getWorld()  { return _world; }
 public static void setWorld(World aWorld)
 {
     // Get old world - if there, stop it
-    World oworld = _world; if(oworld!=null) oworld._sw.stop();
+    World oworld = _world; if(oworld!=null) oworld.getView().stop();
     
     // Set world
     _world = aWorld;
+    _world.getView().setTimerPeriod(getTimerPeriod());
     
     // If no props, init greenfoot
     if(_props==null) initGreenfoot();
 }
 
-public static void start()  { if(_world!=null) getWorld()._sw.start(); }
+public static void start()  { if(_world!=null) getWorld().getView().start(); }
 
 /**
  * Stops Greenfoot from playing.
  */
-public static void stop()  { getWorld()._sw.stop(); }
+public static void stop()  { getWorld().getView().stop(); }
 
 /**
  * Delays the execution by given number of time steps.
@@ -118,29 +119,25 @@ public static int getSpeed()  { return _speed; }
  */
 public static void setSpeed(int aValue)
 {
-    long delay = calculateDelay(aValue); _speed = aValue;
-    _frate = (int)Math.round(1000000000d/delay);
-    getWorld()._sw.setFrameRate(_frate);
+    _speed = aValue;
+    int period = getTimerPeriod();
+    getWorld()._wv.setTimerPeriod(period);
 }
 
 /**
  * Returns the delay as a function of the speed.
  */
-static long calculateDelay(int speed)
+static int getTimerPeriod()
 {
     // Make the speed into a delay
-    long rawDelay = 100 - speed;
+    long rawDelay = 100 - _speed;
     long min = 30 * 1000L; // Delay at MAX_SIMULATION_SPEED - 1
     long max = 10000 * 1000L * 1000L; // Delay at slowest speed
     double a = Math.pow(max / (double) min, 1D / (100 - 1));
-    long delay = 0; if (rawDelay > 0) delay = (long) (Math.pow(a, rawDelay - 1) * min);
-    return delay;
+    long delayNS = 0; if (rawDelay > 0) delayNS = (long) (Math.pow(a, rawDelay - 1) * min);
+    int delayMillis = (int)Math.round(delayNS/1000000d);
+    return delayMillis;
 }
-
-/**
- * Returns a framerate.
- */
-static int getFrameRate()  { return _frate; }
 
 /**
  * Returns the MouseInfo.
@@ -152,7 +149,7 @@ public static MouseInfo getMouseInfo()  { return _mouseInfo; }
  */
 public static boolean mouseClicked(Object anObj)
 {
-   if(anObj==null) return getWorld()!=null? getWorld()._sw.isMouseClicked() : false;
+   if(anObj==null) return getWorld()!=null? getWorld().getView().isMouseClicked() : false;
    System.out.println("Mouse Clicked not supported"); return false;
 }
     

@@ -10,8 +10,14 @@ public class WorldOwner extends ViewOwner {
     // The current world
     World         _world;
     
+    // The World View
+    WorldView     _worldView;
+    
     // The box that holds the World View
     Box           _worldViewBox;
+    
+    // The actor pressed by last mouse
+    Actor         _mouseActor;
 
 /**
  * Creates a new WorldOwner for given World.
@@ -36,9 +42,11 @@ protected View createUI()
     toolBar.setChildren(actBtn, runBtn, resetBtn, sep, speedLbl, speedSldr);
     
     // Configure World View
-    _worldViewBox = new Box(_world.getView()); _worldViewBox.setPadding(8,8,8,8);
+    _worldView = _world.getView();
+    _worldViewBox = new Box(_worldView); _worldViewBox.setPadding(8,8,8,8);
     ScrollView sview = new ScrollView(_worldViewBox); sview.setBorder(null);
-    setFirstFocus(_world.getView());
+    setFirstFocus(_worldView);
+    enableEvents(_worldView, MouseEvents);
 
     // Create border view and add world, toolBar
     BorderView bview = new BorderView(); bview.setFont(Font.Arial12); bview.setFill(ViewUtils.getBackFill());
@@ -59,10 +67,13 @@ protected void resetUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
+    // Handle MouseEvent on WorldView
+    if(anEvent.isMouseEvent() && !_world.getView().isPlaying())
+        handleMouseEvent(anEvent);
+
     // Handle ActButton
-    if(anEvent.equals("ActButton")) {
-        _world._sw.doAct();
-    }
+    if(anEvent.equals("ActButton"))
+        _world._wv.doAct();
     
     // Handle RunButton
     if(anEvent.equals("RunButton")) {
@@ -81,19 +92,8 @@ protected void respondUI(ViewEvent anEvent)
     }
     
     // Handle ResetButton
-    if(anEvent.equals("ResetButton")) {
-        Greenfoot.stop();
-        View pauseBtn = getView("PauseButton");
-        if(pauseBtn!=null) {
-            pauseBtn.setText("Run"); pauseBtn.setName("RunButton");
-            getView("ActButton").setDisabled(false);
-        }
-        
-        try { _world = _world.getClass().newInstance(); }
-        catch(Exception e) { new RuntimeException(e); }
-        _worldViewBox.setContent(_world.getView());
-        Greenfoot.setWorld(_world);
-    }
+    if(anEvent.equals("ResetButton"))
+        resetWorld();
     
     // Handle SpeedSlider
     if(anEvent.equals("SpeedSlider")) {
@@ -102,7 +102,48 @@ protected void respondUI(ViewEvent anEvent)
     }
     
     // Shouldn't need this
-    _world.getView().requestFocus();
+    _worldView.requestFocus();
+}
+
+/**
+ * Reset World.
+ */
+protected void resetWorld()
+{
+    Greenfoot.stop();
+    View pauseBtn = getView("PauseButton");
+    if(pauseBtn!=null) {
+        pauseBtn.setText("Run"); pauseBtn.setName("RunButton");
+        getView("ActButton").setDisabled(false);
+    }
+    
+    try { _world = _world.getClass().newInstance(); }
+    catch(Exception e) { new RuntimeException(e); }
+    _worldView = _world.getView();
+    _worldViewBox.setContent(_worldView);
+    enableEvents(_worldView, MouseEvents);
+    Greenfoot.setWorld(_world);
+}
+
+/**
+ * Handles MouseEvent.
+ */
+protected void handleMouseEvent(ViewEvent anEvent)
+{
+    // Get x/y
+    int x = (int)Math.round(anEvent.getX()), y = (int)Math.round(anEvent.getY());
+    
+    // Handle MousePressed
+    if(anEvent.isMousePressed()) {
+        if((anEvent.isAltDown() || anEvent.isShortcutDown()) && _mouseActor!=null)
+            try { _world.addObject(_mouseActor = _mouseActor.getClass().newInstance(), x, y); }
+            catch(Exception e) { }
+        else _mouseActor = _world.getActorAt(x, y, null);
+    }
+    
+    // Handle MouseDraggged
+    if(anEvent.isMouseDragged() && _mouseActor!=null)
+        _mouseActor.setLocation(x, y);
 }
 
 }

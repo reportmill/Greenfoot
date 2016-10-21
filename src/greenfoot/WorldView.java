@@ -4,15 +4,12 @@ import snap.gfx.*;
 import snap.view.*;
 
 /**
- * The SnapView for Greenfoot World.
+ * A Snap View for Greenfoot World.
  */
-public class SnapWorld extends ChildView {
+public class WorldView extends ChildView {
     
     // The Greenfoot World
     World              _gfw;
-    
-    // The frame rate
-    double             _frameRate = 24;
     
     // Whether mouse is down
     ViewEvent          _mouseDown;
@@ -30,15 +27,15 @@ public class SnapWorld extends ChildView {
     Set <Integer>      _keyClicks = new HashSet();
     
     // The ViewOwner for world
-    ViewOwner          _vowner;
+    WorldOwner         _vowner;
     
     // The animation timer    
-    ViewTimer          _timer = new ViewTimer(getFrameDelay(), t -> doAct());
+    ViewTimer          _timer = new ViewTimer(40, t -> doAct());
 
 /**
- * Creates a new SnapWorld for given GreenFoot World.
+ * Creates a new WorldView for given GreenFoot World.
  */
-public SnapWorld(World aWorld)
+public WorldView(World aWorld)
 {
     _gfw = aWorld;
     _vowner = new WorldOwner(aWorld);
@@ -49,25 +46,6 @@ public SnapWorld(World aWorld)
     setFocusable(true); setFocusWhenPressed(true);
 }
     
-/**
- * Returns the frame rate.
- */
-public double getFrameRate()  { return _frameRate; }
-
-/**
- * Sets the frame rate.
- */
-public void setFrameRate(double aValue)
-{
-    _frameRate = aValue;
-    _timer.setPeriod(getFrameDelay());
-}
-
-/**
- * Returns the frame delay in milliseconds.
- */
-public int getFrameDelay()  { return (int)Math.round(1000/_frameRate); }
-
 /**
  * Starts the animation.
  */
@@ -82,6 +60,20 @@ public void stop()  { _timer.stop(); }
  * Whether scene is playing.
  */
 public boolean isPlaying()  { return _timer.isRunning(); }
+
+/**
+ * Returns the frame rate.
+ */
+public int getTimerPeriod()  { return _timer.getPeriod(); }
+
+/**
+ * Sets the frame rate.
+ */
+public void setTimerPeriod(int aValue)
+{
+    if(aValue<1) aValue = 1; if(aValue>1000) aValue = 1000;
+    _timer.setPeriod(aValue);
+}
 
 /**
  * Returns whether the mouse was clicked on this frame.
@@ -147,6 +139,6 @@ void doAct()
 /**
  * Returns a ViewOwner for this SnapWorld.
  */
-public ViewOwner getViewOwner()  { return _vowner; }
+public WorldOwner getViewOwner()  { return _vowner; }
 
 }

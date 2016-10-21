@@ -9,14 +9,14 @@ import greenfoot.Actor.GFSnapActor;
  */
 public class World {
     
-    // The SnapWorld
-    SnapWorld          _sw;
-    
     // The Width/Height/CellSize
     int                _width, _height, _cellSize = 1;
     
     // The background image
     GreenfootImage     _backImg;
+    
+    // The WorldView
+    WorldView          _wv;
     
 /**
  * Creates a new world.
@@ -32,14 +32,14 @@ public World(int aW, int aH, int aCellSize, boolean aValue)
     _width = aW; _height = aH; _cellSize = aCellSize;
     
     // Set world
-    _sw = new SnapWorld(this);
+    _wv = new WorldView(this);
     
     // If first world, manually set it
     if(Greenfoot._world==null) Greenfoot.setWorld(this);
     
     // Set default FrameRate
-    _sw.setFrameRate(Greenfoot.getFrameRate());
-    _sw.setSize(_width*_cellSize, _height*_cellSize);
+    _wv.setTimerPeriod(Greenfoot.getTimerPeriod());
+    _wv.setSize(_width*_cellSize, _height*_cellSize);
     
     // Set background image
     String iname = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
@@ -72,7 +72,7 @@ public int getCellSize()  { return _cellSize; }
  */
 public int numberOfObjects()
 {
-    int c = 0; for(View n : _sw.getChildren()) if(gfa(n)!=null) c++; return c;
+    int c = 0; for(View n : _wv.getChildren()) if(gfa(n)!=null) c++; return c;
 }
 
 /**
@@ -80,7 +80,7 @@ public int numberOfObjects()
  */
 public void addObject(Actor anActor, int anX, int aY)
 {
-    _sw.addChild(anActor._sa); anActor._world = this;
+    _wv.addChild(anActor._sa); anActor._world = this;
     anActor.setLocation(anX, aY);
     anActor.addedToWorld(this);
 }
@@ -88,7 +88,7 @@ public void addObject(Actor anActor, int anX, int aY)
 /**
  * Removes an Actor.
  */
-public void removeObject(Actor anActor)  { _sw.removeChild(anActor._sa); }
+public void removeObject(Actor anActor)  { _wv.removeChild(anActor._sa); }
 
 /**
  * Returns the actors of a given class.
@@ -96,7 +96,7 @@ public void removeObject(Actor anActor)  { _sw.removeChild(anActor._sa); }
 public List getObjects(Class aClass)
 {
     List list = new ArrayList();
-    for(View child : _sw.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
+    for(View child : _wv.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
         if(aClass==null || aClass.isInstance(gfa))
             list.add(gfa); }
     return list;
@@ -143,7 +143,7 @@ public java.awt.Color getColor()  { System.err.println("World.getColor: Not Impl
 /**
  * Repaint the world.
  */
-public void repaint()  { _sw.repaint(); }
+public void repaint()  { _wv.repaint(); }
 
 /**
  * Sets the act order.
@@ -175,7 +175,7 @@ public void stopped()  { }
  */
 protected Actor getActorAt(double aX, double aY, Class aClass)
 {
-    for(View child : _sw.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
+    for(View child : _wv.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
         if(aClass==null || aClass.isInstance(gfa)) { Point point = child.parentToLocal(aX, aY);
             if(child.contains(point.getX(), point.getY()))
                 return gfa; } }
@@ -188,7 +188,7 @@ protected Actor getActorAt(double aX, double aY, Class aClass)
 protected List getActorsAt(double aX, double aY, Class aClass)
 {
     List hitList = new ArrayList();
-    for(View child : _sw.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
+    for(View child : _wv.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
         if(aClass==null || aClass.isInstance(gfa)) { Point point = child.parentToLocal(aX, aY);
             if(child.contains(point.getX(), point.getY()))
                 hitList.add(gfa); } }
@@ -200,7 +200,7 @@ protected List getActorsAt(double aX, double aY, Class aClass)
  */
 protected Actor getActorAt(Shape aShape, Class aClass)
 {
-    for(View child : _sw.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
+    for(View child : _wv.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
         if(aClass==null || aClass.isInstance(gfa)) { Shape shp2 = child.parentToLocal(aShape);
             if(child.intersects(shp2))
                 return gfa;
@@ -215,7 +215,7 @@ protected Actor getActorAt(Shape aShape, Class aClass)
 protected List getActorsAt(Shape aShape, Class aClass)
 {
     List hitList = new ArrayList();
-    for(View child : _sw.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
+    for(View child : _wv.getChildren()) { Actor gfa = gfa(child); if(gfa==null) continue;
         if(aClass==null || aClass.isInstance(gfa)) { Shape shp2 = child.parentToLocal(aShape);
             if(child.intersects(shp2))
                 hitList.add(gfa);
@@ -225,10 +225,10 @@ protected List getActorsAt(Shape aShape, Class aClass)
 }
 
 /** This method is called by snap.node.ClassPage to return actual Node. */
-public View getView()  { return _sw; }
+public WorldView getView()  { return _wv; }
 
 /** Returns a Snap ViewOwner for World. */
-public ViewOwner getViewOwner()  { return _sw.getViewOwner(); }
+public WorldOwner getViewOwner()  { return _wv.getViewOwner(); }
 
 // Convenience to return Greenfoot Actor for Node.
 static Actor gfa(View aView)  { GFSnapActor gfsa = gfsa(aView); return gfsa!=null? gfsa._gfa : null; }
