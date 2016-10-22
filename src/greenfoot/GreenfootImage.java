@@ -36,9 +36,13 @@ public GreenfootImage(int aWidth, int aHeight)  { _image = Image.get(aWidth, aHe
 public GreenfootImage(String aName)
 {
     _image = _images.get(aName); if(_image!=null) return;
-    _image = Image.get(Greenfoot.getWorld().getClass(), "images/" + aName);
-    if(_image==null) _image = Image.get(Greenfoot.getWorld().getClass(), aName);
-    if(_image==null) System.err.println("Image not found: " + aName);
+    Class cls = Greenfoot.getWorld().getClass();
+    _image = Image.get(cls, "images/" + aName);
+    if(_image==null) _image = Image.get(cls, aName);
+    if(_image==null) {
+        System.err.println("Image not found: " + aName);
+        _image = Image.get(100,20,false);
+    }
     if(_image!=null) _images.put(aName, _image);
 }
 
@@ -85,7 +89,7 @@ public Color getColor()  { return _color; }
 public void setColor(Color aColor)  { _color = aColor; }
 
 /**
- * Returns the AWT Font.
+ * Returns the Font.
  */
 public Font getFont()  { return _font; }
 
@@ -147,11 +151,22 @@ public void drawShape(Shape aShape)
     pntr.setColor(_color); pntr.draw(aShape); pntr.flush();
 }
 
-/** Draw string. */
+/**
+ * Draw string.
+ */
 public void drawString(String aString, int anX, int aY)
 {
     Painter pntr = _image.getPainter();
     pntr.setColor(_color); pntr.setFont(_font); pntr.drawString(aString, anX, aY); pntr.flush();
+}
+
+/**
+ * Draw image.
+ */
+public void drawImage(GreenfootImage anImg, int aX, int aY)
+{
+    Painter pntr = _image.getPainter();
+    pntr.drawImage(anImg._image, aX, aY);
 }
 
 /** Scales the image. */
@@ -173,11 +188,11 @@ public void mirrorVertically()  { System.err.println("GreenfootImage.setColorAt:
 /** Rotates image around center. */
 public void rotate(int theDeg)  { System.err.println("GreenfootImage.setColorAt: Not Impl"); }
 
-/** Returns the AWT color at given x/y. */
-public java.awt.Color getColorAt(int anX, int aY)  { return new java.awt.Color(_image.getRGB(anX, aY)); }
+/** Returns the color at given x/y. */
+public Color getColorAt(int anX, int aY)  { return new Color(_image.getRGB(anX, aY)); }
 
-/** Sets the AWT color at given x/y. */
-public void setColorAt(int aX, int aY, java.awt.Color aColor)  { fillRect(aX, aY, 1, 1); }
+/** Sets the color at given x/y. */
+public void setColorAt(int aX, int aY, Color aColor)  { setColor(aColor); fillRect(aX, aY, 1, 1); }
 
 /** Returns the image opacity. */
 public int getTransparency()  { return _alpha; }

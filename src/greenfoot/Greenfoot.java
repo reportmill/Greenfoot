@@ -1,14 +1,14 @@
 package greenfoot;
 import java.util.*;
-import snap.gfx.SoundClip;
-import snap.view.ParentView;
+import snap.gfx.*;
+import snap.view.*;
 import snap.util.SnapUtils;
 import snap.web.*;
 
 /**
  * A custom class.
  */
-public class Greenfoot extends ParentView {
+public class Greenfoot {
     
     // The current world
     static World      _world;
@@ -154,6 +154,16 @@ public static boolean mouseClicked(Object anObj)
 }
     
 /**
+ * Returns whether mouse was clicked on given actor/world.
+ */
+public static boolean mouseMoved(Object anObj)
+{
+    View view = anObj instanceof Actor? ((Actor)anObj)._sa : null; if(view==null) return false;
+    Point pnt = view.parentToLocal(getWorld().getView()._mx, getWorld().getView()._my);
+    return view.contains(pnt);
+}
+    
+/**
  * Returns the project properties map.
  */
 static Map <String,String> getProps2()  { return _props!=null? _props : (_props=createProps()); }
@@ -178,7 +188,7 @@ static Map <String,String> createProps()
         for(String line : lines) {
             String parts[] = line.split("=");
             if(parts.length>1)
-                props.put(parts[0], parts[1]);
+                props.put(parts[0].trim(), parts[1].trim());
         }
     }
     

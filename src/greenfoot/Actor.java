@@ -84,6 +84,16 @@ public void move(int aValue)
 public void turn(int aDeg)  { _sa.setRotate(_sa.getRotate() + aDeg); }
 
 /**
+ * Rotates actor to face the given world location.
+ */
+public void turnTowards(int aX, int aY)
+{
+    int dx = aX - getX(), dy = aY - getY();
+    double angle = dx!=0? Math.atan(dy/(double)dx) : dy<0? 90 : 270;
+    setRotation((int)Math.round(angle));
+}
+
+/**
  * Returns the rotation.
  */
 public int getRotation()  { int r = ((int)Math.round(_sa.getRotate()))%360; return r>=0? r : (r + 360); }
