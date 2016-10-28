@@ -1,6 +1,7 @@
 package greenfoot;
 import java.util.*;
 import snap.gfx.*;
+import snap.util.StringUtils;
 import snap.view.*;
 
 /**
@@ -31,6 +32,8 @@ public class WorldView extends ChildView {
     
     // The animation timer    
     ViewTimer          _timer = new ViewTimer(40, t -> doAct());
+    
+    // The text to draw in
 
 /**
  * Creates a new WorldView for given GreenFoot World.
@@ -121,6 +124,25 @@ public void paintBack(Painter aPntr)
     for(int x=0;x<w;x+=gimg.getWidth())
         for(int y=0;y<h;y+=gimg.getHeight())
             aPntr.drawImage(img, x, y);
+            
+}
+
+/**
+ * Override to paint background image.
+ */
+public void paintAbove(Painter aPntr)
+{
+    // Paint background text
+    for(Map.Entry<String,String> entry : _gfw._text.entrySet()) {
+        String key = entry.getKey(), str = entry.getValue(), keys[] = key.split("x");
+        int x = StringUtils.intValue(keys[0]), y = StringUtils.intValue(keys[1]);
+        Font font = Font.Arial14.deriveFont(24).getBold(); aPntr.setFont(font);
+        Rect bnds = font.getStringBounds(str);
+        x = x - (int)Math.round(bnds.width/2); y = y - (int)Math.round(font.getDescent() - bnds.height/2);
+        aPntr.setColor(Color.BLACK); aPntr.drawString(str, x, y-1); aPntr.drawString(str, x, y+1);
+        aPntr.drawString(str, x-1, y); aPntr.drawString(str, x+1, y);
+        aPntr.setColor(Color.WHITE); aPntr.drawString(str, x, y);
+    }
 }
 
 /**

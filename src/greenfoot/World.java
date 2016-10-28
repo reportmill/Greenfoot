@@ -10,26 +10,33 @@ import greenfoot.Actor.GFSnapActor;
 public class World {
     
     // The Width/Height/CellSize
-    int                _width, _height, _cellSize = 1;
+    int                  _width, _height, _cellSize = 1;
+    
+    // Whether world is bounded
+    boolean              _bounded;
     
     // The background image
-    GreenfootImage     _backImg;
+    GreenfootImage       _backImg;
+    
+    // Text to be shown in world
+    Map <String,String>  _text = new HashMap();
     
     // The WorldView
-    WorldView          _wv;
+    WorldView            _wv;
     
 /**
  * Creates a new world.
  */
-public World(int aW, int aH, int aCellSize)  { this(aW, aH, aCellSize, false); }
+public World(int aW, int aH, int aCellSize)  { this(aW, aH, aCellSize, true); }
 
 /**
  * Creates a new world.
  */
-public World(int aW, int aH, int aCellSize, boolean aValue)
+public World(int aW, int aH, int aCellSize, boolean isBounded)
 {
     // Set sizing info
     _width = aW; _height = aH; _cellSize = aCellSize;
+    _bounded = isBounded;
     
     // Set world
     _wv = new WorldView(this);
@@ -66,6 +73,11 @@ public int getHeight()  { return _height; }
  * Returns the cell size.
  */
 public int getCellSize()  { return _cellSize; }
+
+/**
+ * Returns whether world is bounded.
+ */
+public boolean isBounded()  { return _bounded; }
 
 /**
  * Returns the number of objects currently in world.
@@ -158,7 +170,12 @@ public void setPaintOrder(Class ... theClasses)  { System.err.println("World.set
 /**
  * Show some text centered at given position in world.
  */
-public void showText(String aStr, int x, int y)   { System.err.println("World.showText: Not Impl"); }
+public void showText(String aStr, int x, int y)
+{
+    String key = x + "x" + y;
+    if(aStr.length()>0) _text.put(key, aStr);
+    else _text.remove(key);
+}
 
 /**
  * This method is called by the greenfoot system.

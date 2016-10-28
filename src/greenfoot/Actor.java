@@ -57,7 +57,13 @@ public int getHeight()  { return _img.getHeight(); }
 public void setLocation(int aX, int aY)
 {
     int cs = _world!=null? _world.getCellSize() : 1, x = aX*cs + cs/2, y = aY*cs + cs/2;
-    _sa.setXY(x - getWidth()/2d, y - getHeight()/2d); _x = aX; _y = aY;
+    if(_world!=null && _world.isBounded()) {
+        if(x<0) x = 0; if(x>=_world.getWidth()*cs) x = _world.getWidth()*cs - cs;
+        if(y<0) y = 0; if(y>=_world.getHeight()*cs) y = _world.getHeight()*cs - cs;
+    }
+        
+    // Set View x/y
+    _sa.setXY(x - getWidth()/2d, y - getHeight()/2d); _x = x; _y = y;
 }
 
 /**
@@ -75,7 +81,7 @@ public void move(int aValue)
 {
     double x = getX() + aValue*Math.cos(Math.toRadians(_sa.getRotate()));
     double y = getY() + aValue*Math.sin(Math.toRadians(_sa.getRotate()));
-    _sa.setXY(x, y);
+    setLocation(x, y);
 }
 
 /**
@@ -198,6 +204,20 @@ protected Actor getOneObjectAtOffset(int aX, int aY, Class aClass)
     double cs = _world.getCellSize(), x = _sa.getWidth()/2 + aX*cs, y = _sa.getHeight()/2 + aY*cs;
     Point pnt = _sa.localToParent(x, y);
     return _world.getActorAt(pnt.getX(), pnt.getY(), aClass);
+}
+
+/**
+ * Returns whether this actor is touching any other objects of the given class.
+ */
+public boolean isTouching(Class aClass)  { return getOneIntersectingObject(aClass)!=null; }
+
+/**
+ * Removes one object of the given class that this actor is currently touching (if any exist).
+ */
+protected void removeTouching(Class aClass)
+{
+    Actor obj = getOneIntersectingObject(aClass);
+    if(obj!=null) _world.removeObject(obj);
 }
 
 /**
