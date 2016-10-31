@@ -134,7 +134,7 @@ protected void handleMouseEvent(ViewEvent anEvent)
     int x = (int)Math.round(anEvent.getX()), y = (int)Math.round(anEvent.getY());
     
     // Handle MousePressed
-    if(anEvent.isMousePressed()) {
+    if(anEvent.isMousePress()) {
         if((anEvent.isAltDown() || anEvent.isShortcutDown()) && _mouseActor!=null)
             try { _world.addObject(_mouseActor = _mouseActor.getClass().newInstance(), x, y); }
             catch(Exception e) { }
@@ -142,7 +142,7 @@ protected void handleMouseEvent(ViewEvent anEvent)
     }
     
     // Handle MouseDraggged
-    if(anEvent.isMouseDragged() && _mouseActor!=null)
+    if(anEvent.isMouseDrag() && _mouseActor!=null)
         _mouseActor.setLocation(x, y);
 }
 
