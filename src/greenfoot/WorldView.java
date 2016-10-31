@@ -101,7 +101,7 @@ protected void processEvent(ViewEvent anEvent)
     if(anEvent.isMouseEvent()) {
         if(anEvent.isMousePressed()) _mouseDown = anEvent;
         else if(anEvent.isMouseReleased()) _mouseDown = null;
-        else if(anEvent.isMouseClicked()) _mouseClicked = anEvent;
+        else if(anEvent.isMouseClick()) _mouseClicked = anEvent;
         _mx = anEvent.getX(); _my = anEvent.getY();
     }
     

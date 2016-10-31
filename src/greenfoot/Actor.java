@@ -220,6 +220,8 @@ protected void removeTouching(Class aClass)
     if(obj!=null) _world.removeObject(obj);
 }
 
+public boolean isAtEdge()  { return false; }
+
 /**
  * The Act method.
  */
