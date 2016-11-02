@@ -121,9 +121,10 @@ public void paintBack(Painter aPntr)
     super.paintBack(aPntr);
     GreenfootImage gimg = _gfw.getBackground(); Image img = gimg._image;
     int cs = _gfw.getCellSize(), w = _gfw.getWidth()*cs, h = _gfw.getHeight()*cs;
-    for(int x=0;x<w;x+=gimg.getWidth())
-        for(int y=0;y<h;y+=gimg.getHeight())
-            aPntr.drawImage(img, x, y);
+    int iw = gimg.getWidth(), ih = gimg.getHeight();
+    for(int x=0;x<w;x+=iw)
+        for(int y=0;y<h;y+=ih)
+            aPntr.drawImage(img, x, y, iw, ih);
             
 }
 

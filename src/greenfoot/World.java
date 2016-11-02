@@ -139,7 +139,9 @@ public GreenfootImage getBackground()
  */
 public void setBackground(GreenfootImage anImage)
 {
+    if(_backImg!=null) _backImg._world = null;
     _backImg = anImage;
+    if(_backImg!=null) _backImg._world = this;
 }
 
 /**

@@ -7,6 +7,9 @@ import snap.gfx.*;
  */
 public class GreenfootImage {
     
+    // The image name
+    String        _name = "GreenfootImage";
+    
     // The encapsulated snap Image
     Image         _image;
     
@@ -22,6 +25,9 @@ public class GreenfootImage {
     // Set of actors that are using this image
     Set <Actor>   _actors = new HashSet();
     
+    // The world that is using this image
+    World         _world;
+    
     // Loaded images
     static Map <String,Image> _images = new HashMap();
     
@@ -35,6 +41,7 @@ public GreenfootImage(int aWidth, int aHeight)  { _image = Image.get(aWidth, aHe
  */
 public GreenfootImage(String aName)
 {
+    _name = aName;
     _image = _images.get(aName); if(_image!=null) return;
     Class cls = Greenfoot.getWorld().getClass();
     _image = Image.get(cls, "images/" + aName);
@@ -43,7 +50,17 @@ public GreenfootImage(String aName)
         System.err.println("Image not found: " + aName);
         _image = Image.get(100,20,false);
     }
-    if(_image!=null) _images.put(aName, _image);
+
+    // If image has non-standard DPI, resize to pix width/height    
+    if(_image.getWidth()!=_image.getPixWidth()) {
+        int pw = _image.getPixWidth(), ph = _image.getPixHeight();
+        Image img = _image;
+        _image = Image.get(pw, ph, true);
+        Painter pntr = _image.getPainter();
+        pntr.drawImage(img, 0, 0, pw, ph); pntr.flush();
+    }
+
+    _images.put(aName, _image);
 }
 
 /**
@@ -54,6 +71,7 @@ public GreenfootImage(GreenfootImage anImage)
     this(anImage.getWidth(), anImage.getHeight());
     Painter pntr = _image.getPainter();
     pntr.drawImage(anImage._image, 0, 0); pntr.flush();
+    imagePainted();
 }
 
 /**
@@ -71,12 +89,12 @@ public GreenfootImage(String aString, int aSize, Color fg, Color bg)
 /**
  * Returns the image width.
  */
-public int getWidth()  { return (int)_image.getWidth(); }
+public int getWidth()  { return _image.getPixWidth(); }
 
 /**
  * Returns the image height.
  */
-public int getHeight()  { return (int)_image.getHeight(); }
+public int getHeight()  { return _image.getPixHeight(); }
 
 /**
  * Returns the color.
@@ -112,6 +130,7 @@ public void fillShape(Shape aShape)
 {
     Painter pntr = _image.getPainter();
     pntr.setColor(_color); pntr.fill(aShape); pntr.flush();
+    imagePainted();
 }
 
 /** Fill Polygon (int). */
@@ -122,13 +141,23 @@ public void fillPolygon(int xPnts[], int yPnts[], int nPnts)
 }
 
 /** Draw line. */
-public void drawLine(int x, int y, int w, int h)  { drawShape(new Line(x,y,w,h)); }
+public void drawLine(int x1, int y1, int x2, int y2)
+{
+    Painter pntr = _image.getPainter();
+    pntr.setColor(_color); pntr.setStrokeWidth(1); pntr.drawLine(x1+.5,y1+.5,x2+.5,y2+.5); pntr.flush();
+    imagePainted();
+}
 
 /** Draw rect. */
-public void drawRect(int x, int y, int w, int h)  { drawShape(new Rect(x,y,w,h)); }
+public void drawRect(int x, int y, int w, int h)
+{
+    Painter pntr = _image.getPainter();
+    pntr.setColor(_color); pntr.setStrokeWidth(1); pntr.drawRect(x+.5,y+.5,w,h); pntr.flush();
+    imagePainted();
+}
 
 /** Draw oval. */
-public void drawOval(int x, int y, int w, int h)  { drawShape(new Ellipse(x,y,w,h)); }
+public void drawOval(int x, int y, int w, int h)  { drawShape(new Ellipse(x+.5,y+.5,w,h)); }
 
 /** Draw Polygon (int). */
 public void drawPolygon(int xPnts[], int yPnts[], int nPnts)
@@ -140,15 +169,13 @@ public void drawPolygon(int xPnts[], int yPnts[], int nPnts)
 /**
  * Strokes a shape.
  */
-public void drawShape(java.awt.Shape aShape)  { drawShape(snap.swing.AWT.get(aShape)); }
-
-/**
- * Strokes a shape.
- */
 public void drawShape(Shape aShape)
 {
     Painter pntr = _image.getPainter();
+    pntr.setAntialiasing(false);
     pntr.setColor(_color); pntr.draw(aShape); pntr.flush();
+    pntr.setAntialiasing(true);
+    imagePainted();
 }
 
 /**
@@ -158,6 +185,7 @@ public void drawString(String aString, int anX, int aY)
 {
     Painter pntr = _image.getPainter();
     pntr.setColor(_color); pntr.setFont(_font); pntr.drawString(aString, anX, aY); pntr.flush();
+    imagePainted();
 }
 
 /**
@@ -167,6 +195,7 @@ public void drawImage(GreenfootImage anImg, int aX, int aY)
 {
     Painter pntr = _image.getPainter();
     pntr.drawImage(anImg._image, aX, aY);
+    imagePainted();
 }
 
 /** Scales the image. */
@@ -175,18 +204,41 @@ public void scale(int aW, int aH)
     Image img = _image;
     _image = Image.get(aW, aH, true);
     Painter pntr = _image.getPainter();
+    pntr.setImageQuality(0);
     pntr.drawImage(img, 0, 0, aW, aH); pntr.flush();
+    pntr.setImageQuality(1);
     imageChanged();
 }
 
 /** Flips the image so that it points left instead of right. */
-public void mirrorHorizontally()  { System.err.println("GreenfootImage.setColorAt: Not Impl"); }
+public void mirrorHorizontally()
+{
+    Image img = _image; int w = getWidth(), h = getHeight();
+    _image = Image.get(w, h, true);
+    Painter pntr = _image.getPainter();  pntr.translate(w/2,0); pntr.scale(-1,1); pntr.translate(-w/2,0);
+    pntr.drawImage(img, 0, 0); pntr.flush();
+    imageChanged();
+}
 
 /** Flips the image so that it point down instead of up. */
-public void mirrorVertically()  { System.err.println("GreenfootImage.setColorAt: Not Impl"); }
+public void mirrorVertically()
+{
+    Image img = _image; int w = getWidth(), h = getHeight();
+    _image = Image.get(w, h, true);
+    Painter pntr = _image.getPainter();  pntr.translate(0,h/2); pntr.scale(1,-1); pntr.translate(0,-h/2);
+    pntr.drawImage(img, 0, 0); pntr.flush();
+    imageChanged();
+}
 
 /** Rotates image around center. */
-public void rotate(int theDeg)  { System.err.println("GreenfootImage.setColorAt: Not Impl"); }
+public void rotate(int theDeg)
+{
+    Image img = _image; int w = getWidth(), h = getHeight();
+    _image = Image.get(w, h, true);
+    Painter pntr = _image.getPainter(); pntr.translate(w/2,h/2); pntr.rotate(theDeg); pntr.translate(-w/2,-h/2);
+    pntr.drawImage(img, 0, 0); pntr.flush();
+    imageChanged();
+}
 
 /** Returns the color at given x/y. */
 public Color getColorAt(int anX, int aY)  { return new Color(_image.getRGB(anX, aY)); }
@@ -214,6 +266,23 @@ public void clear()
 /**
  * Notifies actors of image change.
  */
-void imageChanged()  { for(Actor a : _actors) a.imageChanged(); }
+void imageChanged()
+{
+    for(Actor a : _actors) a.imageChanged();
+    if(_world!=null) _world.repaint();
+}
+
+/**
+ * Notifies that image was painted.
+ */
+void imagePainted()
+{
+    if(_world!=null) _world.repaint();
+}
+
+/**
+ * Standard toString implementation.
+ */
+public String toString()  { return _name + " " + getWidth() + "x" + getHeight(); }
 
 }

@@ -44,12 +44,12 @@ public int getY()  { return _y; }
 /**
  * Returns the width.
  */
-public int getWidth()  { return _img.getWidth(); }
+public int getWidth()  { return (int)_sa.getWidth(); }
 
 /**
  * Returns the height.
  */
-public int getHeight()  { return _img.getHeight(); }
+public int getHeight()  { return (int)_sa.getHeight(); }
 
 /**
  * Set Location.
@@ -156,7 +156,8 @@ public World getWorld()  { return _world; }
  */
 protected List getIntersectingObjects(Class aClass)
 {
-    Shape shp = _sa.localToParent(_sa.getBoundsInside());
+    Rect bnds = _sa.getBoundsInside(); bnds.inset(.5);
+    Shape shp = _sa.localToParent(bnds);
     return _world.getActorsAt(shp, aClass);
 }
 
@@ -192,7 +193,8 @@ protected List getObjectsInRange(int aR, Class aClass)
  */
 protected Actor getOneIntersectingObject(Class aClass)
 {
-    Shape shp = _sa.localToParent(_sa.getBoundsInside());
+    Rect bnds = _sa.getBoundsInside(); bnds.inset(.5);
+    Shape shp = _sa.localToParent(bnds);
     return _world.getActorAt(shp, aClass);
 }
 
