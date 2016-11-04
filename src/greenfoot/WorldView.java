@@ -27,21 +27,12 @@ public class WorldView extends ChildView {
     // The key typed in current frame
     Set <Integer>      _keyClicks = new HashSet();
     
-    // The ViewOwner for world
-    WorldOwner         _vowner;
-    
-    // The animation timer    
-    ViewTimer          _timer = new ViewTimer(40, t -> doAct());
-    
-    // The text to draw in
-
 /**
  * Creates a new WorldView for given GreenFoot World.
  */
 public WorldView(World aWorld)
 {
     _gfw = aWorld;
-    _vowner = new WorldOwner(aWorld);
     int csize = aWorld.getCellSize(), width = aWorld.getWidth()*csize, height = aWorld.getHeight()*csize;
     setPrefSize(width, height); setClip(new Rect(0,0,width,height));
     setFill(Color.WHITE); setBorder(Color.BLACK, 1);
@@ -49,35 +40,6 @@ public WorldView(World aWorld)
     setFocusable(true); setFocusWhenPressed(true);
 }
     
-/**
- * Starts the animation.
- */
-public void start()  { _timer.start(); }
-
-/**
- * Stops the animation.
- */
-public void stop()  { _timer.stop(); }
-
-/**
- * Whether scene is playing.
- */
-public boolean isPlaying()  { return _timer.isRunning(); }
-
-/**
- * Returns the frame rate.
- */
-public int getTimerPeriod()  { return _timer.getPeriod(); }
-
-/**
- * Sets the frame rate.
- */
-public void setTimerPeriod(int aValue)
-{
-    if(aValue<1) aValue = 1; if(aValue>1000) aValue = 1000;
-    _timer.setPeriod(aValue);
-}
-
 /**
  * Returns whether the mouse was clicked on this frame.
  */
@@ -158,10 +120,5 @@ void doAct()
     }
     catch(Exception e) { throw new RuntimeException(e); }
 }
-
-/**
- * Returns a ViewOwner for this SnapWorld.
- */
-public WorldOwner getViewOwner()  { return _vowner; }
 
 }

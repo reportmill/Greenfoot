@@ -3,26 +3,82 @@ import snap.gfx.*;
 import snap.view.*;
 
 /**
- * A custom class.
+ * A ViewOwner for Greenfoot to create wrapper UI and show manage worlds.
  */
-public class WorldOwner extends ViewOwner {
+public class GreenfootOwner extends ViewOwner {
 
     // The current world
-    World         _world;
+    World              _world, _firstWorld;
     
     // The World View
-    WorldView     _worldView;
+    WorldView          _worldView;
     
     // The box that holds the World View
-    Box           _worldViewBox;
+    Box                _worldViewBox;
     
     // The actor pressed by last mouse
-    Actor         _mouseActor;
+    Actor              _mouseActor;
+    
+    // The animation timer    
+    ViewTimer          _timer = new ViewTimer(40, t -> _worldView.doAct());
+    
+    // The shared GreenfootOwner
+    static GreenfootOwner  _shared = new GreenfootOwner(null);
 
 /**
- * Creates a new WorldOwner for given World.
+ * Creates a new GreenfootOwner for given World.
  */
-public WorldOwner(World aWorld)  { _world = aWorld; }
+public GreenfootOwner(World aWorld)  { setWorld(aWorld); }
+
+/**
+ * Returns the world.
+ */
+public World getWorld()  { return _world; }
+
+/**
+ * Sets the world.
+ */
+public void setWorld(World aWorld)
+{
+    if(aWorld==_world) return;
+    if(_world==null) _firstWorld = aWorld;
+    getUI();
+    _world = aWorld;
+    _worldView = aWorld.getView();
+    _worldViewBox.setContent(_worldView);
+    setFirstFocus(_worldView);
+    enableEvents(_worldView, MouseEvents);
+    _worldView.requestFocus();
+}
+
+/**
+ * Starts the animation.
+ */
+public void start()  { _timer.start(); }
+
+/**
+ * Stops the animation.
+ */
+public void stop()  { _timer.stop(); }
+
+/**
+ * Whether scene is playing.
+ */
+public boolean isPlaying()  { return _timer.isRunning(); }
+
+/**
+ * Returns the frame rate.
+ */
+public int getTimerPeriod()  { return _timer.getPeriod(); }
+
+/**
+ * Sets the frame rate.
+ */
+public void setTimerPeriod(int aValue)
+{
+    if(aValue<1) aValue = 1; if(aValue>1000) aValue = 1000;
+    _timer.setPeriod(aValue);
+}
 
 /**
  * Create UI.
@@ -42,11 +98,8 @@ protected View createUI()
     toolBar.setChildren(actBtn, runBtn, resetBtn, sep, speedLbl, speedSldr);
     
     // Configure World View
-    _worldView = _world.getView();
-    _worldViewBox = new Box(_worldView); _worldViewBox.setPadding(8,8,8,8);
+    _worldViewBox = new Box(); _worldViewBox.setPadding(8,8,8,8);
     ScrollView sview = new ScrollView(_worldViewBox); sview.setBorder(null);
-    setFirstFocus(_worldView);
-    enableEvents(_worldView, MouseEvents);
 
     // Create border view and add world, toolBar
     BorderView bview = new BorderView(); bview.setFont(Font.Arial12); bview.setFill(ViewUtils.getBackFill());
@@ -68,7 +121,7 @@ protected void resetUI()
 protected void respondUI(ViewEvent anEvent)
 {
     // Handle MouseEvent on WorldView
-    if(anEvent.isMouseEvent() && !_world.getView().isPlaying())
+    if(anEvent.isMouseEvent() && !isPlaying())
         handleMouseEvent(anEvent);
 
     // Handle ActButton
@@ -117,12 +170,10 @@ protected void resetWorld()
         getView("ActButton").setDisabled(false);
     }
     
-    try { _world = _world.getClass().newInstance(); }
+    World world = null;
+    try { world = _firstWorld.getClass().newInstance(); }
     catch(Exception e) { new RuntimeException(e); }
-    _worldView = _world.getView();
-    _worldViewBox.setContent(_worldView);
-    enableEvents(_worldView, MouseEvents);
-    Greenfoot.setWorld(_world);
+    setWorld(world);
 }
 
 /**
@@ -145,5 +196,10 @@ protected void handleMouseEvent(ViewEvent anEvent)
     if(anEvent.isMouseDrag() && _mouseActor!=null)
         _mouseActor.setLocation(x, y);
 }
+
+/**
+ * Returns the shared GreenfootOwner.
+ */
+public static GreenfootOwner getShared()  { return _shared; }
 
 }

@@ -40,13 +40,10 @@ public World(int aW, int aH, int aCellSize, boolean isBounded)
     
     // Set world
     _wv = new WorldView(this);
+    _wv.setSize(_width*_cellSize, _height*_cellSize);
     
     // If first world, manually set it
-    if(Greenfoot._world==null) Greenfoot.setWorld(this);
-    
-    // Set default FrameRate
-    _wv.setTimerPeriod(Greenfoot.getTimerPeriod());
-    _wv.setSize(_width*_cellSize, _height*_cellSize);
+    if(Greenfoot.getWorld()==null) Greenfoot.setWorld(this);
     
     // Set background image
     String iname = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
@@ -246,9 +243,6 @@ protected List getActorsAt(Shape aShape, Class aClass)
 /** This method is called by snap.node.ClassPage to return actual Node. */
 public WorldView getView()  { return _wv; }
 
-/** Returns a Snap ViewOwner for World. */
-public WorldOwner getViewOwner()  { return _wv.getViewOwner(); }
-
 // Convenience to return Greenfoot Actor for Node.
 static Actor gfa(View aView)  { GFSnapActor gfsa = gfsa(aView); return gfsa!=null? gfsa._gfa : null; }
 static GFSnapActor gfsa(View aView)  { return aView instanceof GFSnapActor? (GFSnapActor)aView : null; }
@@ -256,6 +250,11 @@ static GFSnapActor gfsa(View aView)  { return aView instanceof GFSnapActor? (GFS
 /**
  * Sets the window visible.
  */
-public void setWindowVisible(boolean aValue)  { getViewOwner().setWindowVisible(true); }
+public void setWindowVisible(boolean aValue)
+{
+    GreenfootOwner owner = GreenfootOwner.getShared();
+    owner.setWorld(this);
+    owner.setWindowVisible(true);
+}
 
 }

@@ -10,9 +10,6 @@ import snap.web.*;
  */
 public class Greenfoot {
     
-    // The current world
-    static World      _world;
-    
     // The current speed
     static int        _speed = 50;
     
@@ -77,32 +74,30 @@ static void initGreenfoot()
 }
 
 /**
+ * Returns the GreenfootOwner.
+ */
+public static GreenfootOwner getWorldOwner()  { return GreenfootOwner.getShared(); }
+
+/**
  * Returns a world.
  */
-public static World getWorld()  { return _world; }
+public static World getWorld()  { return getWorldOwner().getWorld(); }
 
 /**
  * Sets a world.
  */
 public static void setWorld(World aWorld)
 {
-    // Get old world - if there, stop it
-    World oworld = _world; if(oworld!=null) oworld.getView().stop();
-    
-    // Set world
-    _world = aWorld;
-    _world.getView().setTimerPeriod(getTimerPeriod());
-    
-    // If no props, init greenfoot
+    getWorldOwner().setWorld(aWorld);
     if(_props==null) initGreenfoot();
 }
 
-public static void start()  { if(_world!=null) getWorld().getView().start(); }
+public static void start()  { getWorldOwner().start(); }
 
 /**
  * Stops Greenfoot from playing.
  */
-public static void stop()  { getWorld().getView().stop(); }
+public static void stop()  { getWorldOwner().stop(); }
 
 /**
  * Delays the execution by given number of time steps.
@@ -121,7 +116,7 @@ public static void setSpeed(int aValue)
 {
     _speed = aValue;
     int period = getTimerPeriod();
-    getWorld()._wv.setTimerPeriod(period);
+    getWorldOwner().setTimerPeriod(period);
 }
 
 /**
@@ -178,7 +173,7 @@ static Map <String,String> createProps()
     
     // Get project file
     //WebSite site = _world._scn.getSite();
-    WebURL url = WebURL.getURL(_world.getClass(), "/project.greenfoot");
+    WebURL url = WebURL.getURL(getWorld().getClass(), "/project.greenfoot");
     WebFile file = url.getFile();//site.getFile("/project.greenfoot"); if(file==null) return props;
         
     // Get file text
