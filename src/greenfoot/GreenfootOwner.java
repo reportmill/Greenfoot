@@ -23,7 +23,7 @@ public class GreenfootOwner extends ViewOwner {
     ViewTimer          _timer = new ViewTimer(40, t -> _worldView.doAct());
     
     // The shared GreenfootOwner
-    static GreenfootOwner  _shared = new GreenfootOwner(null);
+    static GreenfootOwner  _shared;
 
 /**
  * Creates a new GreenfootOwner for given World.
@@ -200,6 +200,6 @@ protected void handleMouseEvent(ViewEvent anEvent)
 /**
  * Returns the shared GreenfootOwner.
  */
-public static GreenfootOwner getShared()  { return _shared; }
+public static GreenfootOwner getShared()  { return _shared!=null? _shared : (_shared = new GreenfootOwner(null)); }
 
 }
