@@ -82,7 +82,7 @@ public GreenfootImage(String aString, int aSize, Color fg, Color bg)
     _font = _font.deriveFont(aSize);
     int sw = (int)Math.ceil(_font.getStringAdvance(aString)), sh = (int)Math.ceil(_font.getLineHeight());
     _image = Image.get(sw+8,sh+8,true);
-    setColor(bg); fill();
+    if(bg.getAlpha()>0) { setColor(bg); fill(); }
     setColor(fg); drawString(aString, 4, (int)Math.round(_font.getAscent()+4));
 }
 
