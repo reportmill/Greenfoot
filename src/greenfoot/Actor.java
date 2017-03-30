@@ -156,7 +156,7 @@ public World getWorld()  { return _world; }
  */
 protected List getIntersectingObjects(Class aClass)
 {
-    Rect bnds = _sa.getBoundsInside(); bnds.inset(.5);
+    Rect bnds = _sa.getBoundsLocal(); bnds.inset(.5);
     Shape shp = _sa.localToParent(bnds);
     return _world.getActorsAt(shp, aClass);
 }
@@ -193,7 +193,7 @@ protected List getObjectsInRange(int aR, Class aClass)
  */
 protected Actor getOneIntersectingObject(Class aClass)
 {
-    Rect bnds = _sa.getBoundsInside(); bnds.inset(.5);
+    Rect bnds = _sa.getBoundsLocal(); bnds.inset(.5);
     Shape shp = _sa.localToParent(bnds);
     return _world.getActorAt(shp, aClass);
 }
