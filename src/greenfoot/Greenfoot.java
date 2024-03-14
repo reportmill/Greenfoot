@@ -1,11 +1,9 @@
 package greenfoot;
 import java.util.*;
-
 import snap.geom.Point;
 import snap.gfx.*;
 import snap.util.Convert;
 import snap.view.*;
-import snap.util.SnapUtils;
 import snap.web.*;
 
 /**
@@ -198,8 +196,10 @@ public class Greenfoot {
 
         // Get project file
         //WebSite site = _world._scn.getSite();
-        WebURL url = WebURL.getURL(getWorld().getClass(), "/project.greenfoot");
-        WebFile file = url.getFile();//site.getFile("/project.greenfoot"); if(file==null) return props;
+        World world = getWorld();
+        Class<?> worldClass = world.getClass();
+        WebURL url = WebURL.getURL(worldClass, "project.greenfoot");
+        WebFile file = url.getFile();
 
         // Get file text
         String text = file.getText();

@@ -1,6 +1,5 @@
 package greenfoot;
 import java.util.*;
-
 import snap.geom.Ellipse;
 import snap.geom.Polygon;
 import snap.geom.Rect;
@@ -22,7 +21,7 @@ public class GreenfootImage {
     private Color _color;
 
     // The current font
-    private Font _font = Font.Arial12;
+    private Font _font = new Font("Arial", false, false, 12); //Font.Arial12;
 
     // The image alpha
     private int _alpha = 255;
@@ -91,16 +90,16 @@ public class GreenfootImage {
      */
     public GreenfootImage(String aString, int aSize, Color fg, Color bg)
     {
-        _font = _font.copyForSize(aSize);
-        int sw = (int) Math.ceil(_font.getStringAdvance(aString));
-        int sh = (int) Math.ceil(_font.getLineHeight());
+        _font = _font.deriveFont(aSize);
+        int sw = (int) Math.ceil(_font.getFontObject().getStringAdvance(aString));
+        int sh = (int) Math.ceil(_font.getFontObject().getLineHeight());
         _image = Image.getImageForSize(sw + 8, sh + 8, true);
         if (bg.getAlpha() > 0) {
             setColor(bg);
             fill();
         }
         setColor(fg);
-        drawString(aString, 4, (int) Math.round(_font.getAscent() + 4));
+        drawString(aString, 4, (int) Math.round(_font.getFontObject().getAscent() + 4));
     }
 
     /**
@@ -163,7 +162,7 @@ public class GreenfootImage {
     public void fillShape(Shape aShape)
     {
         Painter pntr = _image.getPainter();
-        pntr.setColor(_color);
+        pntr.setColor(_color.getColorObject());
         pntr.fill(aShape);
         pntr.flush();
         imagePainted();
@@ -188,7 +187,7 @@ public class GreenfootImage {
     public void drawLine(int x1, int y1, int x2, int y2)
     {
         Painter pntr = _image.getPainter();
-        pntr.setColor(_color);
+        pntr.setColor(_color.getColorObject());
         pntr.setStrokeWidth(1);
         pntr.drawLine(x1 + .5, y1 + .5, x2 + .5, y2 + .5);
         pntr.flush();
@@ -201,7 +200,7 @@ public class GreenfootImage {
     public void drawRect(int x, int y, int w, int h)
     {
         Painter pntr = _image.getPainter();
-        pntr.setColor(_color);
+        pntr.setColor(_color.getColorObject());
         pntr.setStrokeWidth(1);
         pntr.drawRect(x + .5, y + .5, w, h);
         pntr.flush();
@@ -236,7 +235,7 @@ public class GreenfootImage {
     {
         Painter pntr = _image.getPainter();
         pntr.setAntialiasing(false);
-        pntr.setColor(_color);
+        pntr.setColor(_color.getColorObject());
         pntr.draw(aShape);
         pntr.flush();
         pntr.setAntialiasing(true);
@@ -249,8 +248,8 @@ public class GreenfootImage {
     public void drawString(String aString, int anX, int aY)
     {
         Painter pntr = _image.getPainter();
-        pntr.setColor(_color);
-        pntr.setFont(_font);
+        pntr.setColor(_color.getColorObject());
+        pntr.setFont(_font.getFontObject());
         pntr.drawString(aString, anX, aY);
         pntr.flush();
         imagePainted();
@@ -337,7 +336,7 @@ public class GreenfootImage {
      */
     public Color getColorAt(int anX, int aY)
     {
-        return new Color(_image.getRGB(anX, aY));
+        return new Color(new snap.gfx.Color(_image.getRGB(anX, aY)));
     }
 
     /**
@@ -372,7 +371,7 @@ public class GreenfootImage {
     {
         Painter pntr = _image.getPainter();
         pntr.setComposite(Painter.Composite.SRC_IN);
-        pntr.setColor(Color.CLEAR);
+        pntr.setColor(snap.gfx.Color.CLEAR);
         pntr.fillRect(0, 0, getWidth(), getHeight());
         pntr.flush();
     }

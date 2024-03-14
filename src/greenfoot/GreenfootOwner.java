@@ -2,6 +2,7 @@ package greenfoot;
 import snap.geom.HPos;
 import snap.geom.Pos;
 import snap.gfx.*;
+import snap.gfx.Color;
 import snap.view.*;
 
 /**
@@ -106,7 +107,7 @@ public class GreenfootOwner extends ViewOwner {
         sep.setVisible(false);
         Label speedLbl = new Label("Speed:");
         speedLbl.setLeanX(HPos.CENTER);
-        speedLbl.setFont(Font.Arial14);
+        speedLbl.setFont(snap.gfx.Font.Arial14);
         Slider speedSldr = new Slider();
         speedSldr.setName("SpeedSlider");
         speedSldr.setPrefWidth(180);
@@ -126,7 +127,7 @@ public class GreenfootOwner extends ViewOwner {
 
         // Create border view and add world, toolBar
         BorderView bview = new BorderView();
-        bview.setFont(Font.Arial12);
+        bview.setFont(snap.gfx.Font.Arial12);
         bview.setFill(ViewUtils.getBackFill());
         bview.setCenter(sview);
         bview.setBottom(toolBar);

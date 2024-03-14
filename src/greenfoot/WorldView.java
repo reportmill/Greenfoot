@@ -2,6 +2,7 @@ package greenfoot;
 import java.util.*;
 import snap.geom.Rect;
 import snap.gfx.*;
+import snap.gfx.Color;
 import snap.util.StringUtils;
 import snap.view.*;
 
@@ -123,7 +124,7 @@ public class WorldView extends ChildView {
             String[] keys = key.split("x");
             int x = StringUtils.intValue(keys[0]);
             int y = StringUtils.intValue(keys[1]);
-            Font font = Font.Arial14.copyForSize(24).getBold();
+            snap.gfx.Font font = snap.gfx.Font.Arial14.copyForSize(24).getBold();
             aPntr.setFont(font);
             Rect bnds = font.getStringBounds(str);
             x = x - (int) Math.round(bnds.width / 2);
