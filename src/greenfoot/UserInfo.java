@@ -12,57 +12,60 @@ public class UserInfo {
     // Shared instance
     static UserInfo _shared;
 
-/**
- * Returns the User rank.
- */
-public int getRank()  { return 1; }
+    /**
+     * Returns the User rank.
+     */
+    public int getRank()  { return 1; }
 
-/**
- * Returns the User score.
- */
-public int getScore()  { return _score; }
+    /**
+     * Returns the User score.
+     */
+    public int getScore()  { return _score; }
 
-/**
- * Sets the User score.
- */
-public void setScore(int aValue)  { _score = aValue; }
+    /**
+     * Sets the User score.
+     */
+    public void setScore(int aValue)  { _score = aValue; }
 
-/**
- * Return User name.
- */
-public String getUserName()  { return "John Doe"; }
+    /**
+     * Return User name.
+     */
+    public String getUserName()  { return "John Doe"; }
 
-/**
- * Return User image.
- */
-public GreenfootImage getUserImage()
-{
-    return new GreenfootImage("John Doe");
-}
+    /**
+     * Return User image.
+     */
+    public GreenfootImage getUserImage()
+    {
+        return new GreenfootImage("John Doe");
+    }
 
-/**
- * Stores the data.
- */
-public boolean store()  { return true; }
+    /**
+     * Stores the data.
+     */
+    public boolean store()  { return true; }
 
-/**
- * Returns the top n user infos.
- */
-public static List getTop(int aMax)  { return Collections.EMPTY_LIST; }
+    /**
+     * Returns the top n user infos.
+     */
+    public static List getTop(int aMax)  { return Collections.EMPTY_LIST; }
 
-/**
- * Returns the top n user infos.
- */
-public static List getNearby(int aMax)  { return Collections.EMPTY_LIST; }
+    /**
+     * Returns the top n user infos.
+     */
+    public static List getNearby(int aMax)  { return Collections.EMPTY_LIST; }
 
-/**
- * Returns whether storage is available.
- */
-public static boolean isStorageAvailable()  { return false; }
+    /**
+     * Returns whether storage is available.
+     */
+    public static boolean isStorageAvailable()  { return false; }
 
-/**
- * Returns the UserInfo for current user.
- */
-public static UserInfo getMyInfo()  { return _shared!=null? _shared : (_shared=new UserInfo()); }
-
+    /**
+     * Returns the UserInfo for current user.
+     */
+    public static UserInfo getMyInfo()
+    {
+        if (_shared != null) return _shared;
+        return _shared=new UserInfo();
+    }
 }

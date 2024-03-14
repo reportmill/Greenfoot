@@ -1,12 +1,12 @@
 package greenfoot;
 
 /**
- * A custom class.
+ * MouseInfo.
  */
-public class MouseInfo extends Object {
+public class MouseInfo {
 
-public int getX()  { return (int)Greenfoot._mouseX; }
+    public int getX()  { return (int) Greenfoot._mouseX; }
 
-public int getY()  { return (int)Greenfoot._mouseY; }
+    public int getY()  { return (int) Greenfoot._mouseY; }
 
 }
