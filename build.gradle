@@ -1,0 +1,26 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'application'
+}
+
+group 'com.reportmill'
+version new SimpleDateFormat("yyyy.MM").format(new Date())
+
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.main.resources.srcDirs = ['src']
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // SnapKit project
+    implementation project(':SnapKit')
+}
