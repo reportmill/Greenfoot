@@ -1,7 +1,6 @@
 package greenfoot;
 import snap.geom.HPos;
 import snap.geom.Pos;
-import snap.gfx.*;
 import snap.gfx.Color;
 import snap.view.*;
 
@@ -11,7 +10,10 @@ import snap.view.*;
 public class GreenfootOwner extends ViewOwner {
 
     // The current world
-    private World _world, _firstWorld;
+    private World _world;
+
+    // The first world
+    private World _firstWorld;
 
     // The World View
     private WorldView _worldView;
@@ -47,7 +49,8 @@ public class GreenfootOwner extends ViewOwner {
     public void setWorld(World aWorld)
     {
         if (aWorld == _world) return;
-        if (_world == null) _firstWorld = aWorld;
+        if (_world == null)
+            _firstWorld = aWorld;
         getUI();
         _world = aWorld;
         _worldView = aWorld.getView();
@@ -82,8 +85,10 @@ public class GreenfootOwner extends ViewOwner {
      */
     public void setTimerPeriod(int aValue)
     {
-        if (aValue < 1) aValue = 1;
-        if (aValue > 1000) aValue = 1000;
+        if (aValue < 1)
+            aValue = 1;
+        if (aValue > 1000)
+            aValue = 1000;
         _timer.setPeriod(aValue);
     }
 
@@ -92,47 +97,55 @@ public class GreenfootOwner extends ViewOwner {
      */
     protected View createUI()
     {
-        // Create tool bar items
-        Button actBtn = new Button("Act");
-        actBtn.setName("ActButton");
-        actBtn.setPrefSize(70, 20);
-        Button runBtn = new Button("Run");
-        runBtn.setName("RunButton");
-        runBtn.setPrefSize(70, 20);
-        Button resetBtn = new Button("Reset");
-        resetBtn.setName("ResetButton");
-        resetBtn.setPrefSize(70, 20);
+        // Add ActButton
+        Button actButton = new Button("Act");
+        actButton.setName("ActButton");
+        actButton.setPrefSize(70, 20);
+
+        // Add RunButton
+        Button runButton = new Button("Run");
+        runButton.setName("RunButton");
+        runButton.setPrefSize(70, 20);
+
+        // Add ResetButton
+        Button resetButton = new Button("Reset");
+        resetButton.setName("ResetButton");
+        resetButton.setPrefSize(70, 20);
+
+        // Add separator
         Separator sep = new Separator();
         sep.setPrefWidth(40);
         sep.setVisible(false);
-        Label speedLbl = new Label("Speed:");
-        speedLbl.setLeanX(HPos.CENTER);
-        speedLbl.setFont(snap.gfx.Font.Arial14);
-        Slider speedSldr = new Slider();
-        speedSldr.setName("SpeedSlider");
-        speedSldr.setPrefWidth(180);
+
+        // Add Speed label and slider
+        Label speedLabel = new Label("Speed:");
+        speedLabel.setLeanX(HPos.CENTER);
+        speedLabel.setFont(snap.gfx.Font.Arial14);
+        Slider speedSlider = new Slider();
+        speedSlider.setName("SpeedSlider");
+        speedSlider.setPrefWidth(180);
 
         // Create toolbar
         RowView toolBar = new RowView();
         toolBar.setAlign(Pos.CENTER);
         toolBar.setPadding(18, 25, 18, 25);
         toolBar.setSpacing(15);
-        toolBar.setChildren(actBtn, runBtn, resetBtn, sep, speedLbl, speedSldr);
+        toolBar.setChildren(actButton, runButton, resetButton, sep, speedLabel, speedSlider);
 
         // Configure World View
         _worldViewBox = new BoxView();
         _worldViewBox.setPadding(8, 8, 8, 8);
-        ScrollView sview = new ScrollView(_worldViewBox);
-        sview.setBorder(null);
+        ScrollView scrollView = new ScrollView(_worldViewBox);
+        scrollView.setBorder(null);
 
         // Create border view and add world, toolBar
-        BorderView bview = new BorderView();
-        bview.setFont(snap.gfx.Font.Arial12);
-        bview.setFill(ViewUtils.getBackFill());
-        bview.setCenter(sview);
-        bview.setBottom(toolBar);
-        bview.setBorder(Color.GRAY, 1);
-        return bview;
+        BorderView borderView = new BorderView();
+        borderView.setFont(snap.gfx.Font.Arial12);
+        borderView.setFill(ViewUtils.getBackFill());
+        borderView.setCenter(scrollView);
+        borderView.setBottom(toolBar);
+        borderView.setBorder(Color.GRAY, 1);
+        return borderView;
     }
 
     /**
@@ -154,7 +167,7 @@ public class GreenfootOwner extends ViewOwner {
 
         // Handle ActButton
         if (anEvent.equals("ActButton"))
-            _world._wv.doAct();
+            _world._worldView.doAct();
 
         // Handle RunButton
         if (anEvent.equals("RunButton")) {
@@ -213,19 +226,28 @@ public class GreenfootOwner extends ViewOwner {
     protected void handleMouseEvent(ViewEvent anEvent)
     {
         // Get x/y
-        int x = (int) Math.round(anEvent.getX()), y = (int) Math.round(anEvent.getY());
+        int mouseX = (int) Math.round(anEvent.getX());
+        int mouseY = (int) Math.round(anEvent.getY());
 
         // Handle MousePressed
         if (anEvent.isMousePress()) {
-            if ((anEvent.isAltDown() || anEvent.isShortcutDown()) && _mouseActor != null)
-                try { _world.addObject(_mouseActor = _mouseActor.getClass().newInstance(), x, y); }
+
+            // If alt or shortcut down, create new actor
+            if ((anEvent.isAltDown() || anEvent.isShortcutDown()) && _mouseActor != null) {
+                try {
+                    _mouseActor = _mouseActor.getClass().newInstance();
+                    _world.addObject(_mouseActor, mouseX, mouseY);
+                }
                 catch (Exception ignore) { }
-            else _mouseActor = _world.getActorAt(x, y, null);
+            }
+
+            // Otherwise get actor at event
+            else _mouseActor = _world.getActorAt(mouseX, mouseY, null);
         }
 
         // Handle MouseDraggged
         if (anEvent.isMouseDrag() && _mouseActor != null)
-            _mouseActor.setLocation(x, y);
+            _mouseActor.setLocation(mouseX, mouseY);
     }
 
     /**

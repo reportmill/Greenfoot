@@ -146,7 +146,7 @@ public class WorldView extends ChildView {
     {
         try {
             _gfw.act();
-            for (View child : getChildren()) ((Actor.GFSnapActor) child).act();
+            for (View child : getChildren()) ((ActorView) child).act();
             _mouseClicked = null;
             _keyClicks.clear();
         }

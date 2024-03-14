@@ -7,7 +7,7 @@ import snap.view.*;
 import snap.web.*;
 
 /**
- * A custom class.
+ * Greenfoot class.
  */
 public class Greenfoot {
 
@@ -59,8 +59,9 @@ public class Greenfoot {
      */
     public static void playSound(String aName)
     {
-        SoundClip snd = getSound(aName);
-        if (snd != null) snd.play();
+        SoundClip soundClip = getSound(aName);
+        if (soundClip != null)
+            soundClip.play();
     }
 
     /**
@@ -68,12 +69,14 @@ public class Greenfoot {
      */
     public static SoundClip getSound(String aName)
     {
-        SoundClip snd = _clips.get(aName);
-        if (snd != null) return snd;
+        SoundClip soundClip = _clips.get(aName);
+        if (soundClip != null)
+            return soundClip;
+
         Class<?> cls = getWorld().getClass();
-        snd = SoundClip.get(cls, "sounds/" + aName);
-        _clips.put(aName, snd);
-        return snd;
+        soundClip = SoundClip.get(cls, "sounds/" + aName);
+        _clips.put(aName, soundClip);
+        return soundClip;
     }
 
     /**
@@ -143,7 +146,8 @@ public class Greenfoot {
         long max = 10000 * 1000L * 1000L; // Delay at slowest speed
         double a = Math.pow(max / (double) min, 1D / (100 - 1));
         long delayNS = 0;
-        if (rawDelay > 0) delayNS = (long) (Math.pow(a, rawDelay - 1) * min);
+        if (rawDelay > 0)
+            delayNS = (long) (Math.pow(a, rawDelay - 1) * min);
         int delayMillis = (int) Math.round(delayNS / 1000000d);
         return delayMillis;
     }
@@ -151,17 +155,18 @@ public class Greenfoot {
     /**
      * Returns the MouseInfo.
      */
-    public static MouseInfo getMouseInfo()
-    {
-        return _mouseInfo;
-    }
+    public static MouseInfo getMouseInfo()  { return _mouseInfo; }
 
     /**
      * Returns whether mouse was clicked on given actor/world.
      */
     public static boolean mouseClicked(Object anObj)
     {
-        if (anObj == null) return getWorld() != null ? getWorld().getView().isMouseClicked() : false;
+        if (anObj == null) {
+            World world = getWorld();
+            return world != null ? world.getView().isMouseClicked() : false;
+        }
+
         System.out.println("Mouse Clicked not supported");
         return false;
     }
@@ -171,7 +176,7 @@ public class Greenfoot {
      */
     public static boolean mouseMoved(Object anObj)
     {
-        View view = anObj instanceof Actor ? ((Actor) anObj)._sa : null;
+        View view = anObj instanceof Actor ? ((Actor) anObj)._actorView : null;
         if (view == null)
             return false;
         Point pnt = view.parentToLocal(getWorld().getView()._mx, getWorld().getView()._my);
@@ -181,18 +186,19 @@ public class Greenfoot {
     /**
      * Returns the project properties map.
      */
-    static Map<String, String> getProps2()
+    protected static Map<String, String> getProperties()
     {
-        return _props != null ? _props : (_props = createProps());
+        if (_props != null) return _props;
+        return _props = getPropertiesImpl();
     }
 
     /**
      * Returns the project properties map.
      */
-    static Map<String, String> createProps()
+    private static Map<String, String> getPropertiesImpl()
     {
         // Create map
-        Map props = new HashMap();
+        Map<String,String> props = new HashMap<>();
 
         // Get project file
         //WebSite site = _world._scn.getSite();
@@ -204,31 +210,33 @@ public class Greenfoot {
         // Get file text
         String text = file.getText();
         if (text != null && text.length() > 0) {
-            String lines[] = text.split("\\n");
+            String[] lines = text.split("\\n");
             for (String line : lines) {
-                String parts[] = line.split("=");
+                String[] parts = line.split("=");
                 if (parts.length > 1)
                     props.put(parts[0].trim(), parts[1].trim());
             }
         }
 
-        // Return properties
+        // Return
         return props;
     }
 
     /**
      * Returns a property for a given key.
      */
-    static String getProperty(String aKey)
+    protected static String getProperty(String aKey)
     {
-        return getProps2().get(aKey);
+        Map<String,String> properties = getProperties();
+        return properties.get(aKey);
     }
 
     /**
      * Returns an int property.
      */
-    static int getIntProperty(String aKey)
+    protected static int getIntProperty(String aKey)
     {
-        return Convert.intValue(getProperty(aKey));
+        String propString = getProperty(aKey);
+        return Convert.intValue(propString);
     }
 }

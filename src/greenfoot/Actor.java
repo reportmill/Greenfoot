@@ -2,7 +2,6 @@ package greenfoot;
 import snap.geom.Point;
 import snap.geom.Rect;
 import snap.geom.Shape;
-import snap.view.ImageView;
 import java.util.List;
 
 /**
@@ -10,14 +9,14 @@ import java.util.List;
  */
 public class Actor {
 
-    // The snap actor
-    protected GFSnapActor _sa = new GFSnapActor(this);
+    // The actor view
+    protected ActorView _actorView = new ActorView(this);
 
     // The actor location
     private int _x, _y;
 
     // The greenfoot image
-    private GreenfootImage _img;
+    private GreenfootImage _image;
 
     // The world
     protected World _world;
@@ -28,9 +27,10 @@ public class Actor {
     public Actor()
     {
         // If project configured image, set image
-        String iname = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
-        GreenfootImage img = iname != null ? new GreenfootImage(iname) : null;
-        if (img != null) setImage(img);
+        String imageName = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
+        GreenfootImage image = imageName != null ? new GreenfootImage(imageName) : null;
+        if (image != null)
+            setImage(image);
     }
 
     /**
@@ -46,12 +46,12 @@ public class Actor {
     /**
      * Returns the width.
      */
-    public int getWidth()  { return (int) _sa.getWidth(); }
+    public int getWidth()  { return (int) _actorView.getWidth(); }
 
     /**
      * Returns the height.
      */
-    public int getHeight()  { return (int) _sa.getHeight(); }
+    public int getHeight()  { return (int) _actorView.getHeight(); }
 
     /**
      * Set Location.
@@ -67,7 +67,7 @@ public class Actor {
         }
 
         // Set View x/y
-        _sa.setXY(x - getWidth() / 2d, y - getHeight() / 2d);
+        _actorView.setXY(x - getWidth() / 2d, y - getHeight() / 2d);
         _x = x;
         _y = y;
     }
@@ -85,8 +85,8 @@ public class Actor {
      */
     public void move(int aValue)
     {
-        double x = getX() + aValue * Math.cos(Math.toRadians(_sa.getRotate()));
-        double y = getY() + aValue * Math.sin(Math.toRadians(_sa.getRotate()));
+        double x = getX() + aValue * Math.cos(Math.toRadians(_actorView.getRotate()));
+        double y = getY() + aValue * Math.sin(Math.toRadians(_actorView.getRotate()));
         setLocation(x, y);
     }
 
@@ -95,7 +95,7 @@ public class Actor {
      */
     public void turn(int aDeg)
     {
-        _sa.setRotate(_sa.getRotate() + aDeg);
+        _actorView.setRotate(_actorView.getRotate() + aDeg);
     }
 
     /**
@@ -114,7 +114,7 @@ public class Actor {
      */
     public int getRotation()
     {
-        int r = ((int) Math.round(_sa.getRotate())) % 360;
+        int r = ((int) Math.round(_actorView.getRotate())) % 360;
         return r >= 0 ? r : (r + 360);
     }
 
@@ -123,13 +123,13 @@ public class Actor {
      */
     public void setRotation(int aRotation)
     {
-        _sa.setRotate(aRotation);
+        _actorView.setRotate(aRotation);
     }
 
     /**
      * Returns the greenfoot image.
      */
-    public GreenfootImage getImage()  { return _img; }
+    public GreenfootImage getImage()  { return _image; }
 
     /**
      * Returns the greenfoot image.
@@ -137,12 +137,12 @@ public class Actor {
     public void setImage(GreenfootImage anImage)
     {
         // If image already set, just return
-        if (_img == anImage) return;
+        if (_image == anImage) return;
 
         // Update image actor lists and set new image
-        if (_img != null) _img._actors.remove(this);
-        _img = anImage;
-        if (_img != null) _img._actors.add(this);
+        if (_image != null) _image._actors.remove(this);
+        _image = anImage;
+        if (_image != null) _image._actors.add(this);
 
         // Call image changed
         imageChanged();
@@ -162,8 +162,8 @@ public class Actor {
     void imageChanged()
     {
         // Set new image and new size and reset location to make sure new image is centered
-        _sa.setImage(_img._image);
-        _sa.setSize(_img._image.getWidth(), _img._image.getHeight());
+        _actorView.setImage(_image._image);
+        _actorView.setSize(_image._image.getWidth(), _image._image.getHeight());
         setLocation(getX(), getY());
     }
 
@@ -175,18 +175,18 @@ public class Actor {
     /**
      * Returns on intersecting Actor.
      */
-    protected List getIntersectingObjects(Class aClass)
+    protected <T extends Actor> List<T> getIntersectingObjects(Class<T> aClass)
     {
-        Rect bnds = _sa.getBoundsLocal();
+        Rect bnds = _actorView.getBoundsLocal();
         bnds.inset(.5);
-        Shape shp = _sa.localToParent(bnds);
+        Shape shp = _actorView.localToParent(bnds);
         return _world.getActorsAt(shp, aClass);
     }
 
     /**
      * Returns the neighbors to this object within a given distance.
      */
-    public List getNeighbors(int aDist, boolean doDiagonal, Class aClass)
+    public <T> List<T> getNeighbors(int aDist, boolean doDiagonal, Class<T> aClass)
     {
         System.err.println("Actor.getNeighbors: Not impl");
         return null;
@@ -195,48 +195,48 @@ public class Actor {
     /**
      * Returns peer actors at given offset from this actor's center.
      */
-    protected List getObjectsAtOffset(int aX, int aY, Class aClass)
+    protected <T extends Actor> List<T> getObjectsAtOffset(int aX, int aY, Class<T> aClass)
     {
-        double cs = _world.getCellSize(), x = _sa.getWidth() / 2 + aX * cs, y = _sa.getHeight() / 2 + aY * cs;
-        Point pnt = _sa.localToParent(x, y);
+        double cs = _world.getCellSize(), x = _actorView.getWidth() / 2 + aX * cs, y = _actorView.getHeight() / 2 + aY * cs;
+        Point pnt = _actorView.localToParent(x, y);
         return _world.getActorsAt(pnt.x, pnt.y, aClass);
     }
 
     /**
      * Returns actors in given range.
      */
-    protected List getObjectsInRange(int aR, Class aClass)
+    protected <T extends Actor> List<T> getObjectsInRange(int aR, Class<T> aClass)
     {
-        double x = _sa.getWidth() / 2, y = _sa.getHeight() / 2, r = aR * _world.getCellSize(), hr = r / 2;
-        Shape rect = _sa.localToParent(new Rect(x - hr, y - hr, r, r));
+        double x = _actorView.getWidth() / 2, y = _actorView.getHeight() / 2, r = aR * _world.getCellSize(), hr = r / 2;
+        Shape rect = _actorView.localToParent(new Rect(x - hr, y - hr, r, r));
         return _world.getActorsAt(rect, aClass);
     }
 
     /**
      * Returns on intersecting Actor.
      */
-    protected Actor getOneIntersectingObject(Class aClass)
+    protected Actor getOneIntersectingObject(Class<?> aClass)
     {
-        Rect bnds = _sa.getBoundsLocal();
+        Rect bnds = _actorView.getBoundsLocal();
         bnds.inset(.5);
-        Shape shp = _sa.localToParent(bnds);
+        Shape shp = _actorView.localToParent(bnds);
         return _world.getActorAt(shp, aClass);
     }
 
     /**
      * Returns peer actor at given offset from this actor's center.
      */
-    protected Actor getOneObjectAtOffset(int aX, int aY, Class aClass)
+    protected Actor getOneObjectAtOffset(int aX, int aY, Class<? extends Actor> aClass)
     {
-        double cs = _world.getCellSize(), x = _sa.getWidth() / 2 + aX * cs, y = _sa.getHeight() / 2 + aY * cs;
-        Point pnt = _sa.localToParent(x, y);
+        double cs = _world.getCellSize(), x = _actorView.getWidth() / 2 + aX * cs, y = _actorView.getHeight() / 2 + aY * cs;
+        Point pnt = _actorView.localToParent(x, y);
         return _world.getActorAt(pnt.getX(), pnt.getY(), aClass);
     }
 
     /**
      * Returns whether this actor is touching any other objects of the given class.
      */
-    public boolean isTouching(Class aClass)
+    public boolean isTouching(Class<? extends Actor> aClass)
     {
         return getOneIntersectingObject(aClass) != null;
     }
@@ -244,7 +244,7 @@ public class Actor {
     /**
      * Removes one object of the given class that this actor is currently touching (if any exist).
      */
-    protected void removeTouching(Class aClass)
+    protected void removeTouching(Class<? extends Actor> aClass)
     {
         Actor obj = getOneIntersectingObject(aClass);
         if (obj != null) _world.removeObject(obj);
@@ -261,29 +261,4 @@ public class Actor {
      * Notification for when actor is added to a world.
      */
     protected void addedToWorld(World aWorld)  { }
-
-    /**
-     * The Greenfoot SnapActor.
-     */
-    public static class GFSnapActor extends ImageView {
-
-        // The Greenfoot actor
-        Actor _gfa;
-
-        /**
-         * Creates a new SnapActor.
-         */
-        public GFSnapActor(Actor anActor)
-        {
-            _gfa = anActor;
-        }
-
-        /**
-         * Override to send to Greenfoot Actor.
-         */
-        public void act()
-        {
-            _gfa.act();
-        }
-    }
 }

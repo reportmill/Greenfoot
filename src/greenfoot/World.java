@@ -3,7 +3,6 @@ import java.util.*;
 import snap.geom.Point;
 import snap.geom.Shape;
 import snap.view.*;
-import greenfoot.Actor.GFSnapActor;
 
 /**
  * An implementation of the GreenFoot World class using SnapKit.
@@ -23,7 +22,7 @@ public class World {
     protected Map<String, String> _text = new HashMap<>();
 
     // The WorldView
-    protected WorldView _wv;
+    protected WorldView _worldView;
 
     /**
      * Constructor.
@@ -45,8 +44,8 @@ public class World {
         _bounded = isBounded;
 
         // Set world
-        _wv = new WorldView(this);
-        _wv.setSize(_width * _cellSize, _height * _cellSize);
+        _worldView = new WorldView(this);
+        _worldView.setSize(_width * _cellSize, _height * _cellSize);
 
         // If first world, manually set it
         if (Greenfoot.getWorld() == null) Greenfoot.setWorld(this);
@@ -89,7 +88,8 @@ public class World {
     public int numberOfObjects()
     {
         int c = 0;
-        for (View n : _wv.getChildren()) if (gfa(n) != null) c++;
+        for (View n : _worldView.getChildren())
+            if (getActorForView(n) != null) c++;
         return c;
     }
 
@@ -98,7 +98,7 @@ public class World {
      */
     public void addObject(Actor anActor, int anX, int aY)
     {
-        _wv.addChild(anActor._sa);
+        _worldView.addChild(anActor._actorView);
         anActor._world = this;
         anActor.setLocation(anX, aY);
         anActor.addedToWorld(this);
@@ -109,20 +109,21 @@ public class World {
      */
     public void removeObject(Actor anActor)
     {
-        _wv.removeChild(anActor._sa);
+        _worldView.removeChild(anActor._actorView);
     }
 
     /**
      * Returns the actors of a given class.
      */
-    public List getObjects(Class aClass)
+    public <T> List<T> getObjects(Class<T> aClass)
     {
-        List list = new ArrayList();
-        for (View child : _wv.getChildren()) {
-            Actor gfa = gfa(child);
-            if (gfa == null) continue;
-            if (aClass == null || aClass.isInstance(gfa))
-                list.add(gfa);
+        List<T> list = new ArrayList<>();
+        for (View child : _worldView.getChildren()) {
+            Actor actor = getActorForView(child);
+            if (actor == null)
+                continue;
+            if (aClass == null || aClass.isInstance(actor))
+                list.add((T) actor);
         }
         return list;
     }
@@ -130,7 +131,7 @@ public class World {
     /**
      * Returns the objects at given point.
      */
-    public List getObjectsAt(int aX, int aY, Class aClass)
+    public <T extends Actor> List<T> getObjectsAt(int aX, int aY, Class<T> aClass)
     {
         return getActorsAt(aX, aY, aClass);
     }
@@ -185,13 +186,13 @@ public class World {
      */
     public void repaint()
     {
-        _wv.repaint();
+        _worldView.repaint();
     }
 
     /**
      * Sets the act order.
      */
-    public void setActOrder(Class... theClasses)
+    public void setActOrder(Class<?>... theClasses)
     {
         System.err.println("World.setActOrder: Not Impl");
     }
@@ -199,7 +200,7 @@ public class World {
     /**
      * Sets the paint order.
      */
-    public void setPaintOrder(Class... theClasses)
+    public void setPaintOrder(Class<?>... theClasses)
     {
         System.err.println("World.setPaintOrder: Not Impl");
     }
@@ -227,33 +228,42 @@ public class World {
     /**
      * Returns the objects at given point.
      */
-    protected Actor getActorAt(double aX, double aY, Class aClass)
+    protected <T extends  Actor> T getActorAt(double aX, double aY, Class<T> aClass)
     {
-        for (View child : _wv.getChildren()) {
-            Actor gfa = gfa(child);
-            if (gfa == null) continue;
-            if (aClass == null || aClass.isInstance(gfa)) {
-                Point point = child.parentToLocal(aX, aY);
-                if (child.contains(point.getX(), point.getY()))
-                    return gfa;
+        View[] worldViews = _worldView.getChildren();
+
+        for (View actorView : worldViews) {
+            Actor actor = getActorForView(actorView);
+            if (actor == null)
+                continue;
+            if (aClass == null || aClass.isInstance(actor)) {
+                Point point = actorView.parentToLocal(aX, aY);
+                if (actorView.contains(point.getX(), point.getY()))
+                    return (T) actor;
             }
         }
+
         return null;
     }
 
     /**
      * Returns the objects at given point.
      */
-    protected List getActorsAt(double aX, double aY, Class aClass)
+    protected <T extends Actor> List<T> getActorsAt(double aX, double aY, Class<T> aClass)
     {
-        List hitList = new ArrayList();
-        for (View child : _wv.getChildren()) {
-            Actor gfa = gfa(child);
-            if (gfa == null) continue;
-            if (aClass == null || aClass.isInstance(gfa)) {
+        View[] worldViews = _worldView.getChildren();
+        List<T> hitList = new ArrayList<>();
+
+        for (View child : worldViews) {
+
+            Actor actor = getActorForView(child);
+            if (actor == null)
+                continue;
+
+            if (aClass == null || aClass.isInstance(actor)) {
                 Point point = child.parentToLocal(aX, aY);
                 if (child.contains(point.getX(), point.getY()))
-                    hitList.add(gfa);
+                    hitList.add((T) actor);
             }
         }
 
@@ -265,13 +275,18 @@ public class World {
      */
     protected Actor getActorAt(Shape aShape, Class aClass)
     {
-        for (View child : _wv.getChildren()) {
-            Actor gfa = gfa(child);
-            if (gfa == null) continue;
-            if (aClass == null || aClass.isInstance(gfa)) {
-                Shape shp2 = child.parentToLocal(aShape);
-                if (child.intersects(shp2))
-                    return gfa;
+        View[] worldViews = _worldView.getChildren();
+
+        for (View actorView : worldViews) {
+
+            Actor actor = getActorForView(actorView);
+            if (actor == null)
+                continue;
+
+            if (aClass == null || aClass.isInstance(actor)) {
+                Shape shp2 = actorView.parentToLocal(aShape);
+                if (actorView.intersects(shp2))
+                    return actor;
             }
         }
 
@@ -281,17 +296,21 @@ public class World {
     /**
      * Returns on intersecting Actor.
      */
-    protected List getActorsAt(Shape aShape, Class aClass)
+    protected <T extends Actor> List<T> getActorsAt(Shape aShape, Class<T> aClass)
     {
-        List<Actor> hitList = new ArrayList<>();
-        for (View child : _wv.getChildren()) {
-            Actor gfa = gfa(child);
-            if (gfa == null)
+        View[] worldViews = _worldView.getChildren();
+        List<T> hitList = new ArrayList<>();
+
+        for (View actorView : worldViews) {
+
+            Actor actor = getActorForView(actorView);
+            if (actor == null)
                 continue;
-            if (aClass == null || aClass.isInstance(gfa)) {
-                Shape shp2 = child.parentToLocal(aShape);
-                if (child.intersects(shp2))
-                    hitList.add(gfa);
+
+            if (aClass == null || aClass.isInstance(actor)) {
+                Shape shp2 = actorView.parentToLocal(aShape);
+                if (actorView.intersects(shp2))
+                    hitList.add((T) actor);
             }
         }
 
@@ -301,19 +320,7 @@ public class World {
     /**
      * This method is called by snap.node.ClassPage to return actual Node.
      */
-    public WorldView getView()  { return _wv; }
-
-    // Convenience to return Greenfoot Actor for Node.
-    static Actor gfa(View aView)
-    {
-        GFSnapActor gfsa = gfsa(aView);
-        return gfsa != null ? gfsa._gfa : null;
-    }
-
-    static GFSnapActor gfsa(View aView)
-    {
-        return aView instanceof GFSnapActor ? (GFSnapActor) aView : null;
-    }
+    public WorldView getView()  { return _worldView; }
 
     /**
      * Sets the window visible.
@@ -323,5 +330,14 @@ public class World {
         GreenfootOwner owner = GreenfootOwner.getShared();
         owner.setWorld(this);
         owner.setWindowVisible(true);
+    }
+
+    /**
+     * Return actor for given view.
+     */
+    private static Actor getActorForView(View aView)
+    {
+        ActorView gfsa = aView instanceof ActorView ? (ActorView) aView : null;
+        return gfsa != null ? gfsa._actor : null;
     }
 }
