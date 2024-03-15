@@ -94,7 +94,7 @@ public class GreenfootImage {
         int sw = (int) Math.ceil(_font.getFontObject().getStringAdvance(aString));
         int sh = (int) Math.ceil(_font.getFontObject().getLineHeight());
         _image = Image.getImageForSize(sw + 8, sh + 8, true);
-        if (bg.getAlpha() > 0) {
+        if (bg != null && bg.getAlpha() > 0) {
             setColor(bg);
             fill();
         }
