@@ -327,6 +327,10 @@ public class World {
      */
     public void setWindowVisible(boolean aValue)
     {
+        // If not on event thread, call again on event thread
+        if (!ViewUtils.isEventThread()) {
+            ViewUtils.runLater(() -> setWindowVisible(aValue)); return; }
+
         GreenfootOwner owner = GreenfootOwner.getShared();
         owner.setWorld(this);
         owner.setWindowVisible(true);

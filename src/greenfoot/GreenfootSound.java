@@ -14,34 +14,52 @@ public class GreenfootSound extends Object {
      */
     public GreenfootSound(String aName)
     {
-        _sound = SoundClip.get(Greenfoot.getWorld().getClass(), "sounds/" + aName);
-        if (_sound == null) System.err.println("Sound not found: " + aName);
+        Class<?> worldClass = Greenfoot.getWorld().getClass();
+        _sound = SoundClip.get(worldClass, "sounds/" + aName);
+        if (_sound == null)
+            System.err.println("GreenfootSound: Sound not found for name: " + aName);
     }
 
     /**
      * Returns whether greenfoot is playing.
      */
-    public boolean isPlaying()  { return _sound.isPlaying(); }
+    public boolean isPlaying()  { return _sound != null && _sound.isPlaying(); }
 
     /**
      * Plays the sound.
      */
-    public void play()  { _sound.play(); }
+    public void play()
+    {
+        if (_sound != null)
+            _sound.play();
+    }
 
     /**
      * Plays the sound repetedly in a loop.
      */
-    public void playLoop()  { _sound.play(999); }
+    public void playLoop()
+    {
+        if (_sound != null)
+            _sound.play(999);
+    }
 
     /**
      * Tells Greenfoot to stop.
      */
-    public void stop()  { _sound.stop(); }
+    public void stop()
+    {
+        if (_sound != null)
+            _sound.stop();
+    }
 
     /**
      * Pauses a sound.
      */
-    public void pause()  { _sound.stop(); }
+    public void pause()
+    {
+        if (_sound != null)
+            _sound.stop();
+    }
 
     /**
      * Sets the volume of the sound.

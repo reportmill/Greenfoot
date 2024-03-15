@@ -197,7 +197,9 @@ public class Actor {
      */
     protected <T extends Actor> List<T> getObjectsAtOffset(int aX, int aY, Class<T> aClass)
     {
-        double cs = _world.getCellSize(), x = _actorView.getWidth() / 2 + aX * cs, y = _actorView.getHeight() / 2 + aY * cs;
+        double cs = _world.getCellSize();
+        double x = _actorView.getWidth() / 2 + aX * cs;
+        double y = _actorView.getHeight() / 2 + aY * cs;
         Point pnt = _actorView.localToParent(x, y);
         return _world.getActorsAt(pnt.x, pnt.y, aClass);
     }
@@ -207,7 +209,9 @@ public class Actor {
      */
     protected <T extends Actor> List<T> getObjectsInRange(int aR, Class<T> aClass)
     {
-        double x = _actorView.getWidth() / 2, y = _actorView.getHeight() / 2, r = aR * _world.getCellSize(), hr = r / 2;
+        double x = _actorView.getWidth() / 2;
+        double y = _actorView.getHeight() / 2;
+        double r = aR * _world.getCellSize(), hr = r / 2;
         Shape rect = _actorView.localToParent(new Rect(x - hr, y - hr, r, r));
         return _world.getActorsAt(rect, aClass);
     }
@@ -256,6 +260,16 @@ public class Actor {
      * The Act method.
      */
     public void act()  { }
+
+    /**
+     * Check whether this object intersects with another given object.
+     */
+    protected boolean intersects(Actor other)
+    {
+        Shape thisShape = _actorView.localToParent(_actorView.getBoundsLocal());
+        Shape otherShape = other._actorView.localToParent(other._actorView.getBoundsLocal());
+        return thisShape.intersects(otherShape);
+    }
 
     /**
      * Notification for when actor is added to a world.
