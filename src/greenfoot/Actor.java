@@ -161,6 +161,10 @@ public class Actor {
      */
     void imageChanged()
     {
+        // If image not loaded, come back when loaded
+        if (_image._image != null && !_image._image.isLoaded())
+            _image._image.addLoadListener(this::imageChanged);
+
         // Set new image and new size and reset location to make sure new image is centered
         _actorView.setImage(_image._image);
         _actorView.setSize(_image._image.getWidth(), _image._image.getHeight());
