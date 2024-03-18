@@ -228,7 +228,7 @@ public class World {
     /**
      * Returns the objects at given point.
      */
-    protected <T extends  Actor> T getActorAt(double aX, double aY, Class<T> aClass)
+    protected <T> T getActorAt(double aX, double aY, Class<T> aClass)
     {
         View[] worldViews = _worldView.getChildren();
 

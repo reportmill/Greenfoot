@@ -35,6 +35,9 @@ public class GreenfootImage {
     // Loaded images
     private static Map<String, Image> _images = new HashMap<>();
 
+    // Shared image
+    protected static GreenfootImage SHARED = new GreenfootImage(48, 48);
+
     /**
      * Constructor for size.
      */
@@ -50,8 +53,10 @@ public class GreenfootImage {
     {
         _name = aName;
         _image = _images.get(aName);
-        if (_image != null) return;
-        Class cls = Greenfoot.getWorld().getClass();
+        if (_image != null)
+            return;
+
+        Class<?> cls = Greenfoot.getWorld().getClass();
         _image = Image.getImageForClassResource(cls, "images/" + aName);
         if (_image == null)
             _image = Image.getImageForClassResource(cls, aName);
@@ -62,12 +67,9 @@ public class GreenfootImage {
 
         // If image has non-standard DPI, resize to pix width/height
         if (_image.getWidth() != _image.getPixWidth()) {
-            int pw = _image.getPixWidth(), ph = _image.getPixHeight();
-            Image img = _image;
-            _image = Image.getImageForSize(pw, ph, true);
-            Painter pntr = _image.getPainter();
-            pntr.drawImage(img, 0, 0, pw, ph);
-            pntr.flush();
+            int pixW = _image.getPixWidth();
+            int pixH = _image.getPixHeight();
+            _image = _image.cloneForSizeAndDpiScale(pixW, pixH, 1);
         }
 
         _images.put(aName, _image);
@@ -78,27 +80,36 @@ public class GreenfootImage {
      */
     public GreenfootImage(GreenfootImage anImage)
     {
-        this(anImage.getWidth(), anImage.getHeight());
-        Painter pntr = _image.getPainter();
-        pntr.drawImage(anImage._image, 0, 0);
-        pntr.flush();
-        imagePainted();
+        _image = anImage._image.cloneForScale(1);
     }
 
     /**
      * Constructor for string, size, color.
      */
-    public GreenfootImage(String aString, int aSize, Color fg, Color bg)
+    public GreenfootImage(String aString, int fontSize, Color foregroundColor, Color backgroundColor)
     {
-        _font = _font.deriveFont(aSize);
-        int sw = (int) Math.ceil(_font.getFontObject().getStringAdvance(aString));
-        int sh = (int) Math.ceil(_font.getFontObject().getLineHeight());
-        _image = Image.getImageForSize(sw + 8, sh + 8, true);
-        if (bg != null && bg.getAlpha() > 0) {
-            setColor(bg);
+        this(aString, fontSize, foregroundColor, backgroundColor, null);
+    }
+
+    /**
+     * Constructor for string, size, color.
+     */
+    public GreenfootImage(String aString, int fontSize, Color foregroundColor, Color bakcgroundColor, Color lineColor)
+    {
+        // Create image
+        _font = _font.deriveFont(fontSize);
+        int strW = (int) Math.ceil(_font.getFontObject().getStringAdvance(aString));
+        int strH = (int) Math.ceil(_font.getFontObject().getLineHeight());
+        _image = Image.getImageForSize(strW + 8, strH + 8, true);
+
+        // Fill background color
+        if (bakcgroundColor != null && bakcgroundColor.getAlpha() > 0) {
+            setColor(bakcgroundColor);
             fill();
         }
-        setColor(fg);
+
+        // Draw string
+        setColor(foregroundColor);
         drawString(aString, 4, (int) Math.round(_font.getFontObject().getAscent() + 4));
     }
 
@@ -164,7 +175,6 @@ public class GreenfootImage {
         Painter pntr = _image.getPainter();
         pntr.setColor(_color.getColorObject());
         pntr.fill(aShape);
-        pntr.flush();
         imagePainted();
     }
 
@@ -190,7 +200,6 @@ public class GreenfootImage {
         pntr.setColor(_color.getColorObject());
         pntr.setStrokeWidth(1);
         pntr.drawLine(x1 + .5, y1 + .5, x2 + .5, y2 + .5);
-        pntr.flush();
         imagePainted();
     }
 
@@ -203,7 +212,6 @@ public class GreenfootImage {
         pntr.setColor(_color.getColorObject());
         pntr.setStrokeWidth(1);
         pntr.drawRect(x + .5, y + .5, w, h);
-        pntr.flush();
         imagePainted();
     }
 
@@ -237,7 +245,6 @@ public class GreenfootImage {
         pntr.setAntialiasing(false);
         pntr.setColor(_color.getColorObject());
         pntr.draw(aShape);
-        pntr.flush();
         pntr.setAntialiasing(true);
         imagePainted();
     }
@@ -251,7 +258,6 @@ public class GreenfootImage {
         pntr.setColor(_color.getColorObject());
         pntr.setFont(_font.getFontObject());
         pntr.drawString(aString, anX, aY);
-        pntr.flush();
         imagePainted();
     }
 
@@ -275,7 +281,6 @@ public class GreenfootImage {
         Painter pntr = _image.getPainter();
         pntr.setImageQuality(0);
         pntr.drawImage(img, 0, 0, aW, aH);
-        pntr.flush();
         pntr.setImageQuality(1);
         imageChanged();
     }
@@ -293,7 +298,6 @@ public class GreenfootImage {
         pntr.scale(-1, 1);
         pntr.translate(-w / 2, 0);
         pntr.drawImage(img, 0, 0);
-        pntr.flush();
         imageChanged();
     }
 
@@ -310,7 +314,6 @@ public class GreenfootImage {
         pntr.scale(1, -1);
         pntr.translate(0, -h / 2);
         pntr.drawImage(img, 0, 0);
-        pntr.flush();
         imageChanged();
     }
 
@@ -327,7 +330,6 @@ public class GreenfootImage {
         pntr.rotate(theDeg);
         pntr.translate(-w / 2, -h / 2);
         pntr.drawImage(img, 0, 0);
-        pntr.flush();
         imageChanged();
     }
 
@@ -373,7 +375,6 @@ public class GreenfootImage {
         pntr.setComposite(Painter.Composite.SRC_IN);
         pntr.setColor(snap.gfx.Color.CLEAR);
         pntr.fillRect(0, 0, getWidth(), getHeight());
-        pntr.flush();
     }
 
     /**
@@ -381,8 +382,10 @@ public class GreenfootImage {
      */
     void imageChanged()
     {
-        for (Actor a : _actors) a.imageChanged();
-        if (_world != null) _world.repaint();
+        for (Actor actor : _actors)
+            actor.imageChanged();
+        if (_world != null)
+            _world.repaint();
     }
 
     /**
@@ -390,7 +393,8 @@ public class GreenfootImage {
      */
     void imagePainted()
     {
-        if (_world != null) _world.repaint();
+        if (_world != null)
+            _world.repaint();
     }
 
     /**

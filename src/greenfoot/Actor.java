@@ -29,8 +29,9 @@ public class Actor {
         // If project configured image, set image
         String imageName = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
         GreenfootImage image = imageName != null ? new GreenfootImage(imageName) : null;
-        if (image != null)
-            setImage(image);
+        if (image == null)
+            image = GreenfootImage.SHARED;
+        setImage(image);
     }
 
     /**
@@ -234,17 +235,17 @@ public class Actor {
     /**
      * Returns peer actor at given offset from this actor's center.
      */
-    protected Actor getOneObjectAtOffset(int aX, int aY, Class<? extends Actor> aClass)
+    protected Actor getOneObjectAtOffset(int aX, int aY, Class<?> aClass)
     {
         double cs = _world.getCellSize(), x = _actorView.getWidth() / 2 + aX * cs, y = _actorView.getHeight() / 2 + aY * cs;
         Point pnt = _actorView.localToParent(x, y);
-        return _world.getActorAt(pnt.getX(), pnt.getY(), aClass);
+        return (Actor) _world.getActorAt(pnt.getX(), pnt.getY(), aClass);
     }
 
     /**
      * Returns whether this actor is touching any other objects of the given class.
      */
-    public boolean isTouching(Class<? extends Actor> aClass)
+    public boolean isTouching(Class<?> aClass)
     {
         return getOneIntersectingObject(aClass) != null;
     }
@@ -252,7 +253,7 @@ public class Actor {
     /**
      * Removes one object of the given class that this actor is currently touching (if any exist).
      */
-    protected void removeTouching(Class<? extends Actor> aClass)
+    protected void removeTouching(Class<?> aClass)
     {
         Actor obj = getOneIntersectingObject(aClass);
         if (obj != null) _world.removeObject(obj);
