@@ -239,4 +239,18 @@ public class Greenfoot {
         String propString = getProperty(aKey);
         return Convert.intValue(propString);
     }
+
+    /**
+     * Show world for class.
+     */
+    public static void showWorldForClass(Class<? extends World> worldClass)
+    {
+        ViewUtils.runLater(() -> {
+            try {
+                World world = worldClass.getConstructor().newInstance();
+                world.setWindowVisible(true);
+            }
+            catch (Exception e) { e.printStackTrace(); }
+        });
+    }
 }
