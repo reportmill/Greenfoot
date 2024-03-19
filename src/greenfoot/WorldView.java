@@ -12,7 +12,7 @@ import snap.view.*;
 public class WorldView extends ChildView {
 
     // The Greenfoot World
-    private World _gfw;
+    private World _world;
 
     // Whether mouse is down
     private ViewEvent _mouseDown;
@@ -34,7 +34,7 @@ public class WorldView extends ChildView {
      */
     public WorldView(World aWorld)
     {
-        _gfw = aWorld;
+        _world = aWorld;
         int csize = aWorld.getCellSize();
         int width = aWorld.getWidth() * csize;
         int height = aWorld.getHeight() * csize;
@@ -47,6 +47,11 @@ public class WorldView extends ChildView {
         setFocusable(true);
         setFocusWhenPressed(true);
     }
+
+    /**
+     * Returns the world.
+     */
+    public World getWorld()  { return _world; }
 
     /**
      * Returns whether the mouse was clicked on this frame.
@@ -99,11 +104,11 @@ public class WorldView extends ChildView {
     public void paintBack(Painter aPntr)
     {
         super.paintBack(aPntr);
-        GreenfootImage gimg = _gfw.getBackground();
+        GreenfootImage gimg = _world.getBackground();
         Image img = gimg._image;
-        int cs = _gfw.getCellSize();
-        int w = _gfw.getWidth() * cs;
-        int h = _gfw.getHeight() * cs;
+        int cs = _world.getCellSize();
+        int w = _world.getWidth() * cs;
+        int h = _world.getHeight() * cs;
         int iw = gimg.getWidth();
         int ih = gimg.getHeight();
         for (int x = 0; x < w; x += iw)
@@ -118,7 +123,7 @@ public class WorldView extends ChildView {
     public void paintAbove(Painter aPntr)
     {
         // Paint background text
-        for (Map.Entry<String, String> entry : _gfw._text.entrySet()) {
+        for (Map.Entry<String, String> entry : _world._text.entrySet()) {
             String key = entry.getKey();
             String str = entry.getValue();
             String[] keys = key.split("x");
@@ -145,7 +150,7 @@ public class WorldView extends ChildView {
     void doAct()
     {
         try {
-            _gfw.act();
+            _world.act();
             for (View child : getChildren()) ((ActorView) child).act();
             _mouseClicked = null;
             _keyClicks.clear();

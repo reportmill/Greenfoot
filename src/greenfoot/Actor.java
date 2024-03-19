@@ -178,6 +178,11 @@ public class Actor {
     public World getWorld()  { return _world; }
 
     /**
+     * Returns the world as given class (null if wrong class).
+     */
+    public <T> T getWorldOfType(Class<T> worldClass)  { return worldClass.cast(_world); }
+
+    /**
      * Returns on intersecting Actor.
      */
     protected <T extends Actor> List<T> getIntersectingObjects(Class<T> aClass)

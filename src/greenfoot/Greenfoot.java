@@ -4,6 +4,7 @@ import snap.geom.Point;
 import snap.gfx.*;
 import snap.util.Convert;
 import snap.view.*;
+import snap.viewx.DialogBox;
 import snap.web.*;
 
 /**
@@ -238,6 +239,19 @@ public class Greenfoot {
     {
         String propString = getProperty(aKey);
         return Convert.intValue(propString);
+    }
+
+    /**
+     * Asks the user a question.
+     */
+    public static String ask(String aPrompt)
+    {
+        stop();
+
+        String title = "User Input";
+        String output = DialogBox.showInputDialog(getWorldOwner().getUI(), title, aPrompt, "");
+        start();
+        return output;
     }
 
     /**
