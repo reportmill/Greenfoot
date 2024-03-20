@@ -65,6 +65,10 @@ public class GreenfootImage {
             _image = Image.getImageForSize(100, 20, false);
         }
 
+        // If image not loaded, wait for load, because greenfoot apps might immediately look at image props.
+        if (!_image.isLoaded()) // Might want to add GreenfootImage.setAsyncImageLoad(boolean) someday
+            waitForImageLoad();
+
         // If image has non-standard DPI, resize to pix width/height
         if (_image.getWidth() != _image.getPixWidth()) {
             int pixW = _image.getPixWidth();
@@ -395,6 +399,25 @@ public class GreenfootImage {
     {
         if (_world != null)
             _world.repaint();
+    }
+
+    /**
+     * Wait thread until image is loaded.
+     */
+    private synchronized void waitForImageLoad()
+    {
+        _image.addLoadListener(this::wakeFromImageLoad);
+        if (_image.isLoaded()) return;
+        try { wait(); }
+        catch (Exception e) { throw new RuntimeException(e); }
+    }
+
+    /**
+     * Wake thread after image load.
+     */
+    private synchronized void wakeFromImageLoad()
+    {
+        notify();
     }
 
     /**
