@@ -2,6 +2,7 @@ package greenfoot;
 import snap.geom.Point;
 import snap.geom.Rect;
 import snap.geom.Shape;
+import snap.util.MathUtils;
 import java.util.List;
 
 /**
@@ -59,18 +60,20 @@ public class Actor {
      */
     public void setLocation(int aX, int aY)
     {
-        int cs = _world != null ? _world.getCellSize() : 1, x = aX * cs + cs / 2, y = aY * cs + cs / 2;
+        int cellSize = _world != null ? _world.getCellSize() : 1;
+        int newX = aX * cellSize + cellSize / 2;
+        int newY = aY * cellSize + cellSize / 2;
+
+        // If bounded, clamp to bounds
         if (_world != null && _world.isBounded()) {
-            if (x < 0) x = 0;
-            if (x >= _world.getWidth() * cs) x = _world.getWidth() * cs - cs;
-            if (y < 0) y = 0;
-            if (y >= _world.getHeight() * cs) y = _world.getHeight() * cs - cs;
+            newX = MathUtils.clamp(newX, 0, _world.getWidth() * cellSize - cellSize);
+            newY = MathUtils.clamp(newY, 0, _world.getHeight() * cellSize - cellSize);
         }
 
         // Set View x/y
-        _actorView.setXY(x - getWidth() / 2d, y - getHeight() / 2d);
-        _x = x;
-        _y = y;
+        _actorView.setXY(newX - getWidth() / 2d, newY - getHeight() / 2d);
+        _x = newX;
+        _y = newY;
     }
 
     /**
@@ -106,8 +109,9 @@ public class Actor {
     {
         int dx = aX - getX();
         int dy = aY - getY();
-        double angle = dx != 0 ? Math.atan(dy / (double) dx) : dy < 0 ? 90 : 270;
-        setRotation((int) Math.round(angle));
+        double angleDeg = Math.toDegrees(Math.atan2(dy, dx));
+        int angleDegInt = (int) Math.round(angleDeg);
+        setRotation(angleDegInt);
     }
 
     /**
@@ -115,8 +119,8 @@ public class Actor {
      */
     public int getRotation()
     {
-        int r = ((int) Math.round(_actorView.getRotate())) % 360;
-        return r >= 0 ? r : (r + 360);
+        int rotation = ((int) Math.round(_actorView.getRotate())) % 360;
+        return rotation >= 0 ? rotation : (rotation + 360);
     }
 
     /**
@@ -187,10 +191,10 @@ public class Actor {
      */
     protected <T extends Actor> List<T> getIntersectingObjects(Class<T> aClass)
     {
-        Rect bnds = _actorView.getBoundsLocal();
-        bnds.inset(.5);
-        Shape shp = _actorView.localToParent(bnds);
-        return _world.getActorsAt(shp, aClass);
+        Rect actorBounds = _actorView.getBoundsLocal();
+        actorBounds.inset(.5);
+        Shape actorBoundsInWorld = _actorView.localToParent(actorBounds);
+        return _world.getActorsAt(actorBoundsInWorld, aClass);
     }
 
     /**
@@ -207,22 +211,23 @@ public class Actor {
      */
     protected <T extends Actor> List<T> getObjectsAtOffset(int aX, int aY, Class<T> aClass)
     {
-        double cs = _world.getCellSize();
-        double x = _actorView.getWidth() / 2 + aX * cs;
-        double y = _actorView.getHeight() / 2 + aY * cs;
-        Point pnt = _actorView.localToParent(x, y);
-        return _world.getActorsAt(pnt.x, pnt.y, aClass);
+        double cellSize = _world.getCellSize();
+        double x = _actorView.getWidth() / 2 + aX * cellSize;
+        double y = _actorView.getHeight() / 2 + aY * cellSize;
+        Point actorXYInWorld = _actorView.localToParent(x, y);
+        return _world.getActorsAt(actorXYInWorld.x, actorXYInWorld.y, aClass);
     }
 
     /**
      * Returns actors in given range.
      */
-    protected <T extends Actor> List<T> getObjectsInRange(int aR, Class<T> aClass)
+    protected <T extends Actor> List<T> getObjectsInRange(int aRadius, Class<T> aClass)
     {
         double x = _actorView.getWidth() / 2;
         double y = _actorView.getHeight() / 2;
-        double r = aR * _world.getCellSize(), hr = r / 2;
-        Shape rect = _actorView.localToParent(new Rect(x - hr, y - hr, r, r));
+        double radius = aRadius * _world.getCellSize();
+        double halfRadius = radius / 2;
+        Shape rect = _actorView.localToParent(new Rect(x - halfRadius, y - halfRadius, radius, radius));
         return _world.getActorsAt(rect, aClass);
     }
 
@@ -231,10 +236,10 @@ public class Actor {
      */
     protected Actor getOneIntersectingObject(Class<?> aClass)
     {
-        Rect bnds = _actorView.getBoundsLocal();
-        bnds.inset(.5);
-        Shape shp = _actorView.localToParent(bnds);
-        return _world.getActorAt(shp, aClass);
+        Rect actorBounds = _actorView.getBoundsLocal();
+        actorBounds.inset(.5);
+        Shape actorBoundsInWorld = _actorView.localToParent(actorBounds);
+        return _world.getActorAt(actorBoundsInWorld, aClass);
     }
 
     /**
@@ -242,9 +247,11 @@ public class Actor {
      */
     protected Actor getOneObjectAtOffset(int aX, int aY, Class<?> aClass)
     {
-        double cs = _world.getCellSize(), x = _actorView.getWidth() / 2 + aX * cs, y = _actorView.getHeight() / 2 + aY * cs;
-        Point pnt = _actorView.localToParent(x, y);
-        return (Actor) _world.getActorAt(pnt.getX(), pnt.getY(), aClass);
+        double cellSize = _world.getCellSize();
+        double x = _actorView.getWidth() / 2 + aX * cellSize;
+        double y = _actorView.getHeight() / 2 + aY * cellSize;
+        Point actorXYInWorld = _actorView.localToParent(x, y);
+        return (Actor) _world.getActorAt(actorXYInWorld.x, actorXYInWorld.y, aClass);
     }
 
     /**
@@ -261,7 +268,8 @@ public class Actor {
     protected void removeTouching(Class<?> aClass)
     {
         Actor obj = getOneIntersectingObject(aClass);
-        if (obj != null) _world.removeObject(obj);
+        if (obj != null)
+            _world.removeObject(obj);
     }
 
     public boolean isAtEdge()  { return false; }
