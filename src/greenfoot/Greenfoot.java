@@ -52,7 +52,7 @@ public class Greenfoot {
      */
     public static boolean isKeyDown(String aName)
     {
-        return getWorld().getView().isKeyDown(aName);
+        return getWorld().getWorldView().isKeyDown(aName);
     }
 
     /**
@@ -165,7 +165,7 @@ public class Greenfoot {
     {
         if (anObj == null) {
             World world = getWorld();
-            return world != null ? world.getView().isMouseClicked() : false;
+            return world != null ? world.getWorldView().isMouseClicked() : false;
         }
 
         System.out.println("Mouse Clicked not supported");
@@ -180,7 +180,7 @@ public class Greenfoot {
         View view = anObj instanceof Actor ? ((Actor) anObj)._actorView : null;
         if (view == null)
             return false;
-        Point pnt = view.parentToLocal(getWorld().getView()._mx, getWorld().getView()._my);
+        Point pnt = view.parentToLocal(getWorld().getWorldView()._mx, getWorld().getWorldView()._my);
         return view.contains(pnt);
     }
 

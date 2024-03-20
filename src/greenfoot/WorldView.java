@@ -29,6 +29,12 @@ public class WorldView extends ChildView {
     // The key typed in current frame
     private Set<Integer> _keyClicks = new HashSet<>();
 
+    // The children in paint order
+    private Class<?>[] _paintOrderClasses;
+
+    // The children in paint order
+    private View[] _childrenInPaintOrder;
+
     /**
      * Constructor for given GreenFoot World.
      */
@@ -73,6 +79,7 @@ public class WorldView extends ChildView {
     /**
      * Process event.
      */
+    @Override
     protected void processEvent(ViewEvent anEvent)
     {
         // Handle MouseEvent
@@ -101,47 +108,143 @@ public class WorldView extends ChildView {
     /**
      * Override to paint background image.
      */
-    public void paintBack(Painter aPntr)
+    @Override
+    protected void paintBack(Painter aPntr)
     {
         super.paintBack(aPntr);
-        GreenfootImage gimg = _world.getBackground();
-        Image img = gimg._image;
-        int cs = _world.getCellSize();
-        int w = _world.getWidth() * cs;
-        int h = _world.getHeight() * cs;
-        int iw = gimg.getWidth();
-        int ih = gimg.getHeight();
-        for (int x = 0; x < w; x += iw)
-            for (int y = 0; y < h; y += ih)
-                aPntr.drawImage(img, x, y, iw, ih);
 
+        GreenfootImage backgroundImageGF = _world.getBackground();
+        Image backgroundImage = backgroundImageGF._image;
+
+        // Get world and image sizes
+        int cellSize = _world.getCellSize();
+        int worldW = _world.getWidth() * cellSize;
+        int worldH = _world.getHeight() * cellSize;
+        int imageW = backgroundImageGF.getWidth();
+        int imageH = backgroundImageGF.getHeight();
+
+        // Tile image to fill world
+        for (int x = 0; x < worldW; x += imageW)
+            for (int y = 0; y < worldH; y += imageH)
+                aPntr.drawImage(backgroundImage, x, y, imageW, imageH);
     }
 
     /**
-     * Override to paint background image.
+     * Override to paint world strings.
      */
-    public void paintAbove(Painter aPntr)
+    @Override
+    protected void paintAbove(Painter aPntr)
     {
+        // Get strings to show
+        Map<String,String> worldStrings = _world._text;
+
         // Paint background text
-        for (Map.Entry<String, String> entry : _world._text.entrySet()) {
-            String key = entry.getKey();
+        for (Map.Entry<String, String> entry : worldStrings.entrySet()) {
+
+            // Get string, key and text XY
             String str = entry.getValue();
-            String[] keys = key.split("x");
-            int x = StringUtils.intValue(keys[0]);
-            int y = StringUtils.intValue(keys[1]);
+            String key = entry.getKey();
+            String[] textXYStrings = key.split("x");
+            int textX = StringUtils.intValue(textXYStrings[0]);
+            int textY = StringUtils.intValue(textXYStrings[1]);
+
             snap.gfx.Font font = snap.gfx.Font.Arial14.copyForSize(24).getBold();
             aPntr.setFont(font);
-            Rect bnds = font.getStringBounds(str);
-            x = x - (int) Math.round(bnds.width / 2);
-            y = y - (int) Math.round(font.getDescent() - bnds.height / 2);
+            Rect stringBounds = font.getStringBounds(str);
+            textX = textX - (int) Math.round(stringBounds.width / 2);
+            textY = textY - (int) Math.round(font.getDescent() - stringBounds.height / 2);
+
+            // Draw string black (offset by one in every direction)
             aPntr.setColor(Color.BLACK);
-            aPntr.drawString(str, x, y - 1);
-            aPntr.drawString(str, x, y + 1);
-            aPntr.drawString(str, x - 1, y);
-            aPntr.drawString(str, x + 1, y);
+            aPntr.drawString(str, textX, textY - 1);
+            aPntr.drawString(str, textX, textY + 1);
+            aPntr.drawString(str, textX - 1, textY);
+            aPntr.drawString(str, textX + 1, textY);
+
+            // Draw string white
             aPntr.setColor(Color.WHITE);
-            aPntr.drawString(str, x, y);
+            aPntr.drawString(str, textX, textY);
         }
+    }
+
+    /**
+     * Override to use paint order.
+     */
+    @Override
+    protected void paintChildren(Painter aPntr)
+    {
+        super.paintChildren(aPntr);
+    }
+
+    /**
+     * Sets the paint order.
+     */
+    public void setPaintOrder(Class<?>... theClasses)
+    {
+        _paintOrderClasses = theClasses != null && theClasses.length > 0 ? theClasses : null;
+        _childrenInPaintOrder = null;
+    }
+
+    /**
+     * Sets the children in paint order.
+     */
+    @Override
+    protected View[] getChildrenInPaintOrder()
+    {
+        // If no paint order, do normal version
+        if (_paintOrderClasses == null)
+            return super.getChildrenInPaintOrder();
+
+        // If childrenInPaintOrder not set, set
+        if (_childrenInPaintOrder == null) {
+            _childrenInPaintOrder = getChildren().clone();
+            Arrays.sort(_childrenInPaintOrder, (o1,o2) -> Integer.compare(getPaintRanking(o1), getPaintRanking(o2)));
+        }
+
+        // Return
+        return _childrenInPaintOrder;
+    }
+
+    /**
+     * Returns a ranking of the given actorView, depending on where its actor falls in paintOrderClasses.
+     */
+    private int getPaintRanking(View actorView)
+    {
+        // Get actor for view, if not found, return no ranking
+        Actor actor = actorView instanceof ActorView ? ((ActorView) actorView).getActor() : null;
+        if (actor == null)
+            return -1;
+
+        // Iterate over paint order classes and if actor is instance of class, return opposite index
+        // Iterate backwards, in case Actor.class is specified first? Dunno, probably still some problems
+        for (int i = _paintOrderClasses.length - 1; i >= 0; i--) {
+            Class<?> cls = _paintOrderClasses[i];
+            if (cls.isInstance(actor)) // Return opposite index to make it ranking instead of index
+                return _paintOrderClasses.length - i;
+        }
+
+        // Return no ranking
+        return -1;
+    }
+
+    /**
+     * Override to clear paint order.
+     */
+    @Override
+    public void addChild(View aChild, int anIndex)
+    {
+        super.addChild(aChild, anIndex);
+        _childrenInPaintOrder = null;
+    }
+
+    /**
+     * Override to clear paint order.
+     */
+    @Override
+    public View removeChild(int anIndex)
+    {
+        try { return super.removeChild(anIndex); }
+        finally { _childrenInPaintOrder = null; }
     }
 
     /**

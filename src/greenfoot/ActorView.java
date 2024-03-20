@@ -7,7 +7,7 @@ import snap.view.ImageView;
 public class ActorView extends ImageView {
 
     // The Greenfoot actor
-    Actor _actor;
+    protected Actor _actor;
 
     /**
      * Creates a new SnapActor.
@@ -16,6 +16,11 @@ public class ActorView extends ImageView {
     {
         _actor = anActor;
     }
+
+    /**
+     * Returns the actor.
+     */
+    public Actor getActor()  { return _actor; }
 
     /**
      * Override to send to Greenfoot Actor.

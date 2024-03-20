@@ -202,16 +202,17 @@ public class World {
      */
     public void setPaintOrder(Class<?>... theClasses)
     {
-        System.err.println("World.setPaintOrder: Not Impl");
+        _worldView.setPaintOrder(theClasses);
     }
 
     /**
      * Show some text centered at given position in world.
      */
-    public void showText(String aStr, int x, int y)
+    public void showText(String aString, int textX, int textY)
     {
-        String key = x + "x" + y;
-        if (aStr.length() > 0) _text.put(key, aStr);
+        String key = textX + "x" + textY;
+        if (aString != null && aString.length() > 0)
+            _text.put(key, aString);
         else _text.remove(key);
     }
 
@@ -230,9 +231,9 @@ public class World {
      */
     protected <T> T getActorAt(double aX, double aY, Class<T> aClass)
     {
-        View[] worldViews = _worldView.getChildren();
+        View[] actorViews = _worldView.getChildren();
 
-        for (View actorView : worldViews) {
+        for (View actorView : actorViews) {
             Actor actor = getActorForView(actorView);
             if (actor == null)
                 continue;
@@ -318,9 +319,9 @@ public class World {
     }
 
     /**
-     * This method is called by snap.node.ClassPage to return actual Node.
+     * Returns the world view.
      */
-    public WorldView getView()  { return _worldView; }
+    public WorldView getWorldView()  { return _worldView; }
 
     /**
      * Sets the window visible.

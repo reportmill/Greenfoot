@@ -53,7 +53,7 @@ public class GreenfootOwner extends ViewOwner {
             _firstWorld = aWorld;
         getUI();
         _world = aWorld;
-        _worldView = aWorld.getView();
+        _worldView = aWorld.getWorldView();
         _worldViewBox.setContent(_worldView);
         setFirstFocus(_worldView);
         enableEvents(_worldView, MouseEvents);
