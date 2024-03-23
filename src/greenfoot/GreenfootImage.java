@@ -65,6 +65,10 @@ public class GreenfootImage {
             _image = Image.getImageForSize(100, 20, false);
         }
 
+        // Wait for image load, since GF apps regularly use image info (or do image transform) immediately after loading
+        if (!_image.isLoaded())
+            _image.waitForImageLoad();
+
         // If image has non-standard DPI, resize to pix width/height
         if (_image.getWidth() != _image.getPixWidth()) {
             int pixW = _image.getPixWidth();

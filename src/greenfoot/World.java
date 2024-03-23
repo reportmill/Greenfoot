@@ -48,12 +48,13 @@ public class World {
         _worldView.setSize(_width * _cellSize, _height * _cellSize);
 
         // If first world, manually set it
-        if (Greenfoot.getWorld() == null) Greenfoot.setWorld(this);
+        if (Greenfoot.getWorld() == null)
+            Greenfoot.setWorld(this);
 
         // Set background image
-        String iname = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
-        if (iname != null)
-            setBackground(new GreenfootImage(iname));
+        String imageName = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
+        if (imageName != null)
+            setBackground(new GreenfootImage(imageName));
         else setBackground(new GreenfootImage(aW * aCellSize, aH * aCellSize));
     }
 
