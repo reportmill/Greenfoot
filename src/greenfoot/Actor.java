@@ -36,6 +36,11 @@ public class Actor {
     }
 
     /**
+     * Returns the actor view.
+     */
+    public ActorView getActorView()  { return _actorView; }
+
+    /**
      * Returns the x location.
      */
     public int getX()  { return _x; }
@@ -54,6 +59,17 @@ public class Actor {
      * Returns the height.
      */
     public int getHeight()  { return (int) _actorView.getHeight(); }
+
+    /**
+     * Returns the actor bounds in world coords.
+     */
+    public Shape getBoundsInWorld()
+    {
+        // Get actor bounds in world coords
+        Rect actorBounds = _actorView.getBoundsLocal();
+        actorBounds.inset(.5);
+        return _actorView.localToParent(actorBounds);
+    }
 
     /**
      * Set Location.
@@ -191,10 +207,7 @@ public class Actor {
      */
     protected <T extends Actor> List<T> getIntersectingObjects(Class<T> aClass)
     {
-        Rect actorBounds = _actorView.getBoundsLocal();
-        actorBounds.inset(.5);
-        Shape actorBoundsInWorld = _actorView.localToParent(actorBounds);
-        return _world.getActorsAt(actorBoundsInWorld, aClass);
+        return _world.getIntersectingActorsForActorShapeAndClass(this, null, aClass);
     }
 
     /**
@@ -209,26 +222,26 @@ public class Actor {
     /**
      * Returns peer actors at given offset from this actor's center.
      */
-    protected <T extends Actor> List<T> getObjectsAtOffset(int aX, int aY, Class<T> aClass)
+    protected <T> List<T> getObjectsAtOffset(int aX, int aY, Class<T> aClass)
     {
         double cellSize = _world.getCellSize();
-        double x = _actorView.getWidth() / 2 + aX * cellSize;
-        double y = _actorView.getHeight() / 2 + aY * cellSize;
-        Point actorXYInWorld = _actorView.localToParent(x, y);
-        return _world.getActorsAt(actorXYInWorld.x, actorXYInWorld.y, aClass);
+        double offsetX = _actorView.getWidth() / 2 + aX * cellSize;
+        double offsetY = _actorView.getHeight() / 2 + aY * cellSize;
+        Point offsetXYInWorld = _actorView.localToParent(offsetX, offsetY);
+        return _world.getActorsAt(offsetXYInWorld.x, offsetXYInWorld.y, aClass);
     }
 
     /**
      * Returns actors in given range.
      */
-    protected <T extends Actor> List<T> getObjectsInRange(int aRadius, Class<T> aClass)
+    protected <T> List<T> getObjectsInRange(int aRadius, Class<T> aClass)
     {
-        double x = _actorView.getWidth() / 2;
-        double y = _actorView.getHeight() / 2;
+        double actorX = _actorView.getWidth() / 2;
+        double actorY = _actorView.getHeight() / 2;
         double radius = aRadius * _world.getCellSize();
-        double halfRadius = radius / 2;
-        Shape rect = _actorView.localToParent(new Rect(x - halfRadius, y - halfRadius, radius, radius));
-        return _world.getActorsAt(rect, aClass);
+        Rect rangeBounds = new Rect(actorX - radius / 2, actorY - radius / 2, radius, radius);
+        Shape rangeBoundsInWorld = _actorView.localToParent(rangeBounds);
+        return _world.getIntersectingActorsForActorShapeAndClass(this, rangeBoundsInWorld, aClass);
     }
 
     /**
@@ -236,10 +249,7 @@ public class Actor {
      */
     protected Actor getOneIntersectingObject(Class<?> aClass)
     {
-        Rect actorBounds = _actorView.getBoundsLocal();
-        actorBounds.inset(.5);
-        Shape actorBoundsInWorld = _actorView.localToParent(actorBounds);
-        return _world.getActorAt(actorBoundsInWorld, aClass);
+        return _world.getIntersectingActorForActorAndClass(this, aClass);
     }
 
     /**
@@ -248,10 +258,10 @@ public class Actor {
     protected Actor getOneObjectAtOffset(int aX, int aY, Class<?> aClass)
     {
         double cellSize = _world.getCellSize();
-        double x = _actorView.getWidth() / 2 + aX * cellSize;
-        double y = _actorView.getHeight() / 2 + aY * cellSize;
-        Point actorXYInWorld = _actorView.localToParent(x, y);
-        return (Actor) _world.getActorAt(actorXYInWorld.x, actorXYInWorld.y, aClass);
+        double offsetX = _actorView.getWidth() / 2 + aX * cellSize;
+        double offsetY = _actorView.getHeight() / 2 + aY * cellSize;
+        Point offsetXYInWorld = _actorView.localToParent(offsetX, offsetY);
+        return (Actor) _world.getActorAt(offsetXYInWorld.x, offsetXYInWorld.y, aClass);
     }
 
     /**
@@ -284,9 +294,9 @@ public class Actor {
      */
     protected boolean intersects(Actor other)
     {
-        Shape thisShape = _actorView.localToParent(_actorView.getBoundsLocal());
-        Shape otherShape = other._actorView.localToParent(other._actorView.getBoundsLocal());
-        return thisShape.intersects(otherShape);
+        Shape thisShape = getBoundsInWorld();
+        Shape otherShape = other.getBoundsInWorld();
+        return thisShape.intersectsShape(otherShape);
     }
 
     /**

@@ -59,6 +59,11 @@ public class World {
     }
 
     /**
+     * Returns the world view.
+     */
+    public WorldView getWorldView()  { return _worldView; }
+
+    /**
      * Act method for world.
      */
     public void act()  { }
@@ -132,7 +137,7 @@ public class World {
     /**
      * Returns the objects at given point.
      */
-    public <T extends Actor> List<T> getObjectsAt(int aX, int aY, Class<T> aClass)
+    public <T> List<T> getObjectsAt(int aX, int aY, Class<T> aClass)
     {
         return getActorsAt(aX, aY, aClass);
     }
@@ -140,9 +145,9 @@ public class World {
     /**
      * Removes the objects of given class.
      */
-    public void removeObjects(Collection theActors)
+    public void removeObjects(Collection<? extends Actor> theActors)
     {
-        for (Object actor : theActors) removeObject((Actor) actor);
+        theActors.forEach(this::removeObject);
     }
 
     /**
@@ -251,7 +256,7 @@ public class World {
     /**
      * Returns the objects at given point.
      */
-    protected <T extends Actor> List<T> getActorsAt(double aX, double aY, Class<T> aClass)
+    protected <T> List<T> getActorsAt(double aX, double aY, Class<T> aClass)
     {
         View[] worldViews = _worldView.getChildren();
         List<T> hitList = new ArrayList<>();
@@ -273,56 +278,62 @@ public class World {
     }
 
     /**
-     * Returns on intersecting Actor.
+     * Returns the first actor intersecting given Actor and matching given class (optional).
      */
-    protected Actor getActorAt(Shape aShape, Class aClass)
+    protected Actor getIntersectingActorForActorAndClass(Actor anActor, Class<?> aClass)
     {
-        View[] worldViews = _worldView.getChildren();
+        // Get actor bounds in world coords and all actor views
+        Shape actorBoundsInWorld = anActor.getBoundsInWorld();
+        View[] actorViews = _worldView.getChildren();
 
-        for (View actorView : worldViews) {
-
-            Actor actor = getActorForView(actorView);
-            if (actor == null)
-                continue;
-
-            if (aClass == null || aClass.isInstance(actor)) {
-                Shape shp2 = actorView.parentToLocal(aShape);
-                if (actorView.intersects(shp2))
-                    return actor;
-            }
+        // Iterate over all actor views and if any is intersecting and instance of given class, return actor
+        for (View otherView : actorViews) {
+            if (isIntersectingActorViewForActorShapeAndClass(otherView, anActor, actorBoundsInWorld, aClass))
+                return getActorForView(otherView);
         }
 
+        // Return not found
         return null;
     }
 
     /**
-     * Returns on intersecting Actor.
+     * Returns all actors intersecting given Actor and matching given class (optional).
      */
-    protected <T extends Actor> List<T> getActorsAt(Shape aShape, Class<T> aClass)
+    protected <T> List<T> getIntersectingActorsForActorShapeAndClass(Actor anActor, Shape aShape, Class<T> aClass)
     {
-        View[] worldViews = _worldView.getChildren();
-        List<T> hitList = new ArrayList<>();
+        // Get actor view, actor bounds in world coords and all actor views
+        Shape actorBoundsInWorld = aShape != null ? aShape : anActor.getBoundsInWorld();
+        View[] actorViews = _worldView.getChildren();
+        List<T> intersectingActors = new ArrayList<>();
 
-        for (View actorView : worldViews) {
-
-            Actor actor = getActorForView(actorView);
-            if (actor == null)
-                continue;
-
-            if (aClass == null || aClass.isInstance(actor)) {
-                Shape shp2 = actorView.parentToLocal(aShape);
-                if (actorView.intersects(shp2))
-                    hitList.add((T) actor);
-            }
+        // Iterate over all actor views and if any is intersecting and instance of given class, add actor to list
+        for (View otherView : actorViews) {
+            if (isIntersectingActorViewForActorShapeAndClass(otherView, anActor, actorBoundsInWorld, aClass))
+                intersectingActors.add((T) getActorForView(otherView));
         }
 
-        return hitList;
+        // Return
+        return intersectingActors;
     }
 
     /**
-     * Returns the world view.
+     * Returns whether given actor view intersects given shape and is instance of given class (optional).
      */
-    public WorldView getWorldView()  { return _worldView; }
+    private boolean isIntersectingActorViewForActorShapeAndClass(View actorView, Actor anActor, Shape aShape, Class<?> aClass)
+    {
+        // If no actor or is given actor, return false
+        Actor actor = getActorForView(actorView);
+        if (actor == null || actor == anActor)
+            return false;
+
+        // If class is specified and actor isn't class, return false
+        if (aClass != null && !aClass.isInstance(actor))
+            return false;
+
+        // Return whether actor bounds in world coords intersects shape
+        Shape actorBoundsInWorld = actor.getBoundsInWorld();
+        return actorBoundsInWorld.intersectsShape(aShape);
+    }
 
     /**
      * Sets the window visible.
