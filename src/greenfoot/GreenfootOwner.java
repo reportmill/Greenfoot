@@ -135,17 +135,18 @@ public class GreenfootOwner extends ViewOwner {
         // Configure World View
         _worldViewBox = new BoxView();
         _worldViewBox.setPadding(8, 8, 8, 8);
-        ScrollView scrollView = new ScrollView(_worldViewBox);
-        scrollView.setBorder(null);
+        ScaleBox scaleBox = new ScaleBox(_worldViewBox, true, true);
+        scaleBox.setGrowHeight(true);
 
-        // Create border view and add world, toolBar
-        BorderView borderView = new BorderView();
-        borderView.setFont(snap.gfx.Font.Arial12);
-        borderView.setFill(ViewUtils.getBackFill());
-        borderView.setCenter(scrollView);
-        borderView.setBottom(toolBar);
-        borderView.setBorder(Color.GRAY, 1);
-        return borderView;
+        // Create col view and add world, toolBar
+        ColView colView = new ColView();
+        colView.setFillWidth(true);
+        colView.setFont(snap.gfx.Font.Arial12);
+        colView.setBorder(Color.GRAY, 1);
+        colView.setChildren(scaleBox, toolBar);
+
+        // Return
+        return colView;
     }
 
     /**
@@ -242,7 +243,7 @@ public class GreenfootOwner extends ViewOwner {
             }
 
             // Otherwise get actor at event
-            else _mouseActor = _world.getActorAt(mouseX, mouseY, null);
+            else _mouseActor = _world.getActorAt(null, mouseX, mouseY, null);
         }
 
         // Handle MouseDraggged

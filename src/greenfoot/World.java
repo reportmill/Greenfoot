@@ -2,6 +2,7 @@ package greenfoot;
 import java.util.*;
 import snap.geom.Point;
 import snap.geom.Shape;
+import snap.util.SnapUtils;
 import snap.view.*;
 
 /**
@@ -139,7 +140,7 @@ public class World {
      */
     public <T> List<T> getObjectsAt(int aX, int aY, Class<T> aClass)
     {
-        return getActorsAt(aX, aY, aClass);
+        return getActorsAt(null, aX, aY, aClass);
     }
 
     /**
@@ -235,13 +236,13 @@ public class World {
     /**
      * Returns the objects at given point.
      */
-    protected <T> T getActorAt(double aX, double aY, Class<T> aClass)
+    protected <T> T getActorAt(Actor anActor, double aX, double aY, Class<T> aClass)
     {
         View[] actorViews = _worldView.getChildren();
 
         for (View actorView : actorViews) {
             Actor actor = getActorForView(actorView);
-            if (actor == null)
+            if (actor == null || actor == anActor)
                 continue;
             if (aClass == null || aClass.isInstance(actor)) {
                 Point point = actorView.parentToLocal(aX, aY);
@@ -256,7 +257,7 @@ public class World {
     /**
      * Returns the objects at given point.
      */
-    protected <T> List<T> getActorsAt(double aX, double aY, Class<T> aClass)
+    protected <T> List<T> getActorsAt(Actor anActor, double aX, double aY, Class<T> aClass)
     {
         View[] worldViews = _worldView.getChildren();
         List<T> hitList = new ArrayList<>();
@@ -264,7 +265,7 @@ public class World {
         for (View child : worldViews) {
 
             Actor actor = getActorForView(child);
-            if (actor == null)
+            if (actor == null || actor == anActor)
                 continue;
 
             if (aClass == null || aClass.isInstance(actor)) {
@@ -346,6 +347,7 @@ public class World {
 
         GreenfootOwner owner = GreenfootOwner.getShared();
         owner.setWorld(this);
+        owner.getWindow().setMaximized(SnapUtils.isWebVM);
         owner.setWindowVisible(true);
     }
 

@@ -228,7 +228,7 @@ public class Actor {
         double offsetX = _actorView.getWidth() / 2 + aX * cellSize;
         double offsetY = _actorView.getHeight() / 2 + aY * cellSize;
         Point offsetXYInWorld = _actorView.localToParent(offsetX, offsetY);
-        return _world.getActorsAt(offsetXYInWorld.x, offsetXYInWorld.y, aClass);
+        return _world.getActorsAt(this, offsetXYInWorld.x, offsetXYInWorld.y, aClass);
     }
 
     /**
@@ -261,7 +261,7 @@ public class Actor {
         double offsetX = _actorView.getWidth() / 2 + aX * cellSize;
         double offsetY = _actorView.getHeight() / 2 + aY * cellSize;
         Point offsetXYInWorld = _actorView.localToParent(offsetX, offsetY);
-        return (Actor) _world.getActorAt(offsetXYInWorld.x, offsetXYInWorld.y, aClass);
+        return (Actor) _world.getActorAt(this, offsetXYInWorld.x, offsetXYInWorld.y, aClass);
     }
 
     /**
