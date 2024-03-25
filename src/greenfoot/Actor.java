@@ -160,13 +160,23 @@ public class Actor {
         // If image already set, just return
         if (_image == anImage) return;
 
+        // Get whether location needs update
+        boolean updateLocation = _image != null;
+
         // Update image actor lists and set new image
         if (_image != null) _image._actors.remove(this);
         _image = anImage;
         if (_image != null) _image._actors.add(this);
 
-        // Call image changed
-        imageChanged();
+        // Update ActorView Image and Size
+        if (_image != null) {
+            _actorView.setImage(_image._image);
+            _actorView.setSize(_image._image.getWidth(), _image._image.getHeight());
+        }
+
+        // If old image was set, update location to keep image centered if image size changed
+        if (updateLocation)
+            setLocation(getX(), getY());
     }
 
     /**
@@ -174,7 +184,8 @@ public class Actor {
      */
     public void setImage(String aName)
     {
-        setImage(new GreenfootImage(aName));
+        GreenfootImage greenfootImageForName = new GreenfootImage(aName);
+        setImage(greenfootImageForName);
     }
 
     /**
@@ -182,10 +193,6 @@ public class Actor {
      */
     void imageChanged()
     {
-        // If image not loaded, come back when loaded
-        if (_image._image != null && !_image._image.isLoaded())
-            _image._image.addLoadListener(this::imageChanged);
-
         // Set new image and new size and reset location to make sure new image is centered
         _actorView.setImage(_image._image);
         _actorView.setSize(_image._image.getWidth(), _image._image.getHeight());
