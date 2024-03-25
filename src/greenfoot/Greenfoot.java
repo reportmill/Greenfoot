@@ -163,12 +163,28 @@ public class Greenfoot {
      */
     public static boolean mouseClicked(Object anObj)
     {
-        if (anObj == null) {
-            World world = getWorld();
-            return world != null ? world.getWorldView().isMouseClicked() : false;
-        }
-
+        World world = getWorld();
+        if (anObj == null)
+            return world != null && world.getWorldView().isMouseClicked();
+        if (anObj instanceof World)
+            return anObj == world && world.getWorldView().isMouseClicked();
         System.out.println("Mouse Clicked not supported");
+        return false;
+    }
+
+    /**
+     * Returns whether mouse was pressed on given actor/world.
+     */
+    public static boolean mousePressed(Object anObj)
+    {
+        World world = getWorld();
+
+        if (anObj == null)
+            return world != null && world.getWorldView().isMouseDown();
+        if (anObj instanceof World)
+            return anObj == world && world.getWorldView().isMouseDown();
+        if (anObj instanceof Actor)
+            return ((Actor) anObj).getActorView().isMouseDown();
         return false;
     }
 

@@ -26,6 +26,9 @@ package greenfoot;
  */
 public class Color
 {
+    // Real color
+    private final snap.gfx.Color color;
+
     // Common colors
     public final static Color WHITE = new Color(255, 255, 255);
     public final static Color LIGHT_GRAY = new Color(192, 192, 192);
@@ -40,7 +43,21 @@ public class Color
     public final static Color MAGENTA = new Color(255, 0, 255);
     public final static Color CYAN = new Color(0, 255, 255);
     public final static Color BLUE = new Color(0, 0, 255);
-    private final snap.gfx.Color color;
+
+    // Awt legacy
+    public final static Color white = WHITE;
+    public final static Color lightGray = LIGHT_GRAY;
+    public final static Color gray = GRAY;
+    public final static Color darkGray = DARK_GRAY;
+    public final static Color black = BLACK;
+    public final static Color red = RED;
+    public final static Color pink = PINK;
+    public final static Color orange = ORANGE;
+    public final static Color yellow = YELLOW;
+    public final static Color green = GREEN;
+    public final static Color magenta = MAGENTA;
+    public final static Color cyan = CYAN;
+    public final static Color blue = BLUE;
 
     /**
      * Constructor.
