@@ -2,9 +2,10 @@ package greenfoot;
 import snap.gfx.SoundClip;
 
 /**
- * A custom class.
+ * An implementation of the GreenFootSound class using SnapKit.
+ * (<a href="https://www.greenfoot.org/files/javadoc/greenfoot/GreenfootSound.html">GreenfootSound</a>)
  */
-public class GreenfootSound extends Object {
+public class GreenfootSound {
 
     // The SnapSound
     private SoundClip _sound;
@@ -14,7 +15,10 @@ public class GreenfootSound extends Object {
      */
     public GreenfootSound(String aName)
     {
-        Class<?> worldClass = Greenfoot.getWorld().getClass();
+        // Get world class
+        Class<?> worldClass = Greenfoot.getWorldClass();
+
+        // Get sound clip for name
         _sound = SoundClip.get(worldClass, "sounds/" + aName);
         if (_sound == null)
             System.err.println("GreenfootSound: Sound not found for name: " + aName);

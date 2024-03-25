@@ -7,6 +7,7 @@ import snap.view.*;
 
 /**
  * An implementation of the GreenFoot World class using SnapKit.
+ * (<a href="https://www.greenfoot.org/files/javadoc/greenfoot/World.html">World</a>)
  */
 public class World {
 
@@ -38,6 +39,9 @@ public class World {
      */
     public World(int aW, int aH, int aCellSize, boolean isBounded)
     {
+        // Set any project class
+        Greenfoot._worldClass = getClass();
+
         // Set sizing info
         _width = aW;
         _height = aH;

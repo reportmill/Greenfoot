@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * An implementation of the GreenFoot Actor class using SnapKit.
+ * (<a href="https://www.greenfoot.org/files/javadoc/greenfoot/Actor.html">Actor</a>)
  */
 public class Actor {
 

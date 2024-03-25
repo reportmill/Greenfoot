@@ -9,6 +9,7 @@ import snap.web.*;
 
 /**
  * Greenfoot class.
+ * (<a href="https://www.greenfoot.org/files/javadoc/greenfoot/Greenfoot.html">Greenfoot</a>)
  */
 public class Greenfoot {
 
@@ -29,6 +30,9 @@ public class Greenfoot {
 
     // A Random
     private static Random _random = new Random();
+
+    // The world class from the current project
+    protected static Class<?> _worldClass;
 
     /**
      * Get the most recently pressed key, since the last time this method was called.
@@ -282,5 +286,16 @@ public class Greenfoot {
             }
             catch (Exception e) { e.printStackTrace(); }
         });
+    }
+
+    /**
+     * Returns the current world class.
+     */
+    protected static Class<?> getWorldClass()
+    {
+        World world = getWorld();
+        if (world != null)
+            return world.getClass();
+        return _worldClass;
     }
 }

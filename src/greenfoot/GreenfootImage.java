@@ -7,7 +7,8 @@ import snap.geom.Shape;
 import snap.gfx.*;
 
 /**
- * A custom class.
+ * An implementation of the GreenFootImage class using SnapKit.
+ * (<a href="https://www.greenfoot.org/files/javadoc/greenfoot/GreenFootImage.html">GreenFootImage</a>)
  */
 public class GreenfootImage {
 
@@ -56,10 +57,13 @@ public class GreenfootImage {
         if (_image != null)
             return;
 
-        Class<?> cls = Greenfoot.getWorld().getClass();
-        _image = Image.getImageForClassResource(cls, "images/" + aName);
+        // Get world class
+        Class<?> worldClass = Greenfoot.getWorldClass();
+
+        // Get image for name
+        _image = Image.getImageForClassResource(worldClass, "images/" + aName);
         if (_image == null)
-            _image = Image.getImageForClassResource(cls, aName);
+            _image = Image.getImageForClassResource(worldClass, aName);
         if (_image == null) {
             System.err.println("Image not found: " + aName);
             _image = Image.getImageForSize(100, 20, false);
