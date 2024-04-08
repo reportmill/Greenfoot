@@ -25,7 +25,7 @@ public class GreenfootOwner extends ViewOwner {
     private Actor _mouseActor;
 
     // The animation timer    
-    private ViewTimer _timer = new ViewTimer(40, t -> _worldView.doAct());
+    private ViewTimer _timer = new ViewTimer(() -> _worldView.doAct(), 40);
 
     // The shared GreenfootOwner
     private static GreenfootOwner _shared;
