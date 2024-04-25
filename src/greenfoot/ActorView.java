@@ -2,7 +2,7 @@ package greenfoot;
 import snap.view.ImageView;
 
 /**
- * The Greenfoot SnapActor.
+ * The Greenfoot Actor.
  */
 public class ActorView extends ImageView {
 
@@ -10,7 +10,7 @@ public class ActorView extends ImageView {
     protected Actor _actor;
 
     /**
-     * Creates a new SnapActor.
+     * Constructor.
      */
     public ActorView(Actor anActor)
     {
@@ -21,12 +21,4 @@ public class ActorView extends ImageView {
      * Returns the actor.
      */
     public Actor getActor()  { return _actor; }
-
-    /**
-     * Override to send to Greenfoot Actor.
-     */
-    public void act()
-    {
-        _actor.act();
-    }
 }

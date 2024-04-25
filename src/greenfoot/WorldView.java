@@ -254,7 +254,8 @@ public class WorldView extends ChildView {
     {
         try {
             _world.act();
-            for (View child : getChildren()) ((ActorView) child).act();
+            for (View child : getChildren())
+                ((ActorView) child)._actor.act();
             _mouseClicked = null;
             _keyClicks.clear();
         }
