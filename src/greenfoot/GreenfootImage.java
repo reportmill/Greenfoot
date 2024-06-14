@@ -1,10 +1,12 @@
 package greenfoot;
 import java.util.*;
-import snap.geom.Ellipse;
+import snap.geom.*;
 import snap.geom.Polygon;
-import snap.geom.Rect;
 import snap.geom.Shape;
 import snap.gfx.*;
+import snap.text.TextStyle;
+import snap.view.TextArea;
+import snap.view.ViewUtils;
 
 /**
  * An implementation of the GreenFootImage class using SnapKit.
@@ -94,31 +96,39 @@ public class GreenfootImage {
     /**
      * Constructor for string, size, color.
      */
-    public GreenfootImage(String aString, int fontSize, Color foregroundColor, Color backgroundColor)
+    public GreenfootImage(String aString, int lineHeight, Color foregroundColor, Color backgroundColor)
     {
-        this(aString, fontSize, foregroundColor, backgroundColor, null);
+        this(aString, lineHeight, foregroundColor, backgroundColor, null);
     }
 
     /**
-     * Constructor for string, size, color.
+     * Constructor for string, requested line height, color.
      */
-    public GreenfootImage(String aString, int fontSize, Color foregroundColor, Color bakcgroundColor, Color lineColor)
+    public GreenfootImage(String aString, int lineHeight, Color foregroundColor, Color bakcgroundColor, Color lineColor)
     {
-        // Create image
-        _font = _font.deriveFont(fontSize);
-        int strW = (int) Math.ceil(_font.getFontObject().getStringAdvance(aString));
-        int strH = (int) Math.ceil(_font.getFontObject().getLineHeight());
-        _image = Image.getImageForSize(strW + 8, strH + 8, true);
+        // Get font
+        _font = getFontOfPixelHeight(lineHeight);
 
-        // Fill background color
-        if (bakcgroundColor != null && bakcgroundColor.getAlpha() > 0) {
-            setColor(bakcgroundColor);
-            fill();
-        }
+        // Create image, fill background and draw string
+        //Size imageSize = getImageSizeForStringAndFont(aString, _font);
+        //int imageW = (int) imageSize.width; //(int) Math.ceil(_font.getFontObject().getStringAdvance(aString));
+        //int imageH = (int) imageSize.height; //(int) Math.ceil(_font.getFontObject().getLineHeight());
+        //_image = Image.getImageForSize(imageW, imageH, true);
+        //if (bakcgroundColor != null && bakcgroundColor.getAlpha() > 0) { setColor(bakcgroundColor); fill(); }
+        //setColor(foregroundColor); drawString(aString, 0, (int) Math.round(_font.getFontObject().getAscent()));
 
-        // Draw string
-        setColor(foregroundColor);
-        drawString(aString, 4, (int) Math.round(_font.getFontObject().getAscent() + 4));
+        // Create and configure TextArea for attributes and get image
+        TextArea textArea = new TextArea();
+        textArea.getTextBlock().setRichText(false);
+        textArea.setWrapLines(true);
+        textArea.setFont(_font.getFontObject());
+        if (bakcgroundColor != null && bakcgroundColor.getAlpha() > 0)
+            textArea.setFill(bakcgroundColor.getColorObject());
+        if (!foregroundColor.getColorObject().equals(snap.gfx.Color.BLACK))
+            textArea.setDefaultStyle(textArea.getDefaultStyle().copyFor(TextStyle.COLOR_KEY, foregroundColor.getColorObject()));
+        textArea.setText(aString);
+        textArea.setSizeToBestSize();
+        _image = ViewUtils.getImageForScale(textArea, 1);
     }
 
     /**
@@ -411,5 +421,27 @@ public class GreenfootImage {
     public String toString()
     {
         return _name + " " + getWidth() + "x" + getHeight();
+    }
+
+    /**
+     * Returns the font on the given graphics context to have the given style and target line height
+     */
+    private static Font getFontOfPixelHeight(double targetLineHeight)
+    {
+        // Get base font
+        int minFontSize = (int) Math.ceil(targetLineHeight / 2);
+        snap.gfx.Font font = new snap.gfx.Font("SansSerif", minFontSize);
+        //if ((style & 1) == 1) font = font.getBold(); if ((style & 2) == 2) font = font.getItalic();
+
+        // Iterate up to size as long as text is less than target size
+        for (int i = minFontSize; i < targetLineHeight; i++) {
+            snap.gfx.Font bigger = font.copyForSize(i);
+            if (bigger.getStringBounds("WBLMNqpyg").getMaxY() < targetLineHeight)
+                font = bigger;
+            else break; // Too big; keep previous
+        }
+
+        // Return Greenfoot font
+        return new Font(font);
     }
 }
