@@ -51,12 +51,15 @@ public class GreenfootOwner extends ViewOwner {
         if (aWorld == _world) return;
         if (_world == null)
             _firstWorld = aWorld;
+
         getUI();
+        assert (_worldViewBox != null);
+
         _world = aWorld;
-        _worldView = aWorld.getWorldView();
+        _worldView = aWorld.getWorldView(); assert (_worldView != null);
         _worldViewBox.setContent(_worldView);
         setFirstFocus(_worldView);
-        enableEvents(_worldView, MouseEvents);
+        _worldView.addEventHandler(this::handleWorldViewMouseEvent, MouseEvents);
         _worldView.requestFocus();
     }
 
@@ -162,10 +165,6 @@ public class GreenfootOwner extends ViewOwner {
      */
     protected void respondUI(ViewEvent anEvent)
     {
-        // Handle MouseEvent on WorldView
-        if (anEvent.isMouseEvent() && !isPlaying())
-            handleMouseEvent(anEvent);
-
         // Handle ActButton
         if (anEvent.equals("ActButton"))
             _world._worldView.doAct();
@@ -222,10 +221,13 @@ public class GreenfootOwner extends ViewOwner {
     }
 
     /**
-     * Handles MouseEvent.
+     * Handles WorldView MouseEvent.
      */
-    protected void handleMouseEvent(ViewEvent anEvent)
+    protected void handleWorldViewMouseEvent(ViewEvent anEvent)
     {
+        if (isPlaying())
+            return;
+
         // Get x/y
         int mouseX = (int) Math.round(anEvent.getX());
         int mouseY = (int) Math.round(anEvent.getY());
