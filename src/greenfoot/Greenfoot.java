@@ -205,6 +205,19 @@ public class Greenfoot {
     }
 
     /**
+     * Asks the user a question.
+     */
+    public static String ask(String aPrompt)
+    {
+        stop();
+
+        String title = "User Input";
+        String output = DialogBox.showInputDialog(getWorldOwner().getUI(), title, aPrompt, "");
+        start();
+        return output;
+    }
+
+    /**
      * Returns the project properties map.
      */
     protected static Map<String, String> getProperties()
@@ -222,21 +235,21 @@ public class Greenfoot {
         Map<String,String> props = new HashMap<>();
 
         // Get project file
-        //WebSite site = _world._scn.getSite();
-        World world = getWorld();
-        Class<?> worldClass = world.getClass();
-        WebURL url = WebURL.getURL(worldClass, "project.greenfoot");
-        WebFile file = url.getFile();
+        WebFile projectFile = getProjectFile();
+        if (projectFile == null)
+            return props;
 
-        // Get file text
-        String text = file.getText();
-        if (text != null && text.length() > 0) {
-            String[] lines = text.split("\\n");
-            for (String line : lines) {
-                String[] parts = line.split("=");
-                if (parts.length > 1)
-                    props.put(parts[0].trim(), parts[1].trim());
-            }
+        // Get project file lines
+        String text = projectFile.getText();
+        String[] lines = text != null ? text.split("\\n") : null;
+        if (lines == null)
+            return props;
+
+        // Iterate over lines and get key/value for each
+        for (String line : lines) {
+            String[] parts = line.split("=");
+            if (parts.length > 1)
+                props.put(parts[0].trim(), parts[1].trim());
         }
 
         // Return
@@ -262,16 +275,17 @@ public class Greenfoot {
     }
 
     /**
-     * Asks the user a question.
+     * Returns the project file.
      */
-    public static String ask(String aPrompt)
+    private static WebFile getProjectFile()
     {
-        stop();
-
-        String title = "User Input";
-        String output = DialogBox.showInputDialog(getWorldOwner().getUI(), title, aPrompt, "");
-        start();
-        return output;
+        World world = getWorld();
+        Class<?> worldClass = world.getClass();
+        WebURL url = WebURL.getURL(worldClass, "project.greenfoot");
+        WebFile file = url != null ? url.getFile() : null;
+        if (file == null)
+            System.err.println("Couldn't find Greenfoot project file");
+        return file;
     }
 
     /**
@@ -289,7 +303,7 @@ public class Greenfoot {
     }
 
     /**
-     * Returns the current world class.
+     * Returns the current World class.
      */
     protected static Class<?> getWorldClass()
     {
