@@ -104,7 +104,7 @@ public class GreenfootImage {
     /**
      * Constructor for string, requested line height, color.
      */
-    public GreenfootImage(String aString, int lineHeight, Color foregroundColor, Color bakcgroundColor, Color lineColor)
+    public GreenfootImage(String aString, int lineHeight, Color foregroundColor, Color backgroundColor, Color lineColor)
     {
         // Get font
         _font = getFontOfPixelHeight(lineHeight);
@@ -119,11 +119,10 @@ public class GreenfootImage {
 
         // Create and configure TextArea for attributes and get image
         TextArea textArea = new TextArea();
-        textArea.getTextBlock().setRichText(false);
         textArea.setWrapLines(true);
         textArea.setFont(_font.getFontObject());
-        if (bakcgroundColor != null && bakcgroundColor.getAlpha() > 0)
-            textArea.setFill(bakcgroundColor.getColorObject());
+        if (backgroundColor != null && backgroundColor.getAlpha() > 0)
+            textArea.setFill(backgroundColor.getColorObject());
         if (!foregroundColor.getColorObject().equals(snap.gfx.Color.BLACK))
             textArea.setDefaultStyle(textArea.getDefaultStyle().copyFor(TextStyle.COLOR_KEY, foregroundColor.getColorObject()));
         textArea.setText(aString);
