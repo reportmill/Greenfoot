@@ -45,7 +45,7 @@ public class WorldView extends ChildView {
         int width = aWorld.getWidth() * csize;
         int height = aWorld.getHeight() * csize;
         setPrefSize(width, height);
-        setClip(new Rect(0, 0, width, height));
+        setOverflow(Overflow.Clip);
         setFill(Color.WHITE);
         setBorder(Color.BLACK, 1);
         enableEvents(MouseEvents);

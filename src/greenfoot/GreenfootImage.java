@@ -124,7 +124,7 @@ public class GreenfootImage {
         if (backgroundColor != null && backgroundColor.getAlpha() > 0)
             textArea.setFill(backgroundColor.getColorObject());
         if (!foregroundColor.getColorObject().equals(snap.gfx.Color.BLACK))
-            textArea.setDefaultStyle(textArea.getDefaultStyle().copyFor(TextStyle.COLOR_KEY, foregroundColor.getColorObject()));
+            textArea.getTextBlock().setDefaultTextColor(foregroundColor.getColorObject());
         textArea.setText(aString);
         textArea.setSizeToBestSize();
         _image = ViewUtils.getImageForScale(textArea, 1);
