@@ -103,17 +103,17 @@ public class GreenfootOwner extends ViewOwner {
         // Add ActButton
         Button actButton = new Button("Act");
         actButton.setName("ActButton");
-        actButton.setPrefSize(70, 20);
+        actButton.setPrefWidth(70);
 
         // Add RunButton
         Button runButton = new Button("Run");
         runButton.setName("RunButton");
-        runButton.setPrefSize(70, 20);
+        runButton.setPrefWidth(70);
 
         // Add ResetButton
         Button resetButton = new Button("Reset");
         resetButton.setName("ResetButton");
-        resetButton.setPrefSize(70, 20);
+        resetButton.setPrefWidth(70);
 
         // Add separator
         Separator sep = new Separator();
