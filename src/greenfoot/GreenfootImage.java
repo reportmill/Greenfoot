@@ -74,10 +74,10 @@ public class GreenfootImage {
         if (!_image.isLoaded())
             _image.waitForImageLoad();
 
-        // If image has non-standard DPI, resize to image width/height
+        // If image has non-standard DPI, resize to pixel width/height
         if (_image.getWidth() != _image.getPixWidth()) {
-            int imageW = (int) Math.ceil(_image.getWidth());
-            int imageH = (int) Math.ceil(_image.getHeight());
+            int imageW = _image.getPixWidth();
+            int imageH = _image.getPixHeight();
             _image = _image.cloneForSizeAndDpiScale(imageW, imageH, 1);
         }
 

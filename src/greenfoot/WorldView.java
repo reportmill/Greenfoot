@@ -165,6 +165,11 @@ public class WorldView extends ChildView {
             aPntr.setColor(Color.WHITE);
             aPntr.drawString(str, textX, textY);
         }
+
+        // Repaint border above all other painting
+        Border border = getBorder();
+        if (border != null)
+            border.paint(aPntr, getBoundsLocal());
     }
 
     /**
