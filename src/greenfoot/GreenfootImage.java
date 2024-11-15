@@ -4,7 +4,6 @@ import snap.geom.*;
 import snap.geom.Polygon;
 import snap.geom.Shape;
 import snap.gfx.*;
-import snap.text.TextStyle;
 import snap.view.TextArea;
 import snap.view.ViewUtils;
 
@@ -75,11 +74,11 @@ public class GreenfootImage {
         if (!_image.isLoaded())
             _image.waitForImageLoad();
 
-        // If image has non-standard DPI, resize to pix width/height
+        // If image has non-standard DPI, resize to image width/height
         if (_image.getWidth() != _image.getPixWidth()) {
-            int pixW = _image.getPixWidth();
-            int pixH = _image.getPixHeight();
-            _image = _image.cloneForSizeAndDpiScale(pixW, pixH, 1);
+            int imageW = (int) Math.ceil(_image.getWidth());
+            int imageH = (int) Math.ceil(_image.getHeight());
+            _image = _image.cloneForSizeAndDpiScale(imageW, imageH, 1);
         }
 
         _images.put(aName, _image);
