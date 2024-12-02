@@ -57,10 +57,10 @@ public class World {
             Greenfoot.setWorld(this);
 
         // Set background image
-        String imageName = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
-        if (imageName != null)
-            setBackground(new GreenfootImage(imageName));
-        else setBackground(new GreenfootImage(aW * aCellSize, aH * aCellSize));
+        GreenfootImage backgroundImage = Greenfoot.getGreenfootImageForClass(getClass());
+        if (backgroundImage == null)
+            backgroundImage = new GreenfootImage(aW * aCellSize, aH * aCellSize);
+        setBackground(backgroundImage);
     }
 
     /**

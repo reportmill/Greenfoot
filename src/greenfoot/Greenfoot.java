@@ -22,9 +22,6 @@ public class Greenfoot {
     // The mouse info
     private static MouseInfo _mouseInfo = new MouseInfo();
 
-    // The project properties
-    private static Map<String, String> _props;
-
     // The SoundClips
     private static Map<String, SoundClip> _clips = new HashMap<>();
 
@@ -108,8 +105,9 @@ public class Greenfoot {
      */
     public static void setWorld(World aWorld)
     {
+        World oldWorld = getWorld();
         getWorldOwner().setWorld(aWorld);
-        if (_props == null)
+        if (oldWorld == null)
             initGreenfoot();
     }
 
@@ -218,42 +216,12 @@ public class Greenfoot {
     }
 
     /**
-     * Returns the project properties map.
+     * Returns the greenfoot image for class, if configured in project.
      */
-    protected static Map<String, String> getProperties()
+    protected static GreenfootImage getGreenfootImageForClass(Class<?> aClass)
     {
-        if (_props != null) return _props;
-        return _props = getPropertiesImpl();
-    }
-
-    /**
-     * Returns the project properties map.
-     */
-    private static Map<String, String> getPropertiesImpl()
-    {
-        // Create map
-        Map<String,String> props = new HashMap<>();
-
-        // Get project file
-        WebFile projectFile = getProjectFile();
-        if (projectFile == null)
-            return props;
-
-        // Get project file lines
-        String text = projectFile.getText();
-        String[] lines = text != null ? text.split("\\n") : null;
-        if (lines == null)
-            return props;
-
-        // Iterate over lines and get key/value for each
-        for (String line : lines) {
-            String[] parts = line.split("=");
-            if (parts.length > 1)
-                props.put(parts[0].trim(), parts[1].trim());
-        }
-
-        // Return
-        return props;
+        String imageName = Greenfoot.getProperty("class." + aClass.getSimpleName() + ".image");
+        return imageName != null ? new GreenfootImage(imageName) : null;
     }
 
     /**
@@ -261,8 +229,8 @@ public class Greenfoot {
      */
     protected static String getProperty(String aKey)
     {
-        Map<String,String> properties = getProperties();
-        return properties.get(aKey);
+        GreenfootProject greenfootProject = getGreenfootProject();
+        return greenfootProject != null ? greenfootProject.getProperty(aKey) : null;
     }
 
     /**
@@ -275,17 +243,26 @@ public class Greenfoot {
     }
 
     /**
-     * Returns the project file.
+     * Returns the greenfoot project.
      */
-    private static WebFile getProjectFile()
+    private static GreenfootProject getGreenfootProject()
     {
+        // Get URL for World class
         World world = getWorld();
         Class<?> worldClass = world.getClass();
-        WebURL url = WebURL.getURL(worldClass, "project.greenfoot");
-        WebFile file = url != null ? url.getFile() : null;
-        if (file == null)
+        String worldClassFilename = worldClass.getSimpleName() + ".class";
+        WebURL worldClassUrl = WebURL.getURL(worldClass, worldClassFilename);
+        if (worldClassUrl == null) {
             System.err.println("Couldn't find Greenfoot project file");
-        return file;
+            return null;
+        }
+
+        // Get site root dir for world class
+        WebSite worldClassSite = worldClassUrl.getSite();
+        WebFile worldClassSiteDir = worldClassSite.getRootDir();
+
+        // Return
+        return GreenfootProject.getGreenfootProjectForDir(worldClassSiteDir);
     }
 
     /**

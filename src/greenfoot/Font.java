@@ -45,6 +45,8 @@ public class Font
         this.font = new snap.gfx.Font(name, size);
         if (bold)
             this.font = this.font.getBold();
+        if (italic)
+            this.font = this.font.getItalic();
     }
 
     /**

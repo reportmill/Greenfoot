@@ -29,8 +29,7 @@ public class Actor {
     public Actor()
     {
         // If project configured image, set image
-        String imageName = Greenfoot.getProperty("class." + getClass().getSimpleName() + ".image");
-        GreenfootImage image = imageName != null ? new GreenfootImage(imageName) : null;
+        GreenfootImage image = Greenfoot.getGreenfootImageForClass(getClass());
         if (image == null)
             image = GreenfootImage.SHARED;
         setImage(image);
