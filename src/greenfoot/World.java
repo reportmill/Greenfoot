@@ -11,8 +11,11 @@ import snap.view.*;
  */
 public class World {
 
-    // The Width/Height/CellSize
-    private int _width, _height, _cellSize = 1;
+    // The world width/height (defined in 'cells')
+    private int _width, _height;
+
+    // The size of a single cell
+    private int _cellSize;
 
     // Whether world is bounded
     private boolean _bounded;
@@ -338,21 +341,6 @@ public class World {
         // Return whether actor bounds in world coords intersects shape
         Shape actorBoundsInWorld = actor.getBoundsInWorld();
         return actorBoundsInWorld.intersectsShape(aShape);
-    }
-
-    /**
-     * Sets the window visible.
-     */
-    public void setWindowVisible(boolean aValue)
-    {
-        // If not on event thread, call again on event thread
-        if (!ViewUtils.isEventThread()) {
-            ViewUtils.runLater(() -> setWindowVisible(aValue)); return; }
-
-        GreenfootOwner owner = GreenfootOwner.getShared();
-        owner.setWorld(this);
-        owner.getWindow().setMaximized(SnapUtils.isWebVM);
-        owner.setWindowVisible(true);
     }
 
     /**

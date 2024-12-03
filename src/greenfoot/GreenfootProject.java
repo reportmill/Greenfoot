@@ -2,6 +2,9 @@ package greenfoot;
 import snap.gfx.Image;
 import snap.util.Convert;
 import snap.web.WebFile;
+import snap.web.WebSite;
+import snap.web.WebURL;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -131,5 +134,26 @@ public class GreenfootProject {
 
         // Create and return
         return new GreenfootProject(greenfootProjectFile);
+    }
+
+    /**
+     * Returns the greenfoot project.
+     */
+    public static GreenfootProject getGreenfootProjectForClass(Class<?> aClass)
+    {
+        // Get URL for project class
+        String classFilename = aClass.getSimpleName() + ".class";
+        WebURL classUrl = WebURL.getURL(aClass, classFilename);
+        if (classUrl == null) {
+            System.err.println("Couldn't find Greenfoot project file for class: " + aClass.getName());
+            return null;
+        }
+
+        // Get site root dir for project class
+        WebSite classSite = classUrl.getSite();
+        WebFile cassSiteDir = classSite.getRootDir();
+
+        // Return
+        return GreenfootProject.getGreenfootProjectForDir(cassSiteDir);
     }
 }

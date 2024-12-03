@@ -3,9 +3,9 @@ import java.util.*;
 import snap.geom.Point;
 import snap.gfx.*;
 import snap.util.Convert;
+import snap.util.SnapUtils;
 import snap.view.*;
 import snap.viewx.DialogBox;
-import snap.web.*;
 
 /**
  * Greenfoot class.
@@ -22,106 +22,35 @@ public class Greenfoot {
     // The mouse info
     private static MouseInfo _mouseInfo = new MouseInfo();
 
-    // The SoundClips
-    private static Map<String, SoundClip> _clips = new HashMap<>();
-
     // A Random
     private static Random _random = new Random();
+
+    // The greenfoot project
+    private static GreenfootProject _greenfootProject;
+
+    // The main player pane for the app (generally there is only one)
+    private static PlayerPane _playerPane;
 
     // The world class from the current project
     protected static Class<?> _worldClass;
 
     /**
-     * Get the most recently pressed key, since the last time this method was called.
-     */
-    public static String getKey()
-    {
-        System.err.println("Greenfoot.getKey: Not Impl");
-        return "";
-    }
-
-    /**
-     * Returns a random number.
-     */
-    public static int getRandomNumber(int aNum)
-    {
-        return _random.nextInt(aNum);
-    }
-
-    /**
-     * Returns whether key is down.
-     */
-    public static boolean isKeyDown(String aName)
-    {
-        return getWorld().getWorldView().isKeyDown(aName);
-    }
-
-    /**
-     * Plays a sound.
-     */
-    public static void playSound(String aName)
-    {
-        SoundClip soundClip = getSound(aName);
-        if (soundClip != null)
-            soundClip.play();
-    }
-
-    /**
-     * Returns a named sound.
-     */
-    public static SoundClip getSound(String aName)
-    {
-        SoundClip soundClip = _clips.get(aName);
-        if (soundClip != null)
-            return soundClip;
-
-        Class<?> cls = getWorld().getClass();
-        soundClip = SoundClip.get(cls, "sounds/" + aName);
-        _clips.put(aName, soundClip);
-        return soundClip;
-    }
-
-    /**
-     * Initialize Greenfoot.
-     */
-    static void initGreenfoot()
-    {
-        int speed = getIntProperty("simulation.speed");
-        setSpeed(speed > 0 ? speed : _speed);
-    }
-
-    /**
-     * Returns the GreenfootOwner.
-     */
-    public static GreenfootOwner getWorldOwner()  { return GreenfootOwner.getShared(); }
-
-    /**
      * Returns a world.
      */
-    public static World getWorld()  { return getWorldOwner().getWorld(); }
+    public static World getWorld()
+    {
+        PlayerPane playerPane = getPlayerPane();
+        return playerPane.getWorld();
+    }
 
     /**
      * Sets a world.
      */
     public static void setWorld(World aWorld)
     {
-        World oldWorld = getWorld();
-        getWorldOwner().setWorld(aWorld);
-        if (oldWorld == null)
-            initGreenfoot();
+        PlayerPane playerPane = getPlayerPane();
+        playerPane.setWorld(aWorld);
     }
-
-    public static void start()  { getWorldOwner().start(); }
-
-    /**
-     * Stops Greenfoot from playing.
-     */
-    public static void stop()  { getWorldOwner().stop(); }
-
-    /**
-     * Delays the execution by given number of time steps.
-     */
-    public static void delay(int aValue)  { }
 
     /**
      * Returns the speed.
@@ -134,25 +63,64 @@ public class Greenfoot {
     public static void setSpeed(int aValue)
     {
         _speed = aValue;
-        int period = getTimerPeriod();
-        getWorldOwner().setTimerPeriod(period);
+
+        // Set player pane timer delay for speed
+        int timerPeriodMillis = Utils.convertSpeedToDelayMillis(_speed);
+        PlayerPane playerPane = getPlayerPane();
+        playerPane.setTimerPeriod(timerPeriodMillis);
     }
 
     /**
-     * Returns the delay as a function of the speed.
+     * Starts greenfoot playing.
      */
-    static int getTimerPeriod()
+    public static void start()
     {
-        // Make the speed into a delay
-        long rawDelay = 100 - _speed;
-        long min = 30 * 1000L; // Delay at MAX_SIMULATION_SPEED - 1
-        long max = 10000 * 1000L * 1000L; // Delay at slowest speed
-        double a = Math.pow(max / (double) min, 1D / (100 - 1));
-        long delayNS = 0;
-        if (rawDelay > 0)
-            delayNS = (long) (Math.pow(a, rawDelay - 1) * min);
-        int delayMillis = (int) Math.round(delayNS / 1000000d);
-        return delayMillis;
+        PlayerPane playerPane = getPlayerPane();
+        playerPane.start();
+    }
+
+    /**
+     * Stops Greenfoot from playing.
+     */
+    public static void stop()
+    {
+        PlayerPane playerPane = getPlayerPane();
+        playerPane.stop();
+    }
+
+    /**
+     * Delays the execution by given number of time steps.
+     */
+    public static void delay(int aValue)
+    {
+        System.out.println("Greenfoot.delay(): Not implemented yet");
+    }
+
+    /**
+     * Plays a sound.
+     */
+    public static void playSound(String aName)
+    {
+        SoundClip soundClip = Utils.getSoundClipForName(aName);
+        if (soundClip != null)
+            soundClip.play();
+    }
+
+    /**
+     * Get the most recently pressed key, since the last time this method was called.
+     */
+    public static String getKey()
+    {
+        System.err.println("Greenfoot.getKey: Not Impl");
+        return "";
+    }
+
+    /**
+     * Returns whether key is down.
+     */
+    public static boolean isKeyDown(String aName)
+    {
+        return getWorld().getWorldView().isKeyDown(aName);
     }
 
     /**
@@ -210,35 +178,61 @@ public class Greenfoot {
         stop();
 
         String title = "User Input";
-        String output = DialogBox.showInputDialog(getWorldOwner().getUI(), title, aPrompt, "");
+        String output = DialogBox.showInputDialog(getPlayerPane().getUI(), title, aPrompt, "");
         start();
         return output;
     }
+
+    /**
+     * Returns a random number.
+     */
+    public static int getRandomNumber(int aNum)  { return _random.nextInt(aNum); }
 
     /**
      * Returns the greenfoot image for class, if configured in project.
      */
     protected static GreenfootImage getGreenfootImageForClass(Class<?> aClass)
     {
-        String imageName = Greenfoot.getProperty("class." + aClass.getSimpleName() + ".image");
+        String imageName = getPropertyForKey("class." + aClass.getSimpleName() + ".image");
         return imageName != null ? new GreenfootImage(imageName) : null;
+    }
+
+    /**
+     * Returns the greenfoot PlayerPane.
+     */
+    public static PlayerPane getPlayerPane()
+    {
+        if (_playerPane != null) return _playerPane;
+        _playerPane = new PlayerPane();
+        initGreenfoot();
+        return _playerPane;
+    }
+
+    /**
+     * Initialize Greenfoot.
+     */
+    private static void initGreenfoot()
+    {
+        // Initialize speed from project
+        int speed = getIntPropertyForKey("simulation.speed");
+        setSpeed(speed > 0 ? speed : _speed);
     }
 
     /**
      * Returns a property for a given key.
      */
-    protected static String getProperty(String aKey)
+    protected static String getPropertyForKey(String aKey)
     {
-        GreenfootProject greenfootProject = getGreenfootProject();
-        return greenfootProject != null ? greenfootProject.getProperty(aKey) : null;
+        GreenfootProject greenfootProject = getGreenfootProject(); if (greenfootProject == null) return null;
+        return greenfootProject.getProperty(aKey);
     }
 
     /**
      * Returns an int property.
      */
-    protected static int getIntProperty(String aKey)
+    protected static int getIntPropertyForKey(String aKey)
     {
-        String propString = getProperty(aKey);
+        String propString = getPropertyForKey(aKey);
         return Convert.intValue(propString);
     }
 
@@ -247,22 +241,9 @@ public class Greenfoot {
      */
     private static GreenfootProject getGreenfootProject()
     {
-        // Get URL for World class
-        World world = getWorld();
-        Class<?> worldClass = world.getClass();
-        String worldClassFilename = worldClass.getSimpleName() + ".class";
-        WebURL worldClassUrl = WebURL.getURL(worldClass, worldClassFilename);
-        if (worldClassUrl == null) {
-            System.err.println("Couldn't find Greenfoot project file");
-            return null;
-        }
-
-        // Get site root dir for world class
-        WebSite worldClassSite = worldClassUrl.getSite();
-        WebFile worldClassSiteDir = worldClassSite.getRootDir();
-
-        // Return
-        return GreenfootProject.getGreenfootProjectForDir(worldClassSiteDir);
+        if (_greenfootProject != null) return _greenfootProject;
+        Class<?> worldClass = getWorldClass();
+        return _greenfootProject = GreenfootProject.getGreenfootProjectForClass(worldClass);
     }
 
     /**
@@ -270,13 +251,24 @@ public class Greenfoot {
      */
     public static void showWorldForClass(Class<? extends World> worldClass)
     {
-        ViewUtils.runLater(() -> {
-            try {
-                World world = worldClass.getConstructor().newInstance();
-                world.setWindowVisible(true);
-            }
-            catch (Exception e) { e.printStackTrace(); }
-        });
+        ViewUtils.runLater(() -> showWorldForClassImpl(worldClass));
+    }
+
+    /**
+     * Show world for class.
+     */
+    private static void showWorldForClassImpl(Class<? extends World> worldClass)
+    {
+        // Get world for class
+        World world;
+        try { world = worldClass.getConstructor().newInstance(); }
+        catch (Exception e) { e.printStackTrace(); return; }
+        setWorld(world);
+
+        // Show PlayerPane window
+        PlayerPane playerPane = getPlayerPane();
+        playerPane.getWindow().setMaximized(SnapUtils.isWebVM);
+        playerPane.setWindowVisible(true);
     }
 
     /**

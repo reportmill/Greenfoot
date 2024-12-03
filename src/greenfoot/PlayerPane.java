@@ -7,7 +7,7 @@ import snap.view.*;
 /**
  * A ViewOwner for Greenfoot to create wrapper UI and show manage worlds.
  */
-public class GreenfootOwner extends ViewOwner {
+public class PlayerPane extends ViewOwner {
 
     // The current world
     private World _world;
@@ -27,15 +27,12 @@ public class GreenfootOwner extends ViewOwner {
     // The animation timer    
     private ViewTimer _timer = new ViewTimer(() -> _worldView.doAct(), 40);
 
-    // The shared GreenfootOwner
-    private static GreenfootOwner _shared;
-
     /**
-     * Constructor for given World.
+     * Constructor.
      */
-    public GreenfootOwner(World aWorld)
+    public PlayerPane()
     {
-        setWorld(aWorld);
+        super();
     }
 
     /**
@@ -251,14 +248,5 @@ public class GreenfootOwner extends ViewOwner {
         // Handle MouseDraggged
         if (anEvent.isMouseDrag() && _mouseActor != null)
             _mouseActor.setLocation(mouseX, mouseY);
-    }
-
-    /**
-     * Returns the shared GreenfootOwner.
-     */
-    public static GreenfootOwner getShared()
-    {
-        if (_shared != null) return _shared;
-        return _shared = new GreenfootOwner(null);
     }
 }
