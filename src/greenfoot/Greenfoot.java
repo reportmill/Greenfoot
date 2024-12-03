@@ -189,15 +189,6 @@ public class Greenfoot {
     public static int getRandomNumber(int aNum)  { return _random.nextInt(aNum); }
 
     /**
-     * Returns the greenfoot image for class, if configured in project.
-     */
-    protected static GreenfootImage getGreenfootImageForClass(Class<?> aClass)
-    {
-        String imageName = getPropertyForKey("class." + aClass.getSimpleName() + ".image");
-        return imageName != null ? new GreenfootImage(imageName) : null;
-    }
-
-    /**
      * Returns the greenfoot PlayerPane.
      */
     public static PlayerPane getPlayerPane()
@@ -239,7 +230,7 @@ public class Greenfoot {
     /**
      * Returns the greenfoot project.
      */
-    private static GreenfootProject getGreenfootProject()
+    protected static GreenfootProject getGreenfootProject()
     {
         if (_greenfootProject != null) return _greenfootProject;
         Class<?> worldClass = getWorldClass();

@@ -1,4 +1,5 @@
 package greenfoot;
+import snap.gfx.Image;
 import snap.gfx.SoundClip;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,21 +9,74 @@ import java.util.Map;
  */
 class Utils {
 
-    // The SoundClips
-    private static Map<String, SoundClip> _clips = new HashMap<>();
+    // The loaded images
+    private static Map<String, Image> _imageCache = new HashMap<>();
+
+    // The loaded SoundClips
+    private static Map<String, SoundClip> _soundClipCache = new HashMap<>();
+
+    /**
+     * Returns the greenfoot image for class, if configured in project.
+     */
+    public static GreenfootImage getGreenfootImageForClass(Class<?> aClass)
+    {
+        GreenfootProject greenfootProject = Greenfoot.getGreenfootProject(); if (greenfootProject == null) return null;
+        String imageKey = "class." + aClass.getSimpleName() + ".image";
+        String imageName =  greenfootProject.getProperty(imageKey);
+        return imageName != null ? new GreenfootImage(imageName) : null;
+    }
+
+    /**
+     * Returns image for given file name.
+     */
+    public static Image getImageForName(String aName)
+    {
+        Image image = _imageCache.get(aName);
+        if (image != null)
+            return image;
+
+        // Get world class
+        Class<?> worldClass = Greenfoot.getWorldClass();
+
+        // Get image for name
+        image = Image.getImageForClassResource(worldClass, "images/" + aName);
+        if (image == null)
+            image = Image.getImageForClassResource(worldClass, aName);
+        if (image == null) {
+            System.err.println("Image not found: " + aName);
+            image = Image.getImageForSize(100, 20, false);
+        }
+
+        // Wait for image load, since GF apps regularly use image info (or do image transform) immediately after loading
+        if (!image.isLoaded())
+            image.waitForImageLoad();
+
+        // If image has non-standard DPI, resize to pixel width/height
+        if (image.getWidth() != image.getPixWidth()) {
+            int imageW = image.getPixWidth();
+            int imageH = image.getPixHeight();
+            image = image.cloneForSizeAndDpiScale(imageW, imageH, 1);
+        }
+
+        // Add to image cache
+        _imageCache.put(aName, image);
+
+        // Return
+        return image;
+    }
 
     /**
      * Returns a named sound.
      */
     public static SoundClip getSoundClipForName(String aName)
     {
-        SoundClip soundClip = _clips.get(aName);
+        SoundClip soundClip = _soundClipCache.get(aName);
         if (soundClip != null)
             return soundClip;
 
         Class<?> cls = Greenfoot.getWorldClass();
         soundClip = SoundClip.get(cls, "sounds/" + aName);
-        _clips.put(aName, soundClip);
+        _soundClipCache.put(aName, soundClip);
         return soundClip;
     }
 

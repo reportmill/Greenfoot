@@ -23,15 +23,18 @@ public class Actor {
     // The world
     protected World _world;
 
+    // Shared image
+    protected static GreenfootImage DEFAULT_ACTOR_IMAGE = new GreenfootImage(48, 48);
+
     /**
      * Constructor.
      */
     public Actor()
     {
         // If project configured image, set image
-        GreenfootImage image = Greenfoot.getGreenfootImageForClass(getClass());
+        GreenfootImage image = Utils.getGreenfootImageForClass(getClass());
         if (image == null)
-            image = GreenfootImage.SHARED;
+            image = DEFAULT_ACTOR_IMAGE;
         setImage(image);
     }
 

@@ -34,12 +34,6 @@ public class GreenfootImage {
     // The world that is using this image
     protected World _world;
 
-    // Loaded images
-    private static Map<String, Image> _images = new HashMap<>();
-
-    // Shared image
-    protected static GreenfootImage SHARED = new GreenfootImage(48, 48);
-
     /**
      * Constructor for size.
      */
@@ -54,34 +48,7 @@ public class GreenfootImage {
     public GreenfootImage(String aName)
     {
         _name = aName;
-        _image = _images.get(aName);
-        if (_image != null)
-            return;
-
-        // Get world class
-        Class<?> worldClass = Greenfoot.getWorldClass();
-
-        // Get image for name
-        _image = Image.getImageForClassResource(worldClass, "images/" + aName);
-        if (_image == null)
-            _image = Image.getImageForClassResource(worldClass, aName);
-        if (_image == null) {
-            System.err.println("Image not found: " + aName);
-            _image = Image.getImageForSize(100, 20, false);
-        }
-
-        // Wait for image load, since GF apps regularly use image info (or do image transform) immediately after loading
-        if (!_image.isLoaded())
-            _image.waitForImageLoad();
-
-        // If image has non-standard DPI, resize to pixel width/height
-        if (_image.getWidth() != _image.getPixWidth()) {
-            int imageW = _image.getPixWidth();
-            int imageH = _image.getPixHeight();
-            _image = _image.cloneForSizeAndDpiScale(imageW, imageH, 1);
-        }
-
-        _images.put(aName, _image);
+        _image = Utils.getImageForName(aName);
     }
 
     /**

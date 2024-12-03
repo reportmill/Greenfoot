@@ -60,7 +60,7 @@ public class World {
             Greenfoot.setWorld(this);
 
         // Set background image
-        GreenfootImage backgroundImage = Greenfoot.getGreenfootImageForClass(getClass());
+        GreenfootImage backgroundImage = Utils.getGreenfootImageForClass(getClass());
         if (backgroundImage == null)
             backgroundImage = new GreenfootImage(aW * aCellSize, aH * aCellSize);
         setBackground(backgroundImage);
