@@ -2,6 +2,7 @@ package greenfoot;
 import snap.geom.Point;
 import snap.gfx.Image;
 import snap.gfx.SoundClip;
+import snap.props.PropObject;
 import snap.util.Convert;
 import snap.util.SnapUtils;
 import snap.view.View;
@@ -11,7 +12,7 @@ import java.util.*;
 /**
  * The central class that manages a greenfoot app.
  */
-public class GreenfootEnv {
+public class GreenfootEnv extends PropObject {
 
     // The current speed
     private static int _speed = 50;
@@ -36,6 +37,9 @@ public class GreenfootEnv {
 
     // The world class from the current project
     protected static Class<?> _worldClass;
+
+    // Constants for properties
+    public static final String GreenfootProject_Prop = "GreenfootProject";
 
     /**
      * Constructor.
@@ -241,11 +245,20 @@ public class GreenfootEnv {
     /**
      * Returns the greenfoot project.
      */
-    protected GreenfootProject getGreenfootProject()
+    public GreenfootProject getGreenfootProject()
     {
         if (_greenfootProject != null) return _greenfootProject;
         Class<?> worldClass = getWorldClass();
         return _greenfootProject = GreenfootProject.getGreenfootProjectForClass(worldClass);
+    }
+
+    /**
+     * Returns the greenfoot project.
+     */
+    public void setGreenfootProject(GreenfootProject greenfootProject)
+    {
+        if (greenfootProject == _greenfootProject) return;
+        firePropChange(GreenfootProject_Prop, _greenfootProject, _greenfootProject = greenfootProject);
     }
 
     /**

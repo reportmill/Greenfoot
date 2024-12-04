@@ -1,23 +1,29 @@
 package greenfoot;
 import snap.gfx.Image;
+import snap.props.PropObject;
 import snap.util.Convert;
 import snap.web.WebFile;
 import snap.web.WebSite;
 import snap.web.WebURL;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * This class manages a 'project.greenfoot' file.
  */
-public class GreenfootProject {
+public class GreenfootProject extends PropObject {
 
     // The greenfoot project file
     private WebFile _greenfootProjectFile;
 
     // The project properties
     private Map<String, String> _props;
+
+    // The root class node
+    private ClassNode _rootClassNode;
+
+    // Constants for properties
+    public static final String RootClassNode_Prop = "RootClassNode";
 
     /**
      * Constructor.
@@ -101,6 +107,20 @@ public class GreenfootProject {
 
         String imagePath = "/images/" + imageFilename;
         return Image.getImageForClassResource(aClass, imagePath);
+    }
+
+    /**
+     * Returns the root node for project class tree.
+     */
+    public ClassNode getRootClassNode()  { return _rootClassNode; }
+
+    /**
+     * Sets the root node for project class tree.
+     */
+    public void setRootClassNode(ClassNode rootClassNode)
+    {
+        if (rootClassNode == getRootClassNode()) return;
+        firePropChange(RootClassNode_Prop, _rootClassNode, _rootClassNode = rootClassNode);
     }
 
     /**
