@@ -5,8 +5,18 @@ package greenfoot;
  */
 public class MouseInfo {
 
-    public int getX()  { return (int) Greenfoot._mouseX; }
+    // The last mouse x/y
+    protected double _mouseX, _mouseY;
 
-    public int getY()  { return (int) Greenfoot._mouseY; }
+    /**
+     * Constructor.
+     */
+    public MouseInfo()
+    {
 
+    }
+
+    public int getX()  { return (int) _mouseX; }
+
+    public int getY()  { return (int) _mouseY; }
 }

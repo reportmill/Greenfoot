@@ -15,11 +15,8 @@ public class GreenfootSound {
      */
     public GreenfootSound(String aName)
     {
-        // Get world class
-        Class<?> worldClass = Greenfoot.getWorldClass();
-
         // Get sound clip for name
-        _sound = SoundClip.get(worldClass, "sounds/" + aName);
+        _sound = Greenfoot.env().getSoundClipForName(aName);
         if (_sound == null)
             System.err.println("GreenfootSound: Sound not found for name: " + aName);
     }

@@ -2,7 +2,6 @@ package greenfoot;
 import java.util.*;
 import snap.geom.Point;
 import snap.geom.Shape;
-import snap.util.SnapUtils;
 import snap.view.*;
 
 /**
@@ -43,7 +42,7 @@ public class World {
     public World(int aW, int aH, int aCellSize, boolean isBounded)
     {
         // Set any project class
-        Greenfoot._worldClass = getClass();
+        GreenfootEnv._worldClass = getClass();
 
         // Set sizing info
         _width = aW;
@@ -60,7 +59,7 @@ public class World {
             Greenfoot.setWorld(this);
 
         // Set background image
-        GreenfootImage backgroundImage = Utils.getGreenfootImageForClass(getClass());
+        GreenfootImage backgroundImage = Greenfoot.env().getGreenfootImageForClass(getClass());
         if (backgroundImage == null)
             backgroundImage = new GreenfootImage(aW * aCellSize, aH * aCellSize);
         setBackground(backgroundImage);

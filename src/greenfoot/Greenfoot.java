@@ -1,11 +1,5 @@
 package greenfoot;
-import java.util.*;
-import snap.geom.Point;
-import snap.gfx.*;
-import snap.util.Convert;
-import snap.util.SnapUtils;
 import snap.view.*;
-import snap.viewx.DialogBox;
 
 /**
  * Greenfoot class.
@@ -13,263 +7,99 @@ import snap.viewx.DialogBox;
  */
 public class Greenfoot {
 
-    // The current speed
-    private static int _speed = 50;
-
-    // The last mouse x/y
-    protected static double _mouseX, _mouseY;
-
-    // The mouse info
-    private static MouseInfo _mouseInfo = new MouseInfo();
-
-    // A Random
-    private static Random _random = new Random();
-
-    // The greenfoot project
-    private static GreenfootProject _greenfootProject;
-
-    // The main player pane for the app (generally there is only one)
-    private static PlayerPane _playerPane;
-
-    // The world class from the current project
-    protected static Class<?> _worldClass;
+    // The greenfoot environment
+    protected static GreenfootEnv _env = new GreenfootEnv();
 
     /**
      * Returns a world.
      */
-    public static World getWorld()
-    {
-        PlayerPane playerPane = getPlayerPane();
-        return playerPane.getWorld();
-    }
+    public static World getWorld()  { return _env.getWorld(); }
 
     /**
      * Sets a world.
      */
-    public static void setWorld(World aWorld)
-    {
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.setWorld(aWorld);
-    }
+    public static void setWorld(World aWorld)  { _env.setWorld(aWorld); }
 
     /**
      * Returns the speed.
      */
-    public static int getSpeed()  { return _speed; }
+    public static int getSpeed()  { return _env.getSpeed(); }
 
     /**
      * Sets the speed of greenfoot playback.
      */
-    public static void setSpeed(int aValue)
-    {
-        _speed = aValue;
-
-        // Set player pane timer delay for speed
-        int timerPeriodMillis = Utils.convertSpeedToDelayMillis(_speed);
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.setTimerPeriod(timerPeriodMillis);
-    }
+    public static void setSpeed(int aValue)  { _env.setSpeed(aValue); }
 
     /**
      * Starts greenfoot playing.
      */
-    public static void start()
-    {
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.start();
-    }
+    public static void start()  { _env.start(); }
 
     /**
      * Stops Greenfoot from playing.
      */
-    public static void stop()
-    {
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.stop();
-    }
+    public static void stop()  { _env.stop(); }
 
     /**
      * Delays the execution by given number of time steps.
      */
-    public static void delay(int aValue)
-    {
-        System.out.println("Greenfoot.delay(): Not implemented yet");
-    }
+    public static void delay(int aValue)  { _env.delay(aValue); }
 
     /**
      * Plays a sound.
      */
-    public static void playSound(String aName)
-    {
-        SoundClip soundClip = Utils.getSoundClipForName(aName);
-        if (soundClip != null)
-            soundClip.play();
-    }
+    public static void playSound(String aName)  { _env.playSound(aName); }
 
     /**
      * Get the most recently pressed key, since the last time this method was called.
      */
-    public static String getKey()
-    {
-        System.err.println("Greenfoot.getKey: Not Impl");
-        return "";
-    }
+    public static String getKey()  { return _env.getKey(); }
 
     /**
      * Returns whether key is down.
      */
-    public static boolean isKeyDown(String aName)
-    {
-        return getWorld().getWorldView().isKeyDown(aName);
-    }
+    public static boolean isKeyDown(String aName)  { return _env.isKeyDown(aName); }
 
     /**
      * Returns the MouseInfo.
      */
-    public static MouseInfo getMouseInfo()  { return _mouseInfo; }
+    public static MouseInfo getMouseInfo()  { return _env.getMouseInfo(); }
 
     /**
      * Returns whether mouse was clicked on given actor/world.
      */
-    public static boolean mouseClicked(Object anObj)
-    {
-        World world = getWorld();
-        if (anObj == null)
-            return world != null && world.getWorldView().isMouseClicked();
-        if (anObj instanceof World)
-            return anObj == world && world.getWorldView().isMouseClicked();
-        System.out.println("Mouse Clicked not supported");
-        return false;
-    }
+    public static boolean mouseClicked(Object anObj)  { return _env.mouseClicked(anObj); }
 
     /**
      * Returns whether mouse was pressed on given actor/world.
      */
-    public static boolean mousePressed(Object anObj)
-    {
-        World world = getWorld();
-
-        if (anObj == null)
-            return world != null && world.getWorldView().isMouseDown();
-        if (anObj instanceof World)
-            return anObj == world && world.getWorldView().isMouseDown();
-        if (anObj instanceof Actor)
-            return ((Actor) anObj).getActorView().isMouseDown();
-        return false;
-    }
+    public static boolean mousePressed(Object anObj)  { return _env.mousePressed(anObj); }
 
     /**
      * Returns whether mouse was clicked on given actor/world.
      */
-    public static boolean mouseMoved(Object anObj)
-    {
-        View view = anObj instanceof Actor ? ((Actor) anObj)._actorView : null;
-        if (view == null)
-            return false;
-        Point pnt = view.parentToLocal(getWorld().getWorldView()._mx, getWorld().getWorldView()._my);
-        return view.contains(pnt);
-    }
+    public static boolean mouseMoved(Object anObj)  { return _env.mouseMoved(anObj); }
 
     /**
      * Asks the user a question.
      */
-    public static String ask(String aPrompt)
-    {
-        stop();
-
-        String title = "User Input";
-        String output = DialogBox.showInputDialog(getPlayerPane().getUI(), title, aPrompt, "");
-        start();
-        return output;
-    }
+    public static String ask(String aPrompt)  { return _env.ask(aPrompt); }
 
     /**
      * Returns a random number.
      */
-    public static int getRandomNumber(int aNum)  { return _random.nextInt(aNum); }
+    public static int getRandomNumber(int aNum)  { return _env.getRandomNumber(aNum); }
 
     /**
-     * Returns the greenfoot PlayerPane.
+     * Returns the current Greenfoot environment.
      */
-    public static PlayerPane getPlayerPane()
-    {
-        if (_playerPane != null) return _playerPane;
-        _playerPane = new PlayerPane();
-        initGreenfoot();
-        return _playerPane;
-    }
-
-    /**
-     * Initialize Greenfoot.
-     */
-    private static void initGreenfoot()
-    {
-        // Initialize speed from project
-        int speed = getIntPropertyForKey("simulation.speed");
-        setSpeed(speed > 0 ? speed : _speed);
-    }
-
-    /**
-     * Returns a property for a given key.
-     */
-    protected static String getPropertyForKey(String aKey)
-    {
-        GreenfootProject greenfootProject = getGreenfootProject(); if (greenfootProject == null) return null;
-        return greenfootProject.getProperty(aKey);
-    }
-
-    /**
-     * Returns an int property.
-     */
-    protected static int getIntPropertyForKey(String aKey)
-    {
-        String propString = getPropertyForKey(aKey);
-        return Convert.intValue(propString);
-    }
-
-    /**
-     * Returns the greenfoot project.
-     */
-    protected static GreenfootProject getGreenfootProject()
-    {
-        if (_greenfootProject != null) return _greenfootProject;
-        Class<?> worldClass = getWorldClass();
-        return _greenfootProject = GreenfootProject.getGreenfootProjectForClass(worldClass);
-    }
+    public static GreenfootEnv env()  { return _env; }
 
     /**
      * Show world for class.
      */
     public static void showWorldForClass(Class<? extends World> worldClass)
     {
-        ViewUtils.runLater(() -> showWorldForClassImpl(worldClass));
-    }
-
-    /**
-     * Show world for class.
-     */
-    private static void showWorldForClassImpl(Class<? extends World> worldClass)
-    {
-        // Get world for class
-        World world;
-        try { world = worldClass.getConstructor().newInstance(); }
-        catch (Exception e) { e.printStackTrace(); return; }
-        setWorld(world);
-
-        // Show PlayerPane window
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.getWindow().setMaximized(SnapUtils.isWebVM);
-        playerPane.setWindowVisible(true);
-    }
-
-    /**
-     * Returns the current World class.
-     */
-    protected static Class<?> getWorldClass()
-    {
-        World world = getWorld();
-        if (world != null)
-            return world.getClass();
-        return _worldClass;
+        ViewUtils.runLater(() -> _env.showWorldForClass(worldClass));
     }
 }

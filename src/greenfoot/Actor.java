@@ -32,7 +32,7 @@ public class Actor {
     public Actor()
     {
         // If project configured image, set image
-        GreenfootImage image = Utils.getGreenfootImageForClass(getClass());
+        GreenfootImage image = Greenfoot.env().getGreenfootImageForClass(getClass());
         if (image == null)
             image = DEFAULT_ACTOR_IMAGE;
         setImage(image);

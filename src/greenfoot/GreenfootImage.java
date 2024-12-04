@@ -48,7 +48,7 @@ public class GreenfootImage {
     public GreenfootImage(String aName)
     {
         _name = aName;
-        _image = Utils.getImageForName(aName);
+        _image = Greenfoot.env().getImageForName(aName);
     }
 
     /**
