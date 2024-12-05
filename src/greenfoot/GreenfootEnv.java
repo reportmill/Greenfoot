@@ -67,6 +67,17 @@ public class GreenfootEnv extends PropObject {
     }
 
     /**
+     * Sets the world for given class name.
+     */
+    public void setWorldForClass(Class<? extends World> worldClass)
+    {
+        World world;
+        try { world = worldClass.getConstructor().newInstance(); }
+        catch (Exception e) { e.printStackTrace(); return; }
+        setWorld(world);
+    }
+
+    /**
      * Returns the speed.
      */
     public int getSpeed()  { return _speed; }
@@ -331,11 +342,8 @@ public class GreenfootEnv extends PropObject {
      */
     protected void showWorldForClass(Class<? extends World> worldClass)
     {
-        // Get world for class
-        World world;
-        try { world = worldClass.getConstructor().newInstance(); }
-        catch (Exception e) { e.printStackTrace(); return; }
-        setWorld(world);
+        // Set world for class
+        setWorldForClass(worldClass);
 
         // Show PlayerPane window
         PlayerPane playerPane = getPlayerPane();

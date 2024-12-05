@@ -120,6 +120,7 @@ public class GreenfootProject extends PropObject {
     public void setRootClassNode(ClassNode rootClassNode)
     {
         if (rootClassNode == getRootClassNode()) return;
+        ClassNode.orderGreenfootRootNode(rootClassNode);
         firePropChange(RootClassNode_Prop, _rootClassNode, _rootClassNode = rootClassNode);
     }
 

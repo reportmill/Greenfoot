@@ -174,10 +174,10 @@ public class ClassesPane extends ViewOwner {
         public ClassNode getParent(ClassNode anItem)  { return anItem.getParentNode(); }
 
         @Override
-        public boolean isParent(ClassNode anItem)  { return anItem.getChildNodes().length > 0; }
+        public boolean isParent(ClassNode anItem)  { return !anItem.getChildNodes().isEmpty(); }
 
         @Override
-        public ClassNode[] getChildren(ClassNode aParent)  { return aParent.getChildNodes(); }
+        public ClassNode[] getChildren(ClassNode aParent)  { return aParent.getChildNodes().getArray(); }
 
         @Override
         public String getText(ClassNode anItem)  { return ""; }

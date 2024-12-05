@@ -3,6 +3,7 @@ import snap.util.ListUtils;
 import snap.util.ObjectArray;
 import snap.web.WebFile;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * A class to represent the class hierarchy.
@@ -48,7 +49,7 @@ public class ClassNode implements Comparable<ClassNode> {
     /**
      * Returns the child nodes.
      */
-    public ClassNode[] getChildNodes()  { return _childNodes.getArray(); }
+    public ObjectArray<ClassNode> getChildNodes()  { return _childNodes; }
 
     /**
      * Returns a child node for given class.
@@ -121,12 +122,12 @@ public class ClassNode implements Comparable<ClassNode> {
     }
 
     /**
-     * Orders child nodes for greenfoot.
+     * Orders child nodes for greenfoot root class node (moves World/Actor classes to front).
      */
     public static void orderGreenfootRootNode(ClassNode rootNode)
     {
         // Handle Greenfoot stuff
-        ObjectArray<ClassNode> childNodes = rootNode._childNodes;
+        List<ClassNode> childNodes = rootNode._childNodes;
         ClassNode actorClassNode = ListUtils.findMatch(childNodes, clsNode -> clsNode.getNodeClass().getName().equals("greenfoot.Actor"));
         if (actorClassNode != null)
             ListUtils.moveToFront(childNodes, actorClassNode);
