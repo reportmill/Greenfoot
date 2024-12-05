@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ColView Font="Arial 12" Border="#80" FillWidth="true">
+  <ScaleBox Name="ScaleBox" GrowHeight="true">
+    <BoxView Name="WorldViewBox" Padding="8" />
+  </ScaleBox>
+  <RowView Align="CENTER" Padding="18,25,18,25" Spacing="15">
+    <Button Name="ActButton" PrefWidth="70" Text="Act" />
+    <Button Name="RunButton" PrefWidth="70" Text="Run" />
+    <Button Name="ResetButton" PrefWidth="70" Text="Reset" />
+    <Label LeanX="CENTER" Font="Arial 14" Text="Speed:" />
+    <Slider Name="SpeedSlider" PrefWidth="180" />
+    <ToggleButton Name="FullSizeButton" PrefWidth="35" Text="[  ]" ToolTip="Full Size" />
+  </RowView>
+</ColView>

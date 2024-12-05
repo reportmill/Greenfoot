@@ -1,7 +1,4 @@
 package greenfoot;
-import snap.geom.HPos;
-import snap.geom.Pos;
-import snap.gfx.Color;
 import snap.view.*;
 
 /**
@@ -93,105 +90,66 @@ public class PlayerPane extends ViewOwner {
     }
 
     /**
-     * Create UI.
+     * Initialize UI.
      */
-    protected View createUI()
+    @Override
+    protected void initUI()
     {
-        // Add ActButton
-        Button actButton = new Button("Act");
-        actButton.setName("ActButton");
-        actButton.setPrefWidth(70);
-
-        // Add RunButton
-        Button runButton = new Button("Run");
-        runButton.setName("RunButton");
-        runButton.setPrefWidth(70);
-
-        // Add ResetButton
-        Button resetButton = new Button("Reset");
-        resetButton.setName("ResetButton");
-        resetButton.setPrefWidth(70);
-
-        // Add separator
-        Separator sep = new Separator();
-        sep.setPrefWidth(40);
-        sep.setVisible(false);
-
-        // Add Speed label and slider
-        Label speedLabel = new Label("Speed:");
-        speedLabel.setLeanX(HPos.CENTER);
-        speedLabel.setFont(snap.gfx.Font.Arial14);
-        Slider speedSlider = new Slider();
-        speedSlider.setName("SpeedSlider");
-        speedSlider.setPrefWidth(180);
-
-        // Create toolbar
-        RowView toolBar = new RowView();
-        toolBar.setAlign(Pos.CENTER);
-        toolBar.setPadding(18, 25, 18, 25);
-        toolBar.setSpacing(15);
-        toolBar.setChildren(actButton, runButton, resetButton, sep, speedLabel, speedSlider);
-
-        // Configure World View
-        _worldViewBox = new BoxView();
-        _worldViewBox.setPadding(8, 8, 8, 8);
-        ScaleBox scaleBox = new ScaleBox(_worldViewBox, true, true);
-        scaleBox.setGrowHeight(true);
-
-        // Create col view and add world, toolBar
-        ColView colView = new ColView();
-        colView.setFillWidth(true);
-        colView.setFont(snap.gfx.Font.Arial12);
-        colView.setBorder(Color.GRAY, 1);
-        colView.setChildren(scaleBox, toolBar);
-
-        // Return
-        return colView;
+        _worldViewBox = getView("WorldViewBox", BoxView.class);
     }
 
     /**
      * Reset UI.
      */
+    @Override
     protected void resetUI()
     {
-        setViewValue("SpeedSlider", Greenfoot.getSpeed() / 100f);
+        setViewValue("SpeedSlider", Greenfoot.getSpeed());
     }
 
     /**
      * Respond to UI changes.
      */
+    @Override
     protected void respondUI(ViewEvent anEvent)
     {
-        // Handle ActButton
-        if (anEvent.equals("ActButton"))
-            _world._worldView.doAct();
+        switch (anEvent.getName()) {
 
-        // Handle RunButton
-        if (anEvent.equals("RunButton")) {
-            View runBtn = anEvent.getView();
-            runBtn.setText("Pause");
-            runBtn.setName("PauseButton");
-            getView("ActButton").setDisabled(true);
-            Greenfoot.start();
-        }
+            // Handle ActButton
+            case "ActButton": _world._worldView.doAct(); break;
 
-        // Handle PauseButton
-        if (anEvent.equals("PauseButton")) {
-            Greenfoot.stop();
-            View pauseBtn = anEvent.getView();
-            pauseBtn.setText("Run");
-            pauseBtn.setName("RunButton");
-            getView("ActButton").setDisabled(false);
-        }
+            // Handle RunButton
+            case "RunButton":
+                View runBtn = anEvent.getView();
+                runBtn.setText("Pause");
+                runBtn.setName("PauseButton");
+                getView("ActButton").setDisabled(true);
+                Greenfoot.start();
+                break;
 
-        // Handle ResetButton
-        if (anEvent.equals("ResetButton"))
-            resetWorld();
+            // Handle PauseButton
+            case "PauseButton":
+                Greenfoot.stop();
+                View pauseBtn = anEvent.getView();
+                pauseBtn.setText("Run");
+                pauseBtn.setName("RunButton");
+                getView("ActButton").setDisabled(false);
+                break;
 
-        // Handle SpeedSlider
-        if (anEvent.equals("SpeedSlider")) {
-            int val = Math.round(anEvent.getFloatValue() * 100);
-            Greenfoot.setSpeed(val);
+            // Handle ResetButton
+            case "ResetButton": resetWorld(); break;
+
+            // Handle SpeedSlider
+            case "SpeedSlider":
+                Greenfoot.setSpeed(anEvent.getIntValue());
+                break;
+
+            // Handle FullSizeButton
+            case "FullSizeButton":
+                ScaleBox scaleBox = getView("ScaleBox", ScaleBox.class);
+                scaleBox.setFillWidth(anEvent.getBoolValue());
+                scaleBox.setFillHeight(anEvent.getBoolValue());
+                break;
         }
 
         // Shouldn't need this
@@ -213,7 +171,7 @@ public class PlayerPane extends ViewOwner {
 
         World world = null;
         try { world = _firstWorld.getClass().newInstance(); }
-        catch (Exception e) { new RuntimeException(e); }
+        catch (Exception e) { e.printStackTrace(); }
         setWorld(world);
     }
 
@@ -229,7 +187,7 @@ public class PlayerPane extends ViewOwner {
         int mouseX = (int) Math.round(anEvent.getX());
         int mouseY = (int) Math.round(anEvent.getY());
 
-        // Handle MousePressed
+        // Handle MousePress
         if (anEvent.isMousePress()) {
 
             // If alt or shortcut down, create new actor
@@ -245,7 +203,7 @@ public class PlayerPane extends ViewOwner {
             else _mouseActor = _world.getActorAt(null, mouseX, mouseY, null);
         }
 
-        // Handle MouseDraggged
+        // Handle MouseDrag
         if (anEvent.isMouseDrag() && _mouseActor != null)
             _mouseActor.setLocation(mouseX, mouseY);
     }
