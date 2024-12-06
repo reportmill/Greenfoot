@@ -1,4 +1,5 @@
 package greenfoot;
+import snap.gfx.Color;
 import snap.view.*;
 
 /**
@@ -112,6 +113,8 @@ public class PlayerPane extends ViewOwner {
     protected void initUI()
     {
         _worldViewBox = getView("WorldViewBox", BoxView.class);
+        Label buildingLabel = (Label) _worldViewBox.getContent();
+        buildingLabel.setTextColor(Color.get("#E0"));
     }
 
     /**
