@@ -79,7 +79,7 @@ public class ClassesPane extends ViewOwner {
 
         // Get RootClassNode and reset treeview
         ClassNode rootClassNode = getRootClassNode();
-        _treeView.setItems(new ClassNode[] { rootClassNode });
+        _treeView.setItemsList(rootClassNode.getChildNodes());
         _treeView.expandAll();
 
         // Reset SelClassNode
@@ -156,7 +156,7 @@ public class ClassesPane extends ViewOwner {
             if (classImage != null) {
                 ImageView classImageView = new ImageView(classImage);
                 classImageView.setKeepAspect(true);
-                classImageView.setPrefSize(48, 20);
+                classImageView.setPrefSize(40, 18);
                 label.setGraphicAfter(classImageView);
             }
         }
@@ -168,13 +168,19 @@ public class ClassesPane extends ViewOwner {
     /**
      * A TreeResolver for ClassNode.
      */
-    private static class ClassTreeResolver extends TreeResolver<ClassNode> {
-
-        @Override
-        public ClassNode getParent(ClassNode anItem)  { return anItem.getParentNode(); }
+    private class ClassTreeResolver extends TreeResolver<ClassNode> {
 
         @Override
         public boolean isParent(ClassNode anItem)  { return !anItem.getChildNodes().isEmpty(); }
+
+        @Override
+        public ClassNode getParent(ClassNode anItem)
+        {
+            ClassNode parentNode = anItem.getParentNode();
+            if (parentNode == _rootClassNode)
+                return null;
+            return parentNode;
+        }
 
         @Override
         public ClassNode[] getChildren(ClassNode aParent)  { return aParent.getChildNodes().getArray(); }

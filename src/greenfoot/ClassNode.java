@@ -113,6 +113,17 @@ public class ClassNode implements Comparable<ClassNode> {
     }
 
     /**
+     * Standard equals implementation.
+     */
+    @Override
+    public boolean equals(Object anObj)
+    {
+        if (anObj == this) return true;
+        ClassNode other = anObj instanceof ClassNode ? (ClassNode) anObj : null; if (other == null) return false;
+        return _nodeFile == other._nodeFile;
+    }
+
+    /**
      * Standard toString implementation.
      */
     @Override
