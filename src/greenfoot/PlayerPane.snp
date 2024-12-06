@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SplitView DividerSpan="1">
   <ColView Font="Arial 12" GrowWidth="true" FillWidth="true">
-    <ScaleBox Name="ScaleBox" GrowHeight="true">
+    <ScaleBox Name="ScaleBox" Margin="8" GrowHeight="true">
       <BoxView Name="WorldViewBox" Border="#00 1" />
     </ScaleBox>
     <RectView PrefHeight="1" Fill="#CC" />

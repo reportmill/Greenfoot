@@ -54,10 +54,6 @@ public class World {
         _worldView = new WorldView(this);
         _worldView.setSize(_width * _cellSize, _height * _cellSize);
 
-        // If first world, manually set it
-        if (Greenfoot.getWorld() == null)
-            Greenfoot.setWorld(this);
-
         // Set background image
         GreenfootImage backgroundImage = Greenfoot.env().getGreenfootImageForClass(getClass());
         if (backgroundImage == null)

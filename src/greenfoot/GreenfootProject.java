@@ -125,6 +125,24 @@ public class GreenfootProject extends PropObject {
     }
 
     /**
+     * Returns class for name.
+     */
+    public Class<?> getClassForName(String className)
+    {
+        ClassNode rootClassNode = getRootClassNode();
+        return rootClassNode.getClassForName(className);
+    }
+
+    /**
+     * Returns the last instantiated world class.
+     */
+    public Class<? extends World> getLastInstantiatedWorldClass()
+    {
+        String worldClassName = getProperty("world.lastInstantiated");
+        return worldClassName != null ? (Class<? extends World>) getClassForName(worldClassName) : null;
+    }
+
+    /**
      * Returns the greenfoot project for given project dir.
      */
     public static GreenfootProject getGreenfootProjectForDir(WebFile projDir)

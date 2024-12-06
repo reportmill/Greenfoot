@@ -100,6 +100,36 @@ public class ClassNode implements Comparable<ClassNode> {
     }
 
     /**
+     * Returns a child node for given class name.
+     */
+    public Class<?> getClassForName(String className)
+    {
+        ClassNode classNode = getChildNodeForClassName(className);
+        return classNode != null ? classNode.getNodeClass() : null;
+    }
+
+    /**
+     * Returns a child node for given class name.
+     */
+    public ClassNode getChildNodeForClassName(String className)
+    {
+        // Get child with class name - just return if found
+        ClassNode childNode = ListUtils.findMatch(_childNodes, node -> node.getNodeClass().getName().equals(className));
+        if (childNode != null)
+            return childNode;
+
+        // Recurse into children
+        for (ClassNode child : _childNodes) {
+            childNode = child.getChildNodeForClassName(className);
+            if (childNode != null)
+                return childNode;
+        }
+
+        // Return not found
+        return null;
+    }
+
+    /**
      * Standard compareTo implementation.
      */
     @Override
@@ -120,7 +150,7 @@ public class ClassNode implements Comparable<ClassNode> {
     {
         if (anObj == this) return true;
         ClassNode other = anObj instanceof ClassNode ? (ClassNode) anObj : null; if (other == null) return false;
-        return _nodeFile == other._nodeFile;
+        return _nodeFile == other._nodeFile && _nodeClass.getName().equals(other._nodeClass.getName());
     }
 
     /**

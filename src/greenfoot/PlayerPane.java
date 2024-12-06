@@ -12,9 +12,6 @@ public class PlayerPane extends ViewOwner {
     // The current world
     private World _world;
 
-    // The first world
-    private World _firstWorld;
-
     // The World View
     private WorldView _worldView;
 
@@ -51,13 +48,12 @@ public class PlayerPane extends ViewOwner {
     public void setWorld(World aWorld)
     {
         if (aWorld == _world) return;
-        if (_world == null)
-            _firstWorld = aWorld;
-
-        getUI();
 
         _world = aWorld;
         _worldView = aWorld.getWorldView();
+
+        // Set in UI
+        getUI();
         _worldViewBox.setContent(_worldView);
         setFirstFocus(_worldView);
         _worldView.addEventHandler(this::handleWorldViewMouseEvent, MouseEvents);
@@ -192,18 +188,14 @@ public class PlayerPane extends ViewOwner {
      */
     protected void resetWorld()
     {
-        Greenfoot.stop();
+        _greenfootEnv.resetWorldToDefault();
+
         View pauseBtn = getView("PauseButton");
         if (pauseBtn != null) {
             pauseBtn.setText("Run");
             pauseBtn.setName("RunButton");
             getView("ActButton").setDisabled(false);
         }
-
-        World world = null;
-        try { world = _firstWorld.getClass().newInstance(); }
-        catch (Exception e) { e.printStackTrace(); }
-        setWorld(world);
     }
 
     /**

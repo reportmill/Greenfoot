@@ -36,7 +36,7 @@ public class GreenfootEnv extends PropObject {
     private Map<String, SoundClip> _soundClipCache = new HashMap<>();
 
     // The world class from the current project
-    protected static Class<?> _worldClass;
+    protected static Class<? extends World> _worldClass;
 
     // Constants for properties
     public static final String GreenfootProject_Prop = "GreenfootProject";
@@ -354,12 +354,52 @@ public class GreenfootEnv extends PropObject {
     /**
      * Returns the current World class.
      */
-    protected Class<?> getWorldClass()
+    protected Class<? extends World> getWorldClass()
     {
+        // If world current set, return that class
         World world = getWorld();
         if (world != null)
             return world.getClass();
+
+        // Return
+        return getDefaultWorldClass();
+    }
+
+    /**
+     * Returns the default World class.
+     */
+    protected Class<? extends World> getDefaultWorldClass()
+    {
+        // If last instantiated available, use that
+        GreenfootProject greenfootProject = getGreenfootProject();
+        Class<? extends World> lastInstantiatedWorldClass = greenfootProject.getLastInstantiatedWorldClass();
+        if (lastInstantiatedWorldClass != null)
+            return lastInstantiatedWorldClass;
+
+        // Return
         return _worldClass;
+    }
+
+    /**
+     * Resets the world.
+     */
+    public void resetWorld()
+    {
+        stop();
+        Class<? extends World> worldClass = getWorldClass();
+        if (worldClass != null)
+            setWorldForClass(worldClass);
+    }
+
+    /**
+     * Resets the world to default world class.
+     */
+    public void resetWorldToDefault()
+    {
+        stop();
+        Class<? extends World> worldClass = getDefaultWorldClass();
+        if (worldClass != null)
+            setWorldForClass(worldClass);
     }
 
     /**
