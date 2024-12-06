@@ -6,6 +6,9 @@ import snap.view.*;
  */
 public class PlayerPane extends ViewOwner {
 
+    // The Greenfoot Env
+    private GreenfootEnv _greenfootEnv;
+
     // The current world
     private World _world;
 
@@ -18,6 +21,9 @@ public class PlayerPane extends ViewOwner {
     // The box that holds the World View
     private BoxView _worldViewBox;
 
+    // The ClassesPane
+    private ClassesPane _classesPane;
+
     // The actor pressed by last mouse
     private Actor _mouseActor;
 
@@ -27,9 +33,11 @@ public class PlayerPane extends ViewOwner {
     /**
      * Constructor.
      */
-    public PlayerPane()
+    public PlayerPane(GreenfootEnv greenfootEnv)
     {
         super();
+        _greenfootEnv = greenfootEnv;
+        _classesPane = new ClassesPane();
     }
 
     /**
@@ -47,10 +55,9 @@ public class PlayerPane extends ViewOwner {
             _firstWorld = aWorld;
 
         getUI();
-        assert (_worldViewBox != null);
 
         _world = aWorld;
-        _worldView = aWorld.getWorldView(); assert (_worldView != null);
+        _worldView = aWorld.getWorldView();
         _worldViewBox.setContent(_worldView);
         setFirstFocus(_worldView);
         _worldView.addEventHandler(this::handleWorldViewMouseEvent, MouseEvents);
@@ -73,11 +80,6 @@ public class PlayerPane extends ViewOwner {
     public boolean isPlaying()  { return _timer.isRunning(); }
 
     /**
-     * Returns the frame rate.
-     */
-    public int getTimerPeriod()  { return _timer.getPeriod(); }
-
-    /**
      * Sets the frame rate.
      */
     public void setTimerPeriod(int aValue)
@@ -90,12 +92,41 @@ public class PlayerPane extends ViewOwner {
     }
 
     /**
+     * Returns whether player is showing ClassesPane.
+     */
+    public boolean isShowClasses()  { return _classesPane.isShowing(); }
+
+    /**
+     * Sets whether player is showing ClassesPane.
+     */
+    public void setShowClasses(boolean aValue)
+    {
+        if (aValue == isShowClasses()) return;
+
+        SplitView splitView = getUI(SplitView.class);
+        if (aValue)
+            splitView.addItem(_classesPane.getUI());
+        else splitView.removeItem(_classesPane.getUI());
+    }
+
+    /**
      * Initialize UI.
      */
     @Override
     protected void initUI()
     {
         _worldViewBox = getView("WorldViewBox", BoxView.class);
+    }
+
+    /**
+     * Override to show classes if available.
+     */
+    @Override
+    protected void initShowing()
+    {
+        GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
+        ClassNode rootClassNode = greenfootProject.getRootClassNode();
+        setShowClasses(!rootClassNode.getChildNodes().isEmpty());
     }
 
     /**

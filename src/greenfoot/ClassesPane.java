@@ -94,7 +94,7 @@ public class ClassesPane extends ViewOwner {
     {
         // Calculate TreeView RowHeight
         //Label sampleLabel = createLabelForClassNode(new ClassNode(Object.class, null));
-        int treeViewRowHeight = 32; //(int) Math.ceil(sampleLabel.getPrefHeight() + 10);
+        int treeViewRowHeight = 30; //(int) Math.ceil(sampleLabel.getPrefHeight() + 10);
 
         // Configure TreeView
         _treeView = getView("TreeView", TreeView.class);
@@ -148,7 +148,7 @@ public class ClassesPane extends ViewOwner {
         // Create label for node class
         Class<?> nodeClass = classNode.getNodeClass();
         Label label = new Label(nodeClass.getSimpleName());
-        label.setPropsString("Fill:#F5CC9B; Border:#66 1; MinWidth:60; MinHeight:26; Padding:2,4,2,8; BorderRadius:4;");
+        label.setPropsString("Fill:#F5CC9B; Border:#66 1; MinWidth:60; MinHeight:24; Padding:2,4,2,8; BorderRadius:2;");
 
         // If Greenfoot Project is set, check for image
         if (_greenfootProject != null) {
@@ -156,7 +156,7 @@ public class ClassesPane extends ViewOwner {
             if (classImage != null) {
                 ImageView classImageView = new ImageView(classImage);
                 classImageView.setKeepAspect(true);
-                classImageView.setPrefSize(48, 22);
+                classImageView.setPrefSize(48, 20);
                 label.setGraphicAfter(classImageView);
             }
         }

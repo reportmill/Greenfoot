@@ -220,7 +220,7 @@ public class GreenfootEnv extends PropObject {
     public PlayerPane getPlayerPane()
     {
         if (_playerPane != null) return _playerPane;
-        _playerPane = new PlayerPane();
+        _playerPane = new PlayerPane(this);
         initGreenfoot();
         return _playerPane;
     }
