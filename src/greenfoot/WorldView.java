@@ -47,7 +47,6 @@ public class WorldView extends ChildView {
         setPrefSize(width, height);
         setOverflow(Overflow.Clip);
         setFill(Color.WHITE);
-        setBorder(Color.BLACK, 1);
         enableEvents(MouseEvents);
         enableEvents(KeyEvents);
         setFocusable(true);
@@ -165,11 +164,6 @@ public class WorldView extends ChildView {
             aPntr.setColor(Color.WHITE);
             aPntr.drawString(str, textX, textY);
         }
-
-        // Repaint border above all other painting
-        Border border = getBorder();
-        if (border != null)
-            border.paint(aPntr, getBoundsLocal());
     }
 
     /**

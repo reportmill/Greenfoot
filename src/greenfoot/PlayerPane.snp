@@ -2,7 +2,7 @@
 <SplitView DividerSpan="1">
   <ColView Font="Arial 12" GrowWidth="true" FillWidth="true">
     <ScaleBox Name="ScaleBox" GrowHeight="true">
-      <BoxView Name="WorldViewBox" Padding="8" />
+      <BoxView Name="WorldViewBox" Border="#00 1" />
     </ScaleBox>
     <RectView PrefHeight="1" Fill="#CC" />
     <RowView Align="CENTER" Padding="18,25,18,25" Spacing="15">
