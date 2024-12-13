@@ -1,5 +1,6 @@
 package greenfoot;
 import snap.gfx.Color;
+import snap.props.PropChange;
 import snap.view.*;
 
 /**
@@ -87,6 +88,11 @@ public class PlayerPane extends ViewOwner {
             aValue = 1000;
         _timer.setPeriod(aValue);
     }
+
+    /**
+     * Returns the classes pane.
+     */
+    public ClassesPane getClassesPane()  { return _classesPane; }
 
     /**
      * Returns whether player is showing ClassesPane.
@@ -198,6 +204,19 @@ public class PlayerPane extends ViewOwner {
             pauseBtn.setText("Run");
             pauseBtn.setName("RunButton");
             getView("ActButton").setDisabled(false);
+        }
+    }
+
+    /**
+     * Called when GreenfootProject has prop change.
+     */
+    protected void handleGreenfootProjectRootClassNodeChange(PropChange propChange)
+    {
+        // Handle RootClassNode
+        if (propChange.getPropName() == GreenfootProject.RootClassNode_Prop) {
+            GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
+            ClassNode rootClassNode = greenfootProject.getRootClassNode();
+            setShowClasses(!rootClassNode.getChildNodes().isEmpty());
         }
     }
 

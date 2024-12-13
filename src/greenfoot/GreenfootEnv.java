@@ -2,6 +2,8 @@ package greenfoot;
 import snap.geom.Point;
 import snap.gfx.Image;
 import snap.gfx.SoundClip;
+import snap.props.PropChange;
+import snap.props.PropChangeListener;
 import snap.props.PropObject;
 import snap.util.Convert;
 import snap.util.SnapUtils;
@@ -34,6 +36,9 @@ public class GreenfootEnv extends PropObject {
 
     // The loaded SoundClips
     private Map<String, SoundClip> _soundClipCache = new HashMap<>();
+
+    // A prop change listener for greenfoot project prop changes
+    private PropChangeListener _greenfootProjectLsnr = this::handleGreenfootProjectPropChange;
 
     // The world class from the current project
     protected static Class<? extends World> _worldClass;
@@ -269,7 +274,12 @@ public class GreenfootEnv extends PropObject {
     public void setGreenfootProject(GreenfootProject greenfootProject)
     {
         if (greenfootProject == _greenfootProject) return;
+
+        if (_greenfootProject != null)
+            _greenfootProject.removePropChangeListener(_greenfootProjectLsnr);
         firePropChange(GreenfootProject_Prop, _greenfootProject, _greenfootProject = greenfootProject);
+        if (_greenfootProject != null)
+            _greenfootProject.addPropChangeListener(_greenfootProjectLsnr);
     }
 
     /**
@@ -400,6 +410,15 @@ public class GreenfootEnv extends PropObject {
         Class<? extends World> worldClass = getDefaultWorldClass();
         if (worldClass != null)
             setWorldForClass(worldClass);
+    }
+
+    /**
+     * Called when GreenfootProject has prop change.
+     */
+    private void handleGreenfootProjectPropChange(PropChange propChange)
+    {
+        if (_playerPane != null)
+            _playerPane.handleGreenfootProjectRootClassNodeChange(propChange);
     }
 
     /**

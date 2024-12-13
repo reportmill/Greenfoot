@@ -54,6 +54,11 @@ public class ClassesPane extends ViewOwner {
     }
 
     /**
+     * Returns the selected class.
+     */
+    public Class<?> getSelClass()  { return _selClassNode != null ? _selClassNode.getNodeClass() : null; }
+
+    /**
      * Returns the selected class node.
      */
     public ClassNode getSelClassNode()  { return _selClassNode; }
@@ -64,7 +69,7 @@ public class ClassesPane extends ViewOwner {
     public void setSelClassNode(ClassNode classNode)
     {
         if (Objects.equals(classNode, getSelClassNode())) return;
-        firePropChange(SelClassNode_Prop, _selClassNode, _selClassNode);
+        firePropChange(SelClassNode_Prop, _selClassNode, _selClassNode = classNode);
     }
 
     /**
@@ -101,9 +106,6 @@ public class ClassesPane extends ViewOwner {
         _treeView.setRowHeight(treeViewRowHeight);
         _treeView.setResolver(new ClassTreeResolver());
         _treeView.setCellConfigure(this::configureClassTreeCell);
-
-        // Rebuild classes view
-        resetClassTree();
     }
 
     /**
@@ -163,6 +165,19 @@ public class ClassesPane extends ViewOwner {
 
         // Return
         return label;
+    }
+
+    /**
+     * Override to reset class tree when shown.
+     */
+    @Override
+    protected void setShowing(boolean aValue)
+    {
+        if (aValue == isShowing()) return;
+        super.setShowing(aValue);
+
+        if (aValue)
+            resetClassTree();
     }
 
     /**

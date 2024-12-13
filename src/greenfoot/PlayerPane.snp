@@ -3,7 +3,7 @@
   <ColView Font="Arial 12" GrowWidth="true" FillWidth="true">
     <ScaleBox Name="ScaleBox" Margin="8" GrowHeight="true">
       <BoxView Name="WorldViewBox" Border="#00 1">
-        <Label Font="Arial Bold Italic 64" Align="CENTER" PrefWidth="500" PrefHeight="400" Fill="#FF" Text="Building..." />
+        <Label Font="Arial Bold Italic 42" Align="CENTER" PrefWidth="500" PrefHeight="400" Fill="#FF" Text="Building Project..." />
       </BoxView>
     </ScaleBox>
     <RectView PrefHeight="1" Fill="#CC" />
