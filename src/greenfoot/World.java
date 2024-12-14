@@ -42,7 +42,8 @@ public class World {
     public World(int aW, int aH, int aCellSize, boolean isBounded)
     {
         // Set any project class
-        GreenfootEnv._worldClass = getClass();
+        if (GreenfootEnv._worldClass == null)
+            GreenfootEnv._worldClass = getClass();
 
         // Set sizing info
         _width = aW;

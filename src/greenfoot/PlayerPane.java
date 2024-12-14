@@ -131,7 +131,8 @@ public class PlayerPane extends ViewOwner {
     {
         GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
         ClassNode rootClassNode = greenfootProject.getRootClassNode();
-        setShowClasses(!rootClassNode.getChildNodes().isEmpty());
+        if (rootClassNode != null && !rootClassNode.getChildNodes().isEmpty())
+            setShowClasses(true);
     }
 
     /**
@@ -216,9 +217,10 @@ public class PlayerPane extends ViewOwner {
         if (propChange.getPropName() == GreenfootProject.RootClassNode_Prop) {
             GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
             ClassNode rootClassNode = greenfootProject.getRootClassNode();
-            setShowClasses(!rootClassNode.getChildNodes().isEmpty());
-            if (isShowClasses())
+            if (rootClassNode != null && !rootClassNode.getChildNodes().isEmpty()) {
+                setShowClasses(true);
                 _classesPane.resetClassTree();
+            }
         }
     }
 

@@ -9,6 +9,8 @@ import snap.util.Convert;
 import snap.util.SnapUtils;
 import snap.view.View;
 import snap.viewx.DialogBox;
+import snap.web.WebFile;
+import snap.web.WebURL;
 import java.util.*;
 
 /**
@@ -264,8 +266,18 @@ public class GreenfootEnv extends PropObject {
     public GreenfootProject getGreenfootProject()
     {
         if (_greenfootProject != null) return _greenfootProject;
+
+        // Get project file url for given world class
         Class<?> worldClass = getWorldClass();
-        return _greenfootProject = GreenfootProject.getGreenfootProjectForClass(worldClass);
+        WebURL projectUrl = WebURL.getURL(worldClass, "project.greenfoot");
+        WebFile projectFile = projectUrl != null ? projectUrl.getFile() : null;
+        if (projectFile == null) {
+            System.err.println("Couldn't find Greenfoot project file for class: " + worldClass.getName());
+            return null;
+        }
+
+        // Return
+        return _greenfootProject = new GreenfootProject(projectFile);
     }
 
     /**
@@ -372,7 +384,7 @@ public class GreenfootEnv extends PropObject {
             return world.getClass();
 
         // Return
-        return getDefaultWorldClass();
+        return _worldClass;
     }
 
     /**
@@ -399,6 +411,7 @@ public class GreenfootEnv extends PropObject {
         Class<? extends World> worldClass = getWorldClass();
         if (worldClass != null)
             setWorldForClass(worldClass);
+        else resetWorldToDefault();
     }
 
     /**
