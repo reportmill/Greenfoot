@@ -97,7 +97,7 @@ public class PlayerPane extends ViewOwner {
     /**
      * Returns whether player is showing ClassesPane.
      */
-    public boolean isShowClasses()  { return _classesPane.isShowing(); }
+    public boolean isShowClasses()  { return _classesPane.isUISet() && _classesPane.getUI().getParent() != null; }
 
     /**
      * Sets whether player is showing ClassesPane.
