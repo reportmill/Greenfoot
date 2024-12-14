@@ -106,6 +106,7 @@ public class ClassesPane extends ViewOwner {
         _treeView.setRowHeight(treeViewRowHeight);
         _treeView.setResolver(new ClassTreeResolver());
         _treeView.setCellConfigure(this::configureClassTreeCell);
+        _treeView.addEventHandler(this::handleTreeViewDragGestureEvent, DragGesture);
     }
 
     /**
@@ -165,6 +166,29 @@ public class ClassesPane extends ViewOwner {
 
         // Return
         return label;
+    }
+
+    /**
+     * Called when TreeView gets DragGesture event.
+     */
+    private void handleTreeViewDragGestureEvent(ViewEvent anEvent)
+    {
+        // Get the class under mouse (just return if not found)
+        ListCell<ClassNode> dragCell = _treeView.getCol(0).getCellForY(anEvent.getY());
+        ClassNode dragNode = dragCell != null ? dragCell.getItem() : null;
+        Class<?> dragClass = dragNode != null ? dragNode.getNodeClass() : null;
+        if (dragClass == null)
+            return;
+
+        // Add to clipboard
+        Clipboard clipboard = anEvent.getClipboard();
+        clipboard.addData("Drag:" + dragClass.getName());
+        Image classImage = _greenfootProject.getImageForClass(dragClass);
+        if (classImage != null)
+            clipboard.setDragImage(classImage);
+
+        // Start drag
+        clipboard.startDrag();
     }
 
     /**

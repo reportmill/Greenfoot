@@ -121,6 +121,7 @@ public class PlayerPane extends ViewOwner {
         _worldViewBox = getView("WorldViewBox", BoxView.class);
         Label buildingLabel = (Label) _worldViewBox.getContent();
         buildingLabel.setTextColor(Color.get("#E0"));
+        _worldViewBox.addEventHandler(this::handleWorldViewBoxDragEvent, DragEvents);
     }
 
     /**
@@ -255,5 +256,52 @@ public class PlayerPane extends ViewOwner {
         // Handle MouseDrag
         if (anEvent.isMouseDrag() && _mouseActor != null)
             _mouseActor.setLocation(mouseX, mouseY);
+    }
+
+    /**
+     * Called when WorldViewBox gets drag event.
+     */
+    private void handleWorldViewBoxDragEvent(ViewEvent anEvent)
+    {
+        // Just accept all drags for now
+        if (!anEvent.isDragDrop()) {
+            anEvent.acceptDrag();
+            return;
+        }
+
+        // If clipboard not loaded, come back
+        Clipboard clipboard = anEvent.getClipboard();
+        if (!clipboard.isLoaded()) {
+            clipboard.addLoadListener(() -> handleWorldViewBoxDragEvent(anEvent));
+            return;
+        }
+
+        // Get drag string - just return if not from classes tree
+        String dragString = clipboard.hasString() ? clipboard.getString() : null;
+        if (dragString == null || !dragString.startsWith("Drag:"))
+            return;
+
+        // Get drag class - just return if not found
+        String className = dragString.substring("Drag:".length());
+        GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
+        Class<?> dragClass = greenfootProject.getClassForName(className);
+        if (dragClass == null)
+            return;
+
+        // Create drag object - just return if failed
+        Object dragObj;
+        try { dragObj = dragClass.getConstructor().newInstance(); }
+        catch (Exception ignore) { return; }
+
+        // If Actor, add to world
+        if (dragObj instanceof Actor) {
+            anEvent.acceptDrag();
+            int dragX = (int) anEvent.getX();
+            int dragY = (int) anEvent.getY();
+            getWorld().addObject((Actor) dragObj, dragX, dragY);
+        }
+
+        // Complete drop
+        anEvent.dropComplete();
     }
 }
