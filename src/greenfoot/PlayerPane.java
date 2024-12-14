@@ -217,6 +217,7 @@ public class PlayerPane extends ViewOwner {
             GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
             ClassNode rootClassNode = greenfootProject.getRootClassNode();
             setShowClasses(!rootClassNode.getChildNodes().isEmpty());
+            _classesPane.resetClassTree();
         }
     }
 
