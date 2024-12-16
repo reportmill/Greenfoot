@@ -355,6 +355,8 @@ public class GreenfootEnv extends PropObject {
 
         // Get world class
         Class<?> worldClass = getWorldClass();
+        if (worldClass == null)
+            return null;
 
         // Get image for name
         image = Image.getImageForClassResource(worldClass, "images/" + aName);
