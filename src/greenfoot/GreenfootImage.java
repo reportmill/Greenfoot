@@ -72,28 +72,8 @@ public class GreenfootImage {
      */
     public GreenfootImage(String aString, int lineHeight, Color foregroundColor, Color backgroundColor, Color lineColor)
     {
-        // Get font
         _font = getFontOfPixelHeight(lineHeight);
-
-        // Create image, fill background and draw string
-        //Size imageSize = getImageSizeForStringAndFont(aString, _font);
-        //int imageW = (int) imageSize.width; //(int) Math.ceil(_font.getFontObject().getStringAdvance(aString));
-        //int imageH = (int) imageSize.height; //(int) Math.ceil(_font.getFontObject().getLineHeight());
-        //_image = Image.getImageForSize(imageW, imageH, true);
-        //if (bakcgroundColor != null && bakcgroundColor.getAlpha() > 0) { setColor(bakcgroundColor); fill(); }
-        //setColor(foregroundColor); drawString(aString, 0, (int) Math.round(_font.getFontObject().getAscent()));
-
-        // Create and configure TextArea for attributes and get image
-        TextArea textArea = new TextArea();
-        textArea.setWrapLines(true);
-        textArea.setFont(_font.getFontObject());
-        if (backgroundColor != null && backgroundColor.getAlpha() > 0)
-            textArea.setFill(backgroundColor.getColorObject());
-        if (!foregroundColor.getColorObject().equals(snap.gfx.Color.BLACK))
-            textArea.getTextBlock().setDefaultTextColor(foregroundColor.getColorObject());
-        textArea.setText(aString);
-        textArea.setSizeToBestSize();
-        _image = ViewUtils.getImageForScale(textArea, 1);
+        _image = createImage(aString, _font, foregroundColor, backgroundColor);
     }
 
     /**
@@ -386,6 +366,23 @@ public class GreenfootImage {
     public String toString()
     {
         return _name + " " + getWidth() + "x" + getHeight();
+    }
+
+    /**
+     * Returns an image for given string, font, foreground color, background color.
+     */
+    private static Image createImage(String aString, Font aFont, Color foregroundColor, Color backgroundColor)
+    {
+        TextArea textArea = new TextArea();
+        textArea.setWrapLines(true);
+        textArea.setFont(aFont.getFontObject());
+        if (backgroundColor != null && backgroundColor.getAlpha() > 0)
+            textArea.setFill(backgroundColor.getColorObject());
+        if (!foregroundColor.getColorObject().equals(snap.gfx.Color.BLACK))
+            textArea.getTextBlock().setDefaultTextColor(foregroundColor.getColorObject());
+        textArea.setText(aString);
+        textArea.setSizeToBestSize();
+        return ViewUtils.getImageForScale(textArea, 1);
     }
 
     /**

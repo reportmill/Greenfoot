@@ -306,6 +306,17 @@ public class GreenfootEnv extends PropObject {
     }
 
     /**
+     * Returns the image for given class.
+     */
+    public Image getImageForClass(Class<?> aClass)
+    {
+        GreenfootProject greenfootProject = getGreenfootProject(); if (greenfootProject == null) return null;
+        String imageKey = "class." + aClass.getSimpleName() + ".image";
+        String imageName = greenfootProject.getProperty(imageKey);
+        return imageName != null ? getImageForName(imageName) : null;
+    }
+
+    /**
      * Returns image for given file name.
      */
     public Image getImageForName(String aName)

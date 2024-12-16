@@ -36,7 +36,7 @@ public class PlayerPane extends ViewOwner {
     {
         super();
         _greenfootEnv = greenfootEnv;
-        _classesPane = new ClassesPane();
+        _classesPane = new ClassesPane(greenfootEnv);
     }
 
     /**

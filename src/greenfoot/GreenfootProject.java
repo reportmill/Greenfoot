@@ -1,5 +1,4 @@
 package greenfoot;
-import snap.gfx.Image;
 import snap.props.PropObject;
 import snap.util.Convert;
 import snap.web.WebFile;
@@ -91,20 +90,6 @@ public class GreenfootProject extends PropObject {
     {
         String propString = getProperty(aKey);
         return Convert.intValue(propString);
-    }
-
-    /**
-     * Returns the image for given class.
-     */
-    public Image getImageForClass(Class<?> aClass)
-    {
-        String imageKey = "class." + aClass.getSimpleName() + ".image";
-        String imageFilename = getProperty(imageKey);
-        if (imageFilename == null)
-            return null;
-
-        String imagePath = "/images/" + imageFilename;
-        return Image.getImageForClassResource(aClass, imagePath);
     }
 
     /**

@@ -8,14 +8,14 @@ import java.util.Objects;
  */
 public class ClassesPane extends ViewOwner {
 
+    // The Greenfoot Env
+    private GreenfootEnv _greenfootEnv;
+
     // The root class node
     private ClassNode _rootClassNode;
 
     // The selected class node
     private ClassNode _selClassNode;
-
-    // The current greenfoot project (if available)
-    private GreenfootProject _greenfootProject;
 
     // The TreeView to show classes
     private TreeView<ClassNode> _treeView;
@@ -26,19 +26,16 @@ public class ClassesPane extends ViewOwner {
     /**
      * Constructor.
      */
-    public ClassesPane()
+    public ClassesPane(GreenfootEnv greenfootEnv)
     {
         super();
+        _greenfootEnv = greenfootEnv;
     }
 
     /**
      * Returns the GreenfootProject.
      */
-    public GreenfootProject getGreenfootProject()
-    {
-        if (_greenfootProject != null) return _greenfootProject;
-        return _greenfootProject = Greenfoot.env().getGreenfootProject();
-    }
+    public GreenfootProject getGreenfootProject()  { return _greenfootEnv.getGreenfootProject(); }
 
     /**
      * Returns the root class node.
@@ -77,10 +74,8 @@ public class ClassesPane extends ViewOwner {
      */
     protected void resetClassTree()
     {
-        // Clear RootClassNode and reset GreenfootProject
+        // Clear RootClassNode
         _rootClassNode = null;
-        _greenfootProject = null;
-        getGreenfootProject();
 
         // Get RootClassNode and reset treeview
         ClassNode rootClassNode = getRootClassNode();
@@ -153,15 +148,13 @@ public class ClassesPane extends ViewOwner {
         Label label = new Label(nodeClass.getSimpleName());
         label.setPropsString("Fill:#F5CC9B; Border:#66 1; MinWidth:60; MinHeight:24; Padding:2,4,2,8; BorderRadius:2;");
 
-        // If Greenfoot Project is set, check for image
-        if (_greenfootProject != null) {
-            Image classImage = _greenfootProject.getImageForClass(nodeClass);
-            if (classImage != null) {
-                ImageView classImageView = new ImageView(classImage);
-                classImageView.setKeepAspect(true);
-                classImageView.setPrefSize(40, 18);
-                label.setGraphicAfter(classImageView);
-            }
+        // If image available for class, add to label
+        Image classImage = _greenfootEnv.getImageForClass(nodeClass);
+        if (classImage != null) {
+            ImageView classImageView = new ImageView(classImage);
+            classImageView.setKeepAspect(true);
+            classImageView.setPrefSize(40, 18);
+            label.setGraphicAfter(classImageView);
         }
 
         // Return
@@ -183,7 +176,7 @@ public class ClassesPane extends ViewOwner {
         // Add to clipboard
         Clipboard clipboard = anEvent.getClipboard();
         clipboard.addData("Drag:" + dragClass.getName());
-        Image classImage = _greenfootProject.getImageForClass(dragClass);
+        Image classImage = _greenfootEnv.getImageForClass(dragClass);
         if (classImage != null)
             clipboard.setDragImage(classImage);
 
