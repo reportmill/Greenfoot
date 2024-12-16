@@ -26,9 +26,6 @@ public class PlayerPane extends ViewOwner {
     // The actor pressed by last mouse
     private Actor _mouseActor;
 
-    // The animation timer    
-    private ViewTimer _timer = new ViewTimer(() -> _worldView.doAct(), 40);
-
     /**
      * Constructor.
      */
@@ -60,33 +57,6 @@ public class PlayerPane extends ViewOwner {
         setFirstFocus(_worldView);
         _worldView.addEventHandler(this::handleWorldViewMouseEvent, MouseEvents);
         _worldView.requestFocus();
-    }
-
-    /**
-     * Starts the animation.
-     */
-    public void start()  { _timer.start(); }
-
-    /**
-     * Stops the animation.
-     */
-    public void stop()  { _timer.stop(); }
-
-    /**
-     * Whether scene is playing.
-     */
-    public boolean isPlaying()  { return _timer.isRunning(); }
-
-    /**
-     * Sets the frame rate.
-     */
-    public void setTimerPeriod(int aValue)
-    {
-        if (aValue < 1)
-            aValue = 1;
-        if (aValue > 1000)
-            aValue = 1000;
-        _timer.setPeriod(aValue);
     }
 
     /**
@@ -154,7 +124,7 @@ public class PlayerPane extends ViewOwner {
         switch (anEvent.getName()) {
 
             // Handle ActButton
-            case "ActButton": _world._worldView.doAct(); break;
+            case "ActButton": _greenfootEnv.act(); break;
 
             // Handle RunButton
             case "RunButton":
@@ -210,27 +180,11 @@ public class PlayerPane extends ViewOwner {
     }
 
     /**
-     * Called when GreenfootProject has prop change.
-     */
-    protected void handleGreenfootProjectRootClassNodeChange(PropChange propChange)
-    {
-        // Handle RootClassNode
-        if (propChange.getPropName() == GreenfootProject.RootClassNode_Prop) {
-            GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
-            ClassNode rootClassNode = greenfootProject.getRootClassNode();
-            if (rootClassNode != null && !rootClassNode.getChildNodes().isEmpty()) {
-                setShowClasses(true);
-                _classesPane.resetClassTree();
-            }
-        }
-    }
-
-    /**
      * Handles WorldView MouseEvent.
      */
     protected void handleWorldViewMouseEvent(ViewEvent anEvent)
     {
-        if (isPlaying())
+        if (_greenfootEnv.isPlaying())
             return;
 
         // Get x/y
@@ -298,10 +252,30 @@ public class PlayerPane extends ViewOwner {
             anEvent.acceptDrag();
             int dragX = (int) anEvent.getX();
             int dragY = (int) anEvent.getY();
-            getWorld().addObject((Actor) dragObj, dragX, dragY);
+            try {
+                World world = getWorld();
+                world.addObject((Actor) dragObj, dragX, dragY);
+            }
+            catch (Exception e) { _greenfootEnv.handleException(e); }
         }
 
         // Complete drop
         anEvent.dropComplete();
+    }
+
+    /**
+     * Called when GreenfootProject has prop change.
+     */
+    protected void handleGreenfootProjectRootClassNodeChange(PropChange propChange)
+    {
+        // Handle RootClassNode
+        if (propChange.getPropName() == GreenfootProject.RootClassNode_Prop) {
+            GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
+            ClassNode rootClassNode = greenfootProject.getRootClassNode();
+            if (rootClassNode != null && !rootClassNode.getChildNodes().isEmpty()) {
+                setShowClasses(true);
+                _classesPane.resetClassTree();
+            }
+        }
     }
 }

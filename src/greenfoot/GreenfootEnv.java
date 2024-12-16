@@ -8,6 +8,7 @@ import snap.props.PropObject;
 import snap.util.Convert;
 import snap.util.SnapUtils;
 import snap.view.View;
+import snap.view.ViewTimer;
 import snap.viewx.DialogBox;
 import snap.web.WebFile;
 import snap.web.WebURL;
@@ -27,11 +28,11 @@ public class GreenfootEnv extends PropObject {
     // The main player pane for the app (generally there is only one)
     private PlayerPane _playerPane;
 
-    // A Random
-    private static Random _random = new Random();
-
     // The greenfoot project
     private GreenfootProject _greenfootProject;
+
+    // The animation timer
+    private ViewTimer _timer;
 
     // The loaded images
     private Map<String, Image> _imageCache = new HashMap<>();
@@ -45,6 +46,9 @@ public class GreenfootEnv extends PropObject {
     // The world class from the current project
     protected static Class<? extends World> _worldClass;
 
+    // A Random
+    private static Random _random = new Random();
+
     // Constants for properties
     public static final String GreenfootProject_Prop = "GreenfootProject";
 
@@ -53,6 +57,7 @@ public class GreenfootEnv extends PropObject {
      */
     public GreenfootEnv()
     {
+        _timer = new ViewTimer(this::act, 40);
     }
 
     /**
@@ -85,6 +90,15 @@ public class GreenfootEnv extends PropObject {
     }
 
     /**
+     * Returns the world view.
+     */
+    private WorldView getWorldView()
+    {
+        World world = getWorld();
+        return world != null ? world.getWorldView() : null;
+    }
+
+    /**
      * Returns the speed.
      */
     public int getSpeed()  { return _speed; }
@@ -96,28 +110,34 @@ public class GreenfootEnv extends PropObject {
     {
         _speed = aValue;
 
-        // Set player pane timer delay for speed
+        // Set timer delay for speed
         int timerPeriodMillis = GreenfootEnv.convertSpeedToDelayMillis(_speed);
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.setTimerPeriod(timerPeriodMillis);
+        _timer.setPeriod(timerPeriodMillis);
     }
+
+    /**
+     * Returns whether game is running.
+     */
+    public boolean isPlaying()  { return _timer.isRunning(); }
 
     /**
      * Starts greenfoot playing.
      */
-    public void start()
-    {
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.start();
-    }
+    public void start()  { _timer.start(); }
 
     /**
      * Stops Greenfoot from playing.
      */
-    public void stop()
+    public void stop()  { _timer.stop(); }
+
+    /**
+     * Plays one frame of game.
+     */
+    protected void act()
     {
-        PlayerPane playerPane = getPlayerPane();
-        playerPane.stop();
+        WorldView worldView = getWorldView(); if (worldView == null) return;
+        try { worldView.doAct(); }
+        catch (Exception e) { handleException(e); }
     }
 
     /**
@@ -152,8 +172,8 @@ public class GreenfootEnv extends PropObject {
      */
     public boolean isKeyDown(String aName)
     {
-        WorldView worldView = getWorld().getWorldView();
-        return worldView.isKeyDown(aName);
+        WorldView worldView = getWorldView();
+        return worldView != null && worldView.isKeyDown(aName);
     }
 
     /**
@@ -167,10 +187,14 @@ public class GreenfootEnv extends PropObject {
     public boolean mouseClicked(Object anObj)
     {
         World world = getWorld();
+        WorldView worldView = getWorldView();
+        if (worldView == null)
+            return false;
+
         if (anObj == null)
-            return world != null && world.getWorldView().isMouseClicked();
+            return worldView.isMouseClicked();
         if (anObj instanceof World)
-            return anObj == world && world.getWorldView().isMouseClicked();
+            return anObj == world && worldView.isMouseClicked();
         System.out.println("Mouse Clicked not supported");
         return false;
     }
@@ -181,11 +205,12 @@ public class GreenfootEnv extends PropObject {
     public boolean mousePressed(Object anObj)
     {
         World world = getWorld();
+        WorldView worldView = getWorldView();
 
         if (anObj == null)
-            return world != null && world.getWorldView().isMouseDown();
+            return worldView != null && worldView.isMouseDown();
         if (anObj instanceof World)
-            return anObj == world && world.getWorldView().isMouseDown();
+            return anObj == world && worldView != null && worldView.isMouseDown();
         if (anObj instanceof Actor)
             return ((Actor) anObj).getActorView().isMouseDown();
         return false;
@@ -199,7 +224,10 @@ public class GreenfootEnv extends PropObject {
         View view = anObj instanceof Actor ? ((Actor) anObj)._actorView : null;
         if (view == null)
             return false;
-        Point pnt = view.parentToLocal(getWorld().getWorldView()._mx, getWorld().getWorldView()._my);
+        WorldView worldView = getWorldView();
+        if (worldView == null)
+            return false;
+        Point pnt = view.parentToLocal(worldView._mx, worldView._my);
         return view.contains(pnt);
     }
 
@@ -443,6 +471,15 @@ public class GreenfootEnv extends PropObject {
     {
         if (_playerPane != null)
             _playerPane.handleGreenfootProjectRootClassNodeChange(propChange);
+    }
+
+    /**
+     * Called when Greenfoot gets exception.
+     */
+    public void handleException(Exception e)
+    {
+        stop();
+        e.printStackTrace();
     }
 
     /**
