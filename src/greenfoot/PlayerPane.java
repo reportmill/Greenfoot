@@ -217,16 +217,22 @@ public class PlayerPane extends ViewOwner {
      */
     private void handleWorldViewBoxDragEvent(ViewEvent anEvent)
     {
-        // Just accept all drags for now
-        if (!anEvent.isDragDrop()) {
-            anEvent.acceptDrag();
-            return;
-        }
+        if (anEvent.isDragDrop())
+            handleWorldViewBoxDragDropEvent(anEvent);
 
+        // Just accept all drags for now
+        else anEvent.acceptDrag();
+    }
+
+    /**
+     * Called when WorldViewBox gets drag drop event.
+     */
+    private void handleWorldViewBoxDragDropEvent(ViewEvent anEvent)
+    {
         // If clipboard not loaded, come back
         Clipboard clipboard = anEvent.getClipboard();
         if (!clipboard.isLoaded()) {
-            clipboard.addLoadListener(() -> handleWorldViewBoxDragEvent(anEvent));
+            clipboard.addLoadListener(() -> handleWorldViewBoxDragDropEvent(anEvent));
             return;
         }
 
@@ -245,7 +251,7 @@ public class PlayerPane extends ViewOwner {
         // Create drag object - just return if failed
         Object dragObj;
         try { dragObj = dragClass.getConstructor().newInstance(); }
-        catch (Exception ignore) { return; }
+        catch (Exception e) { _greenfootEnv.handleException(e); return; }
 
         // If Actor, add to world
         if (dragObj instanceof Actor) {
@@ -256,6 +262,13 @@ public class PlayerPane extends ViewOwner {
                 World world = getWorld();
                 world.addObject((Actor) dragObj, dragX, dragY);
             }
+            catch (Exception e) { _greenfootEnv.handleException(e); }
+        }
+
+        // If World, set world
+        else if (dragObj instanceof World) {
+            anEvent.acceptDrag();
+            try { setWorld((World) dragObj); }
             catch (Exception e) { _greenfootEnv.handleException(e); }
         }
 

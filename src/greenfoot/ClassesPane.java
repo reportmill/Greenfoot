@@ -177,8 +177,11 @@ public class ClassesPane extends ViewOwner {
         Clipboard clipboard = anEvent.getClipboard();
         clipboard.addData("Drag:" + dragClass.getName());
         Image classImage = _greenfootEnv.getImageForClass(dragClass);
-        if (classImage != null)
+        if (classImage != null) {
+            if (classImage.getWidth() > 400 && classImage.getHeight() > 400)
+                classImage = classImage.cloneForScale(.5);
             clipboard.setDragImage(classImage);
+        }
 
         // Start drag
         clipboard.startDrag();
