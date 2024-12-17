@@ -83,6 +83,11 @@ public class PlayerPane extends ViewOwner {
     }
 
     /**
+     * Returns the world view box.
+     */
+    public View getWorldViewBox()  { return _worldViewBox; }
+
+    /**
      * Initialize UI.
      */
     @Override

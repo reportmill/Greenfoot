@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RowView Font="Arial 13" Spacing="5">
+  <ColView Margin="5">
+    <Label Margin="2" Text="Image Categories:" />
+    <ListView Name="CategoryList" PrefWidth="200" PrefHeight="320" />
+  </ColView>
+  <ColView>
+    <Label Margin="2" Text="Library Images:" />
+    <ListView Name="ImageList" PrefWidth="200" PrefHeight="320" />
+  </ColView>
+</RowView>

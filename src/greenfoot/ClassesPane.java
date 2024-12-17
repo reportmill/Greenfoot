@@ -102,6 +102,7 @@ public class ClassesPane extends ViewOwner {
         _treeView.setResolver(new ClassTreeResolver());
         _treeView.setCellConfigure(this::configureClassTreeCell);
         _treeView.addEventHandler(this::handleTreeViewDragGestureEvent, DragGesture);
+        _treeView.addEventFilter(this::handleTreeViewMouseEvent, MousePress, MouseRelease);
     }
 
     /**
@@ -119,6 +120,11 @@ public class ClassesPane extends ViewOwner {
             case "TreeView":
                 ClassNode selClassNode = _treeView.getSelItem();
                 setSelClassNode(selClassNode);
+                break;
+
+            // Handle SetImageMenuItem
+            case "SetImageMenuItem":
+                new ImagePicker().showImagePicker(_greenfootEnv.getPlayerPane().getWorldViewBox());
                 break;
 
             // Do normal version
@@ -159,6 +165,35 @@ public class ClassesPane extends ViewOwner {
 
         // Return
         return label;
+    }
+
+    /**
+     * Called when TreeView gets mouse event.
+     */
+    private void handleTreeViewMouseEvent(ViewEvent anEvent)
+    {
+        if (anEvent.isPopupTrigger()) {
+            Menu contextMenu = createContextMenu();
+            contextMenu.showMenuAtXY(_treeView, anEvent.getX(), anEvent.getY());
+            anEvent.consume();
+        }
+    }
+
+    /**
+     * Creates the ContextMenu.
+     */
+    protected Menu createContextMenu()
+    {
+        // Create MenuItems
+        ViewBuilder<MenuItem> viewBuilder = new ViewBuilder<>(MenuItem.class);
+        viewBuilder.name("SetImageMenuItem").text("Set Image...").save();
+
+        // Create context menu
+        Menu contextMenu = viewBuilder.buildMenu("ContextMenu", null);
+        contextMenu.setOwner(this);
+
+        // Return
+        return contextMenu;
     }
 
     /**
