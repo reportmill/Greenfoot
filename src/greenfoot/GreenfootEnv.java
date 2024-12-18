@@ -328,8 +328,7 @@ public class GreenfootEnv extends PropObject {
     public GreenfootImage getGreenfootImageForClass(Class<?> aClass)
     {
         GreenfootProject greenfootProject = getGreenfootProject(); if (greenfootProject == null) return null;
-        String imageKey = "class." + aClass.getSimpleName() + ".image";
-        String imageName =  greenfootProject.getProperty(imageKey);
+        String imageName =  greenfootProject.getImageNameForClass(aClass);
         return imageName != null ? new GreenfootImage(imageName) : null;
     }
 
@@ -339,8 +338,7 @@ public class GreenfootEnv extends PropObject {
     public Image getImageForClass(Class<?> aClass)
     {
         GreenfootProject greenfootProject = getGreenfootProject(); if (greenfootProject == null) return null;
-        String imageKey = "class." + aClass.getSimpleName() + ".image";
-        String imageName = greenfootProject.getProperty(imageKey);
+        String imageName =  greenfootProject.getImageNameForClass(aClass);
         return imageName != null ? getImageForName(imageName) : null;
     }
 

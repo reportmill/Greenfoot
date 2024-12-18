@@ -33,7 +33,7 @@ public class GreenfootProject extends PropObject {
     /**
      * Returns the project file.
      */
-    private WebFile getProjectFile()  { return _greenfootProjectFile; }
+    public WebFile getProjectFile()  { return _greenfootProjectFile; }
 
     /**
      * Returns the project properties map.
@@ -125,6 +125,24 @@ public class GreenfootProject extends PropObject {
     {
         String worldClassName = getProperty("world.lastInstantiated");
         return worldClassName != null ? (Class<? extends World>) getClassForName(worldClassName) : null;
+    }
+
+    /**
+     * Returns the image name for class.
+     */
+    public String getImageNameForClass(Class<?> aClass)
+    {
+        String imageKey = "class." + aClass.getSimpleName() + ".image";
+        return getProperty(imageKey);
+    }
+
+    /**
+     * Sets the image name for class.
+     */
+    public void setImageNameForClass(Class<?> aClass, String aName)
+    {
+        String imageKey = "class." + aClass.getSimpleName() + ".image";
+        getProperties().put(imageKey, aName);
     }
 
     /**

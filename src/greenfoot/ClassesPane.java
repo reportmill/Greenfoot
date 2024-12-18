@@ -1,6 +1,7 @@
 package greenfoot;
 import snap.gfx.Image;
 import snap.view.*;
+import snap.web.WebFile;
 import java.util.Objects;
 
 /**
@@ -188,8 +189,40 @@ public class ClassesPane extends ViewOwner {
             return;
 
         // Set image in actor class
+        GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
+        if (greenfootProject != null) {
 
-        // Save image in project
+            // Set image
+            Class<?> selClass = getSelClass();
+            String imageName = image.getName();
+            greenfootProject.setImageNameForClass(selClass, imageName);
+
+            // Save image
+            WebFile projectFile = greenfootProject.getProjectFile();
+            WebFile imageDir = projectFile.getParent().getFileForName("images");
+            if (imageDir == null) {
+                System.err.println("ClassesPane.handleSetImageMenuItem: Can't find image dir");
+                return;
+            }
+
+            // Save image to project images
+            String imagePath = imageDir.getDirPath() + imageName;
+            WebFile imageFile = imageDir.getSite().createFileForPath(imagePath, false);
+            imageFile.setBytes(image.getBytes());
+            imageFile.save();
+
+            // Try to save to build images
+            WebFile buildImagesDir = imageDir.getSite().getFileForPath("/bin/images");
+            if (buildImagesDir != null) {
+                String buildImagePath = buildImagesDir.getDirPath() + imageName;
+                WebFile buildImageFile = imageDir.getSite().createFileForPath(buildImagePath, false);
+                buildImageFile.setBytes(image.getBytes());
+                buildImageFile.save();
+            }
+
+            // Reset class tree
+            _treeView.updateItems();
+        }
     }
 
     /**
