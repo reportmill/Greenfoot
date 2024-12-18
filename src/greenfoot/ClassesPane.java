@@ -197,13 +197,19 @@ public class ClassesPane extends ViewOwner {
      */
     private void handleTreeViewMouseEvent(ViewEvent anEvent)
     {
-        if (anEvent.isPopupTrigger()) {
-            if (getSelClass() != null) {
-                Menu contextMenu = createContextMenu();
-                contextMenu.showMenuAtXY(_treeView, anEvent.getX(), anEvent.getY());
-            }
-            anEvent.consume();
-        }
+        if (anEvent.isPopupTrigger())
+            runLater(() -> showContextMenu(anEvent));
+    }
+
+    /**
+     * Shows the context menu.
+     */
+    private void showContextMenu(ViewEvent anEvent)
+    {
+        if (getSelClass() == null)
+            return;
+        Menu contextMenu = createContextMenu();
+        contextMenu.showMenuAtXY(_treeView, anEvent.getX(), anEvent.getY());
     }
 
     /**
