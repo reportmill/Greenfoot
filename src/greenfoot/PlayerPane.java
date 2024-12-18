@@ -253,32 +253,44 @@ public class PlayerPane extends ViewOwner {
         if (dragClass == null)
             return;
 
+        // Add instance for class
+        boolean didAdd = addInstanceForClassAndXY(dragClass, anEvent.getX(), anEvent.getY());
+        if (didAdd)
+            anEvent.acceptDrag();
+
+        // Complete drop
+        anEvent.dropComplete();
+    }
+
+    /**
+     * Adds instance of actor/world for given class at given point.
+     */
+    protected boolean addInstanceForClassAndXY(Class<?> aClass, double aX, double aY)
+    {
         // Create drag object - just return if failed
         Object dragObj;
-        try { dragObj = dragClass.getConstructor().newInstance(); }
-        catch (Exception e) { _greenfootEnv.handleException(e); return; }
+        try { dragObj = aClass.getConstructor().newInstance(); }
+        catch (Exception e) { _greenfootEnv.handleException(e); return false; }
 
         // If Actor, add to world
         if (dragObj instanceof Actor) {
-            anEvent.acceptDrag();
-            int dragX = (int) anEvent.getX();
-            int dragY = (int) anEvent.getY();
             try {
                 World world = getWorld();
-                world.addObject((Actor) dragObj, dragX, dragY);
+                world.addObject((Actor) dragObj, (int) aX, (int) aY);
             }
             catch (Exception e) { _greenfootEnv.handleException(e); }
+            return true;
         }
 
         // If World, set world
         else if (dragObj instanceof World) {
-            anEvent.acceptDrag();
             try { setWorld((World) dragObj); }
             catch (Exception e) { _greenfootEnv.handleException(e); }
+            return true;
         }
 
-        // Complete drop
-        anEvent.dropComplete();
+        // Return nothing added
+        return false;
     }
 
     /**

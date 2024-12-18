@@ -122,7 +122,8 @@ public class ClassesPane extends ViewOwner {
                 setSelClassNode(selClassNode);
                 break;
 
-            // Handle SetImageMenuItem
+            // Handle NewInstanceMenuItem, SetImageMenuItem
+            case "NewInstanceMenuItem": handleNewInstanceMenuItem(); break;
             case "SetImageMenuItem": handleSetImageMenuItem(); break;
 
             // Do normal version
@@ -166,6 +167,17 @@ public class ClassesPane extends ViewOwner {
     }
 
     /**
+     * Called when user selects NewInstanceMenuItem.
+     */
+    private void handleNewInstanceMenuItem()
+    {
+        PlayerPane playerPane = _greenfootEnv.getPlayerPane();
+        Class<?> selClass = getSelClass();
+        World world = _greenfootEnv.getWorld();
+        playerPane.addInstanceForClassAndXY(selClass, world.getWidth() - 100, world.getHeight() / 2d);
+    }
+
+    /**
      * Called when user selects SetImageMenuItem.
      */
     private void handleSetImageMenuItem()
@@ -186,8 +198,10 @@ public class ClassesPane extends ViewOwner {
     private void handleTreeViewMouseEvent(ViewEvent anEvent)
     {
         if (anEvent.isPopupTrigger()) {
-            Menu contextMenu = createContextMenu();
-            contextMenu.showMenuAtXY(_treeView, anEvent.getX(), anEvent.getY());
+            if (getSelClass() != null) {
+                Menu contextMenu = createContextMenu();
+                contextMenu.showMenuAtXY(_treeView, anEvent.getX(), anEvent.getY());
+            }
             anEvent.consume();
         }
     }
@@ -199,6 +213,9 @@ public class ClassesPane extends ViewOwner {
     {
         // Create MenuItems
         ViewBuilder<MenuItem> viewBuilder = new ViewBuilder<>(MenuItem.class);
+        String newInstanceText = "New " + getSelClass().getSimpleName() + "()";
+        viewBuilder.name("NewInstanceMenuItem").text(newInstanceText).save();
+        viewBuilder.save(); // Separator
         viewBuilder.name("SetImageMenuItem").text("Set Image...").save();
 
         // Create context menu

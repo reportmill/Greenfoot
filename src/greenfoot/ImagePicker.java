@@ -225,6 +225,7 @@ public class ImagePicker extends ViewOwner {
         imageView.setPadding(5, 5, 5, 5);
         imageView.setMaxHeight(80);
         imageView.setKeepAspect(true);
+        imageView.setToolTip(imageFile.getName());
         imageView.addEventHandler(this::handleImageViewMousePress, MousePress);
         return imageView;
     }

@@ -2,11 +2,11 @@
 <RowView Font="Arial 13" Spacing="5" GrowWidth="true" GrowHeight="true" FillHeight="true">
   <ColView Margin="5">
     <Label Margin="2" Text="Image Categories:" />
-    <ListView Name="CategoryListView" PrefWidth="200" PrefHeight="320" GrowHeight="true" />
+    <ListView Name="CategoryListView" PrefWidth="220" PrefHeight="400" GrowHeight="true" />
   </ColView>
   <ColView Margin="5" GrowWidth="true">
     <Label Margin="2" Text="Library Images:" />
-    <ScrollView PrefWidth="200" PrefHeight="320" GrowWidth="true" GrowHeight="true" FillWidth="true">
+    <ScrollView PrefWidth="280" PrefHeight="400" GrowWidth="true" GrowHeight="true" FillWidth="true">
       <ColView Name="ImageListColView" FillWidth="true" Fill="#FF" />
     </ScrollView>
   </ColView>
