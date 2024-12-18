@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RowView Font="Arial 13" Spacing="5">
+<RowView Font="Arial 13" Spacing="5" GrowWidth="true" GrowHeight="true" FillHeight="true">
   <ColView Margin="5">
     <Label Margin="2" Text="Image Categories:" />
-    <ListView Name="CategoryListView" PrefWidth="200" PrefHeight="320" />
+    <ListView Name="CategoryListView" PrefWidth="200" PrefHeight="320" GrowHeight="true" />
   </ColView>
-  <ColView>
+  <ColView Margin="5" GrowWidth="true">
     <Label Margin="2" Text="Library Images:" />
-    <ListView Name="ImageListView" PrefWidth="200" PrefHeight="320" />
+    <ScrollView PrefWidth="200" PrefHeight="320" GrowWidth="true" GrowHeight="true" FillWidth="true">
+      <ColView Name="ImageListColView" FillWidth="true" Fill="#FF" />
+    </ScrollView>
   </ColView>
 </RowView>

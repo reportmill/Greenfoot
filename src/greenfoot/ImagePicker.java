@@ -1,11 +1,13 @@
 package greenfoot;
 import snap.geom.Insets;
+import snap.geom.Pos;
 import snap.gfx.Image;
 import snap.util.ArrayUtils;
 import snap.view.*;
 import snap.viewx.DialogBox;
 import snap.web.WebURL;
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,11 +30,17 @@ public class ImagePicker extends ViewOwner {
     // The selected category name
     private String _selCategoryName;
 
+    // The selected image view.
+    private ImageView _selImageView;
+
+    // The dialog box
+    private DialogBox _dialogBox;
+
     // The categories list
     private ListView<String> _categoryListView;
 
     // The images list
-    private ListView<File> _imageListView;
+    private ColView _imageListColView;
 
     // The URL for image lib index file
     private static final String IMAGE_ROOT = "https://reportmill.com/images/greenfoot";
@@ -51,10 +59,11 @@ public class ImagePicker extends ViewOwner {
      */
     public Image showImagePicker(View aView)
     {
-        DialogBox dialogBox = new DialogBox("Select class image");
-        dialogBox.setContent(getUI());
-        dialogBox.showConfirmDialog(aView);
-        return null;
+        _dialogBox = new DialogBox("Select class image");
+        _dialogBox.setContent(getUI());
+        _dialogBox.setConfirmEnabled(getSelImageView() != null);
+        boolean confirmed = _dialogBox.showConfirmDialog(aView);
+        return confirmed ? getSelImage() : null;
     }
 
     /**
@@ -99,7 +108,9 @@ public class ImagePicker extends ViewOwner {
         // Get file lines and return Files
         String inputFilePaths = indexFileUrl.getText();
         String[] lines = inputFilePaths.split("\n");
-        return ArrayUtils.map(lines, line -> new File(line.trim()), File.class);
+        File[] imageFiles = ArrayUtils.map(lines, line -> new File(line.trim()), File.class);
+        Arrays.sort(imageFiles);
+        return imageFiles;
     }
 
     /**
@@ -115,12 +126,46 @@ public class ImagePicker extends ViewOwner {
         if (Objects.equals(categoryName, getSelCategoryName())) return;
         _selCategoryName = categoryName;
 
-        // Reset ImageListView items
+        // Reset ImageListColView children
         File[] imageFiles = getImageFiles();
         File[] categoryFiles = new File[0];
         if (categoryName != null)
             categoryFiles = ArrayUtils.filter(imageFiles, file -> file.getPath().startsWith('/' + categoryName));
-        _imageListView.setItems(categoryFiles);
+
+        // Get Images and set in ImageListColView
+        ImageView[] imageViews = ArrayUtils.map(categoryFiles, this::createImageViewForFile, ImageView.class);
+        for (int i = 1; i < imageViews.length; i += 2)
+            imageViews[i].setFill(ViewTheme.get().getContentAltColor());
+        _imageListColView.setChildren(imageViews);
+        setSelImageView(null);
+    }
+
+    /**
+     * Returns the selected Image.
+     */
+    public Image getSelImage()  { return _selImageView != null ? _selImageView.getImage() : null; }
+
+    /**
+     * Returns the selected ImageView.
+     */
+    public ImageView getSelImageView()  { return _selImageView; }
+
+    /**
+     * Sets the selected ImageView.
+     */
+    private void setSelImageView(ImageView imageView)
+    {
+        if (imageView == _selImageView) return;
+
+        if (_selImageView != null)
+            _selImageView.setFill(null);
+        _selImageView = imageView;
+        if (_selImageView != null)
+            _selImageView.setFill(ViewTheme.get().getSelectedFill());
+
+        // Update DialogBox ConfirmEnabled
+        if (_dialogBox != null)
+            _dialogBox.setConfirmEnabled(_selImageView != null);
     }
 
     /**
@@ -134,8 +179,25 @@ public class ImagePicker extends ViewOwner {
         _categoryListView.setItemsList(getCategoryNames());
 
         // Configure ImageListView
-        _imageListView = getView("ImageListView", ListView.class);
-        _imageListView.setCellConfigure(this::configureImageListViewCell);
+        _imageListColView = getView("ImageListColView", ColView.class);
+    }
+
+    /**
+     * Override to select default category.
+     */
+    @Override
+    protected void initShowing()
+    {
+        setSelCategoryName("animals");
+    }
+
+    /**
+     * Reset UI.
+     */
+    @Override
+    protected void resetUI()
+    {
+        _categoryListView.setSelItem(getSelCategoryName());
     }
 
     /**
@@ -152,18 +214,29 @@ public class ImagePicker extends ViewOwner {
     }
 
     /**
-     * Called to configure ImageListView cells.
+     * Returns an ImageView for given file.
      */
-    private void configureImageListViewCell(ListCell<File> aCell)
+    private ImageView createImageViewForFile(File imageFile)
     {
-        File imageFile = aCell.getItem();
-        if (imageFile == null)
-            return;
-
         String imageFileAddr = IMAGE_ROOT + imageFile.getPath();
         WebURL imageFileUrl = WebURL.getURL(imageFileAddr);
         ImageView imageView = new ImageView(imageFileUrl);
-        imageView.setMaxHeight(50);
-        aCell.setGraphic(imageView);
+        imageView.setAlign(Pos.CENTER);
+        imageView.setPadding(5, 5, 5, 5);
+        imageView.setMaxHeight(80);
+        imageView.setKeepAspect(true);
+        imageView.addEventHandler(this::handleImageViewMousePress, MousePress);
+        return imageView;
+    }
+
+    /**
+     * Called when image view gets mouse press.
+     */
+    private void handleImageViewMousePress(ViewEvent anEvent)
+    {
+        ImageView imageView = (ImageView) anEvent.getView();
+        if (anEvent.isShortcutDown() && imageView == getSelImageView())
+            imageView = null;
+        setSelImageView(imageView);
     }
 }
