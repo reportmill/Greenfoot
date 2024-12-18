@@ -123,9 +123,7 @@ public class ClassesPane extends ViewOwner {
                 break;
 
             // Handle SetImageMenuItem
-            case "SetImageMenuItem":
-                new ImagePicker().showImagePicker(_greenfootEnv.getPlayerPane().getWorldViewBox());
-                break;
+            case "SetImageMenuItem": handleSetImageMenuItem(); break;
 
             // Do normal version
             default: super.respondUI(anEvent); break;
@@ -165,6 +163,21 @@ public class ClassesPane extends ViewOwner {
 
         // Return
         return label;
+    }
+
+    /**
+     * Called when user selects SetImageMenuItem.
+     */
+    private void handleSetImageMenuItem()
+    {
+        // Show image picker to select image (just return if none selected)
+        Image image = new ImagePicker().showImagePicker(_greenfootEnv.getPlayerPane().getWorldViewBox());
+        if (image == null)
+            return;
+
+        // Set image in actor class
+
+        // Save image in project
     }
 
     /**

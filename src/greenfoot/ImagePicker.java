@@ -2,13 +2,12 @@ package greenfoot;
 import snap.geom.Insets;
 import snap.gfx.Image;
 import snap.util.ArrayUtils;
-import snap.view.ListView;
-import snap.view.View;
-import snap.view.ViewOwner;
+import snap.view.*;
 import snap.viewx.DialogBox;
 import snap.web.WebURL;
 import java.io.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,27 +16,34 @@ import java.util.stream.Stream;
  */
 public class ImagePicker extends ViewOwner {
 
-    // The index file paths
-    private File[] _files;
+    // The image files listed in index file
+    private File[] _imageFiles;
 
-    // The categories
+    // The category files list
+    private List<File> _categoryFiles;
+
+    // The category names list
     private List<String> _categoryNames;
 
+    // The selected category name
+    private String _selCategoryName;
+
     // The categories list
-    private ListView<String> _categoryList;
+    private ListView<String> _categoryListView;
 
     // The images list
-    private ListView<ImageEntry> _imageList;
+    private ListView<File> _imageListView;
 
     // The URL for image lib index file
-    private static final String INDEX_FILE_URL = "https://reportmill.com/images/greenfoot/index.txt";
+    private static final String IMAGE_ROOT = "https://reportmill.com/images/greenfoot";
+    private static final String INDEX_FILE_URL = IMAGE_ROOT + "/index.txt";
 
     /**
      * Constructor.
      */
     public ImagePicker()
     {
-
+        super();
     }
 
     /**
@@ -52,29 +58,38 @@ public class ImagePicker extends ViewOwner {
     }
 
     /**
+     * Returns the list of category files.
+     */
+    private List<File> getCategoryFiles()
+    {
+        if (_categoryFiles != null) return _categoryFiles;
+        File[] imageFiles = getImageFiles();
+        return _categoryFiles = Stream.of(imageFiles).map(file -> file.getParentFile()).distinct().collect(Collectors.toList());
+    }
+
+    /**
      * Returns the list of category names.
      */
-    public List<String> getCategoryNames()
+    private List<String> getCategoryNames()
     {
         if (_categoryNames != null) return _categoryNames;
-        File[] files = getFiles();
-        List<String> categoryNames = Stream.of(files).map(file -> file.getParentFile().getName()).distinct().collect(Collectors.toList());
-        return _categoryNames = categoryNames;
+        List<File> categoryFiles = getCategoryFiles();
+        return _categoryNames = categoryFiles.stream().map(file -> file.getName()).collect(Collectors.toList());
     }
 
     /**
      * Returns the image files.
      */
-    public File[] getFiles()
+    private File[] getImageFiles()
     {
-        if (_files != null) return _files;
-        return _files = getFilesImpl();
+        if (_imageFiles != null) return _imageFiles;
+        return _imageFiles = getImageFilesImpl();
     }
 
     /**
      * Returns the image files.
      */
-    private File[] getFilesImpl()
+    private File[] getImageFilesImpl()
     {
         // Path to the input file containing UNIX paths
         WebURL indexFileUrl = WebURL.getURL(INDEX_FILE_URL);
@@ -88,21 +103,67 @@ public class ImagePicker extends ViewOwner {
     }
 
     /**
+     * Returns the selected category name.
+     */
+    private String getSelCategoryName()  { return _selCategoryName; }
+
+    /**
+     * Sets the selected category name.
+     */
+    private void setSelCategoryName(String categoryName)
+    {
+        if (Objects.equals(categoryName, getSelCategoryName())) return;
+        _selCategoryName = categoryName;
+
+        // Reset ImageListView items
+        File[] imageFiles = getImageFiles();
+        File[] categoryFiles = new File[0];
+        if (categoryName != null)
+            categoryFiles = ArrayUtils.filter(imageFiles, file -> file.getPath().startsWith('/' + categoryName));
+        _imageListView.setItems(categoryFiles);
+    }
+
+    /**
      * Initialize UI.
      */
     @Override
     protected void initUI()
     {
-        _categoryList = getView("CategoryList", ListView.class);
-        _categoryList.setCellPadding(new Insets(5));
-        _categoryList.setItemsList(getCategoryNames());
-        _imageList = getView("ImageList", ListView.class);
+        _categoryListView = getView("CategoryListView", ListView.class);
+        _categoryListView.setCellPadding(new Insets(5));
+        _categoryListView.setItemsList(getCategoryNames());
+
+        // Configure ImageListView
+        _imageListView = getView("ImageListView", ListView.class);
+        _imageListView.setCellConfigure(this::configureImageListViewCell);
     }
 
     /**
-     * A class to hold an image.
+     * Respond UI.
      */
-    private class ImageEntry {
+    @Override
+    protected void respondUI(ViewEvent anEvent)
+    {
+        String eventName = anEvent.getName();
 
+        // Handle CategoryListView
+        if (eventName.equals("CategoryListView"))
+            setSelCategoryName(anEvent.getStringValue());
+    }
+
+    /**
+     * Called to configure ImageListView cells.
+     */
+    private void configureImageListViewCell(ListCell<File> aCell)
+    {
+        File imageFile = aCell.getItem();
+        if (imageFile == null)
+            return;
+
+        String imageFileAddr = IMAGE_ROOT + imageFile.getPath();
+        WebURL imageFileUrl = WebURL.getURL(imageFileAddr);
+        ImageView imageView = new ImageView(imageFileUrl);
+        imageView.setMaxHeight(50);
+        aCell.setGraphic(imageView);
     }
 }
