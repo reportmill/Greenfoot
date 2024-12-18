@@ -1,7 +1,10 @@
 package greenfoot;
 import snap.gfx.Image;
+import snap.util.ArrayUtils;
 import snap.view.*;
 import snap.web.WebFile;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -125,7 +128,7 @@ public class ClassesPane extends ViewOwner {
 
             // Handle NewInstanceMenuItem, SetImageMenuItem
             case "NewInstanceMenuItem": handleNewInstanceMenuItem(); break;
-            case "SetImageMenuItem": handleSetImageMenuItem(); break;
+            case "SetImageMenuItem": runLater(this::handleSetImageMenuItem); break;
 
             // Do normal version
             default: super.respondUI(anEvent); break;
@@ -184,7 +187,11 @@ public class ClassesPane extends ViewOwner {
     private void handleSetImageMenuItem()
     {
         // Show image picker to select image (just return if none selected)
-        Image image = new ImagePicker().showImagePicker(_greenfootEnv.getPlayerPane().getWorldViewBox());
+        ImagePicker imagePicker = new ImagePicker();
+        imagePicker.setScenarioImages(getScenarioImages());
+        View parentView = _greenfootEnv.getPlayerPane().getWorldViewBox();
+        String imagePickerTitle = "Select class image: " + getSelClass().getSimpleName();
+        Image image = imagePicker.showImagePicker(parentView, imagePickerTitle);
         if (image == null)
             return;
 
@@ -223,6 +230,22 @@ public class ClassesPane extends ViewOwner {
             // Reset class tree
             _treeView.updateItems();
         }
+    }
+
+    /**
+     * Returns the scenario images.
+     */
+    private List<Image> getScenarioImages()
+    {
+        GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject(); if (greenfootProject == null) return null;
+        WebFile projectFile = greenfootProject.getProjectFile();
+        WebFile imageDir = projectFile.getParent().getFileForName("images");
+        if (imageDir == null)
+            return null;
+
+        WebFile[] imageFiles = imageDir.getFiles();
+        Image[] images = ArrayUtils.mapNonNull(imageFiles, file -> _greenfootEnv.getImageForName(file.getName()), Image.class);
+        return Arrays.asList(images);
     }
 
     /**

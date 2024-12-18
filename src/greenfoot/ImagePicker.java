@@ -8,6 +8,7 @@ import snap.viewx.DialogBox;
 import snap.web.WebURL;
 import java.io.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -27,6 +28,9 @@ public class ImagePicker extends ViewOwner {
     // The category names list
     private List<String> _categoryNames;
 
+    // The scenario images
+    private List<Image> _scenarioImages;
+
     // The selected category name
     private String _selCategoryName;
 
@@ -41,6 +45,9 @@ public class ImagePicker extends ViewOwner {
 
     // The images list
     private ColView _imageListColView;
+
+    // The scenario images select view
+    private ColView _scenarioImagesColView;
 
     // The URL for image lib index file
     private static final String IMAGE_ROOT = "https://reportmill.com/images/greenfoot";
@@ -57,9 +64,9 @@ public class ImagePicker extends ViewOwner {
     /**
      * Shows the image picker.
      */
-    public Image showImagePicker(View aView)
+    public Image showImagePicker(View aView, String aTitle)
     {
-        _dialogBox = new DialogBox("Select class image");
+        _dialogBox = new DialogBox(aTitle);
         _dialogBox.setContent(getUI());
         _dialogBox.setConfirmEnabled(getSelImageView() != null);
         boolean confirmed = _dialogBox.showConfirmDialog(aView);
@@ -111,6 +118,19 @@ public class ImagePicker extends ViewOwner {
         File[] imageFiles = ArrayUtils.map(lines, line -> new File(line.trim()), File.class);
         Arrays.sort(imageFiles);
         return imageFiles;
+    }
+
+    /**
+     * Returns the scenario images.
+     */
+    public List<Image> getScenarioImages()  { return _scenarioImages != null ? _scenarioImages : Collections.EMPTY_LIST; }
+
+    /**
+     * Sets the scenario images.
+     */
+    public void setScenarioImages(List<Image> scenarioImages)
+    {
+        _scenarioImages = scenarioImages;
     }
 
     /**
@@ -174,12 +194,25 @@ public class ImagePicker extends ViewOwner {
     @Override
     protected void initUI()
     {
+        // Get and configure CategoryListView
         _categoryListView = getView("CategoryListView", ListView.class);
         _categoryListView.setCellPadding(new Insets(5));
         _categoryListView.setItemsList(getCategoryNames());
 
-        // Configure ImageListView
+        // Get and configure ImageListView
         _imageListColView = getView("ImageListColView", ColView.class);
+
+        // Get and configure ScenarioImagesColView
+        _scenarioImagesColView = getView("ScenarioImagesColView", ColView.class);
+        if (getScenarioImages().isEmpty())
+            _scenarioImagesColView.getParent(ColView.class).setVisible(false);
+        else {
+            Image[] scenarioImages = getScenarioImages().toArray(new Image[0]);
+            ImageView[] imageViews = ArrayUtils.map(scenarioImages, this::createImageViewForImage, ImageView.class);
+            for (int i = 1; i < imageViews.length; i += 2)
+                imageViews[i].setFill(ViewTheme.get().getContentAltColor());
+            _scenarioImagesColView.setChildren(imageViews);
+        }
     }
 
     /**
@@ -226,6 +259,21 @@ public class ImagePicker extends ViewOwner {
         imageView.setMaxHeight(80);
         imageView.setKeepAspect(true);
         imageView.setToolTip(imageFile.getName());
+        imageView.addEventHandler(this::handleImageViewMousePress, MousePress);
+        return imageView;
+    }
+
+    /**
+     * Returns an ImageView for given image.
+     */
+    private ImageView createImageViewForImage(Image image)
+    {
+        ImageView imageView = new ImageView(image);
+        imageView.setAlign(Pos.CENTER);
+        imageView.setPadding(5, 5, 5, 5);
+        imageView.setMaxHeight(80);
+        imageView.setKeepAspect(true);
+        imageView.setToolTip(image.getName());
         imageView.addEventHandler(this::handleImageViewMousePress, MousePress);
         return imageView;
     }

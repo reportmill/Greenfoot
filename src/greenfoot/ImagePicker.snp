@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<ColView>
 <RowView Font="Arial 13" Spacing="5" GrowWidth="true" GrowHeight="true" FillHeight="true">
+  <ColView Margin="5" GrowWidth="true">
+    <Label Margin="2" Text="Scenario Images:" />
+    <ScrollView PrefWidth="180" PrefHeight="400" GrowWidth="true" GrowHeight="true" FillWidth="true">
+      <ColView Name="ScenarioImagesColView" FillWidth="true" Fill="#FF" />
+    </ScrollView>
+  </ColView>
   <ColView Margin="5">
     <Label Margin="2" Text="Image Categories:" />
     <ListView Name="CategoryListView" PrefWidth="220" PrefHeight="400" GrowHeight="true" />
@@ -11,3 +18,13 @@
     </ScrollView>
   </ColView>
 </RowView>
+  <MenuButton Margin="10, 5, 5, 5" MinHeight="28" Text="Options">
+    <MenuItem Name="MenuItem" Text="Edit" />
+    <MenuItem Name="MenuItem" Text="Duplicate" />
+    <MenuItem Name="MenuItem" Text="Delete" />
+    <MenuItem />
+    <MenuItem Name="MenuItem" Text="Create new image..." />
+    <MenuItem Name="MenuItem" Text="Paste image..." />
+    <MenuItem Name="MenuItem" Text="Import from library..." />
+  </MenuButton>
+</ColView>
