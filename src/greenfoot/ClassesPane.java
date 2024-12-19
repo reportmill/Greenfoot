@@ -345,7 +345,7 @@ public class ClassesPane extends ViewOwner {
         }
 
         @Override
-        public ClassNode[] getChildren(ClassNode aParent)  { return aParent.getChildNodes().getArray(); }
+        public List<ClassNode> getChildren(ClassNode aParent)  { return aParent.getChildNodes(); }
 
         @Override
         public String getText(ClassNode anItem)  { return ""; }
