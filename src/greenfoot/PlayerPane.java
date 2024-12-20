@@ -97,6 +97,10 @@ public class PlayerPane extends ViewOwner {
         Label buildingLabel = (Label) _worldViewBox.getContent();
         buildingLabel.setTextColor(Color.get("#E0"));
         _worldViewBox.addEventHandler(this::handleWorldViewBoxDragEvent, DragEvents);
+
+        // Keep world at proper aspect when scaled
+        ScaleBox scaleBox = (ScaleBox) _worldViewBox.getParent();
+        scaleBox.setKeepAspect(true);
     }
 
     /**
