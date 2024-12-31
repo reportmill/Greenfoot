@@ -52,6 +52,9 @@ public class GreenfootEnv extends PropObject {
     // Constants for properties
     public static final String GreenfootProject_Prop = "GreenfootProject";
 
+    // A shared image stand-in for when getImageForName() can't find image
+    private static Image MISSING_IMAGE = Image.getImageForSize(100, 20, false);
+
     /**
      * Constructor.
      */
@@ -361,8 +364,8 @@ public class GreenfootEnv extends PropObject {
         if (image == null)
             image = Image.getImageForClassResource(worldClass, aName);
         if (image == null) {
-            System.err.println("Image not found: " + aName);
-            image = Image.getImageForSize(100, 20, false);
+            System.err.println("GreenfootEnv.getImageForName: Image not found: " + aName);
+            return MISSING_IMAGE;
         }
 
         // Wait for image load, since GF apps regularly use image info (or do image transform) immediately after loading
