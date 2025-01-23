@@ -21,6 +21,12 @@ public class ClassesPane extends ViewOwner {
     // The selected class node
     private ClassNode _selClassNode;
 
+    // A callback to get class pane action events (like NewSubclassMenuItem)
+    private EventListener _actionListener;
+
+    // The java file contents for new subclass
+    private String _newClassString;
+
     // The TreeView to show classes
     private TreeView<ClassNode> _treeView;
 
@@ -72,6 +78,24 @@ public class ClassesPane extends ViewOwner {
         if (Objects.equals(classNode, getSelClassNode())) return;
         firePropChange(SelClassNode_Prop, _selClassNode, _selClassNode = classNode);
     }
+
+    /**
+     * Returns the action listener.
+     */
+    public EventListener getActionListener()  { return _actionListener; }
+
+    /**
+     * Sets the action listener.
+     */
+    public void setActionListener(EventListener actionListener)
+    {
+        _actionListener = actionListener;
+    }
+
+    /**
+     * Returns the new class string.
+     */
+    public String getNewClassString()  { return _newClassString; }
 
     /**
      * Resets the Classes tree.
@@ -126,9 +150,10 @@ public class ClassesPane extends ViewOwner {
                 setSelClassNode(selClassNode);
                 break;
 
-            // Handle NewInstanceMenuItem, SetImageMenuItem
+            // Handle NewInstanceMenuItem, SetImageMenuItem, NewSubclassMenuItem
             case "NewInstanceMenuItem": handleNewInstanceMenuItem(); break;
             case "SetImageMenuItem": runLater(this::handleSetImageMenuItem); break;
+            case "NewSubclassMenuItem": runLater(() -> handleNewSubclassMenuItem(anEvent)); break;
 
             // Do normal version
             default: super.respondUI(anEvent); break;
@@ -195,41 +220,91 @@ public class ClassesPane extends ViewOwner {
         if (image == null)
             return;
 
+        // Set image for class
+        Class<?> selClass = getSelClass();
+        setImageForClass(selClass, image);
+    }
+
+    /**
+     * Sets a new image for a class.
+     */
+    private void setImageForClass(Class<?> aClass, Image image)
+    {
         // Set image in actor class
         GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
-        if (greenfootProject != null) {
+        if (greenfootProject == null)
+            return;
 
-            // Set image
-            Class<?> selClass = getSelClass();
-            String imageName = image.getName();
-            greenfootProject.setImageNameForClass(selClass, imageName);
+        // Set image
+        String imageName = image.getName();
+        greenfootProject.setImageNameForClass(aClass, imageName);
 
-            // Save image
-            WebFile projectFile = greenfootProject.getProjectFile();
-            WebFile imageDir = projectFile.getParent().getFileForName("images");
-            if (imageDir == null) {
-                System.err.println("ClassesPane.handleSetImageMenuItem: Can't find image dir");
-                return;
-            }
-
-            // Save image to project images
-            String imagePath = imageDir.getDirPath() + imageName;
-            WebFile imageFile = imageDir.getSite().createFileForPath(imagePath, false);
-            imageFile.setBytes(image.getBytes());
-            imageFile.save();
-
-            // Try to save to build images
-            WebFile buildImagesDir = imageDir.getSite().getFileForPath("/bin/images");
-            if (buildImagesDir != null) {
-                String buildImagePath = buildImagesDir.getDirPath() + imageName;
-                WebFile buildImageFile = imageDir.getSite().createFileForPath(buildImagePath, false);
-                buildImageFile.setBytes(image.getBytes());
-                buildImageFile.save();
-            }
-
-            // Reset class tree
-            _treeView.updateItems();
+        // Save image
+        WebFile projectFile = greenfootProject.getProjectFile();
+        WebFile imageDir = projectFile.getParent().getFileForName("images");
+        if (imageDir == null) {
+            System.err.println("ClassesPane.handleSetImageMenuItem: Can't find image dir");
+            return;
         }
+
+        // Save image to project images
+        String imagePath = imageDir.getDirPath() + imageName;
+        WebFile imageFile = imageDir.getSite().createFileForPath(imagePath, false);
+        imageFile.setBytes(image.getBytes());
+        imageFile.save();
+
+        // Try to save to build images
+        WebFile buildImagesDir = imageDir.getSite().getFileForPath("/bin/images");
+        if (buildImagesDir != null) {
+            String buildImagePath = buildImagesDir.getDirPath() + imageName;
+            WebFile buildImageFile = imageDir.getSite().createFileForPath(buildImagePath, false);
+            buildImageFile.setBytes(image.getBytes());
+            buildImageFile.save();
+        }
+
+        // Reset class tree
+        _treeView.updateItems();
+    }
+
+    /**
+     * Sets image for class name.
+     */
+    private void setImageForClassName(String className, Image image)
+    {
+        GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
+        Class<?> cls = greenfootProject.getClassForName(className);
+        if (cls != null)
+            setImageForClass(cls, image);
+    }
+
+    /**
+     * Called when user selects NewSubclassMenuItem.
+     */
+    private void handleNewSubclassMenuItem(ViewEvent anEvent)
+    {
+        // Show image picker to select image (just return if none selected)
+        ImagePicker imagePicker = new ImagePicker();
+        imagePicker.setScenarioImages(getScenarioImages());
+        View parentView = _greenfootEnv.getPlayerPane().getWorldViewBox();
+        String newClassName = imagePicker.showNewClassPanel(parentView);
+        if (newClassName == null)
+            return;
+
+        // Create NewClassString
+        Class<?> selClass = getSelClass();
+        String selClassName = selClass != null ? selClass.getName() : "Object";
+        _newClassString = NEW_SUBCLASS_TEMPLATE.replaceAll("@Class@", newClassName);
+        _newClassString = _newClassString.replace("@Superclass@", selClassName);
+
+        // Call actionListener
+        EventListener actionListener = getActionListener();
+        if (actionListener != null)
+            actionListener.listenEvent(anEvent);
+
+        // If image, set in new class
+        Image image = imagePicker.getSelImage();
+        if (image != null)
+            runDelayed(() -> setImageForClassName(newClassName, image), 2000);
     }
 
     /**
@@ -274,14 +349,16 @@ public class ClassesPane extends ViewOwner {
     protected Menu createContextMenu()
     {
         // Create MenuItems
-        ViewBuilder<MenuItem> viewBuilder = new ViewBuilder<>(MenuItem.class);
+        ViewBuilder<MenuItem> menuBuilder = new ViewBuilder<>(MenuItem.class);
         String newInstanceText = "New " + getSelClass().getSimpleName() + "()";
-        viewBuilder.name("NewInstanceMenuItem").text(newInstanceText).save();
-        viewBuilder.save(); // Separator
-        viewBuilder.name("SetImageMenuItem").text("Set Image...").save();
+        menuBuilder.name("NewInstanceMenuItem").text(newInstanceText).save();
+        menuBuilder.save(); // Separator
+        menuBuilder.name("SetImageMenuItem").text("Set Image...").save();
+        menuBuilder.save(); // Separator
+        menuBuilder.name("NewSubclassMenuItem").text("New Subclass...").save();
 
         // Create context menu
-        Menu contextMenu = viewBuilder.buildMenu("ContextMenu", null);
+        Menu contextMenu = menuBuilder.buildMenu("ContextMenu", null);
         contextMenu.setOwner(this);
 
         // Return
@@ -350,4 +427,25 @@ public class ClassesPane extends ViewOwner {
         @Override
         public String getText(ClassNode anItem)  { return ""; }
     }
+
+    // Template for new subclass
+    private String NEW_SUBCLASS_TEMPLATE = "import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)\n" +
+            "\n" +
+            "/**\n" +
+            " * Write a description of class @Class@ here.\n" +
+            " * \n" +
+            " * @author (your name) \n" +
+            " * @version (a version number or a date)\n" +
+            " */\n" +
+            "public class @Class@ extends @Superclass@\n" +
+            "{\n" +
+            "    /**\n" +
+            "     * Act - do whatever the @Class@ wants to do. This method is called whenever\n" +
+            "     * the 'Act' or 'Run' button gets pressed in the environment.\n" +
+            "     */\n" +
+            "    public void act()\n" +
+            "    {\n" +
+            "        // Add your action code here.\n" +
+            "    }\n" +
+            "}\n";
 }

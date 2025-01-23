@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ColView>
-<RowView Font="Arial 13" Spacing="5" GrowWidth="true" GrowHeight="true" FillHeight="true">
-  <ColView Margin="5" GrowWidth="true">
-    <Label Margin="2" Text="Scenario Images:" />
-    <ScrollView PrefWidth="180" PrefHeight="400" GrowWidth="true" GrowHeight="true" FillWidth="true">
-      <ColView Name="ScenarioImagesColView" FillWidth="true" Fill="#FF" />
-    </ScrollView>
-  </ColView>
-  <ColView Margin="5">
-    <Label Margin="2" Text="Image Categories:" />
-    <ListView Name="CategoryListView" PrefWidth="220" PrefHeight="400" GrowHeight="true" />
-  </ColView>
-  <ColView Margin="5" GrowWidth="true">
-    <Label Margin="2" Text="Library Images:" />
-    <ScrollView PrefWidth="280" PrefHeight="400" GrowWidth="true" GrowHeight="true" FillWidth="true">
-      <ColView Name="ImageListColView" FillWidth="true" Fill="#FF" />
-    </ScrollView>
-  </ColView>
-</RowView>
+  <RowView Name="NewClassBox" Margin="5" PrefHeight="40" Spacing="5" Font="Arial 14">
+    <Label Text="New Class Name:" />
+    <TextField Name="ClassNameText" PrefWidth="240" />
+  </RowView>
+  <Separator Margin="10,5,10,5" GrowWidth="true" />
+  <RowView Font="Arial 13" Spacing="5" GrowWidth="true" GrowHeight="true" FillHeight="true">
+    <ColView Margin="5" GrowWidth="true">
+      <Label Margin="2" Text="Scenario Images:" />
+      <ScrollView PrefWidth="180" PrefHeight="400" GrowWidth="true" GrowHeight="true" FillWidth="true">
+        <ColView Name="ScenarioImagesColView" FillWidth="true" Fill="#FF" />
+      </ScrollView>
+    </ColView>
+    <ColView Margin="5">
+      <Label Margin="2" Text="Image Categories:" />
+      <ListView Name="CategoryListView" PrefWidth="220" PrefHeight="400" GrowHeight="true" />
+    </ColView>
+    <ColView Margin="5" GrowWidth="true">
+      <Label Margin="2" Text="Library Images:" />
+      <ScrollView PrefWidth="280" PrefHeight="400" GrowWidth="true" GrowHeight="true" FillWidth="true">
+        <ColView Name="ImageListColView" FillWidth="true" Fill="#FF" />
+      </ScrollView>
+    </ColView>
+  </RowView>
   <MenuButton Margin="10, 5, 5, 5" MinHeight="28" Text="Options">
     <MenuItem Name="MenuItem" Text="Edit" />
     <MenuItem Name="MenuItem" Text="Duplicate" />

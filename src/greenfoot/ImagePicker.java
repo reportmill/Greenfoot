@@ -34,6 +34,9 @@ public class ImagePicker extends ViewOwner {
     // The selected category name
     private String _selCategoryName;
 
+    // Whether to really show new class panel
+    private boolean _showNewClassPanel;
+
     // The selected image view.
     private ImageView _selImageView;
 
@@ -71,6 +74,20 @@ public class ImagePicker extends ViewOwner {
         _dialogBox.setConfirmEnabled(getSelImageView() != null);
         boolean confirmed = _dialogBox.showConfirmDialog(aView);
         return confirmed ? getSelImage() : null;
+    }
+
+    /**
+     * Shows the new class panel.
+     */
+    public String showNewClassPanel(View aView)
+    {
+        _showNewClassPanel = true;
+        _dialogBox = new DialogBox("New Class");
+        _dialogBox.setContent(getUI());
+        _dialogBox.setConfirmEnabled(true);
+        boolean confirmed = _dialogBox.showConfirmDialog(aView);
+        String newClassName = getViewText("ClassNameText");
+        return confirmed && newClassName != null && !newClassName.isEmpty() ? newClassName : null;
     }
 
     /**
@@ -213,6 +230,11 @@ public class ImagePicker extends ViewOwner {
                 imageViews[i].setFill(ViewTheme.get().getContentAltColor());
             _scenarioImagesColView.setChildren(imageViews);
         }
+
+        // If not ShowNewClassPanel, hide new class UI
+        setViewVisible("NewClassBox", _showNewClassPanel);
+        if (_showNewClassPanel)
+            setFirstFocus("ClassNameText");
     }
 
     /**
