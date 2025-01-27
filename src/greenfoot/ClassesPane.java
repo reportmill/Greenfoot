@@ -222,13 +222,13 @@ public class ClassesPane extends ViewOwner {
 
         // Set image for class
         Class<?> selClass = getSelClass();
-        setImageForClass(selClass, image);
+        setImageForClassName(selClass.getName(), image);
     }
 
     /**
      * Sets a new image for a class.
      */
-    private void setImageForClass(Class<?> aClass, Image image)
+    private void setImageForClassName(String className, Image image)
     {
         // Set image in actor class
         GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
@@ -237,7 +237,7 @@ public class ClassesPane extends ViewOwner {
 
         // Set image
         String imageName = image.getName();
-        greenfootProject.setImageNameForClass(aClass, imageName);
+        greenfootProject.setImageNameForClassName(className, imageName);
 
         // Save image
         WebFile projectFile = greenfootProject.getProjectFile();
@@ -267,17 +267,6 @@ public class ClassesPane extends ViewOwner {
     }
 
     /**
-     * Sets image for class name.
-     */
-    private void setImageForClassName(String className, Image image)
-    {
-        GreenfootProject greenfootProject = _greenfootEnv.getGreenfootProject();
-        Class<?> cls = greenfootProject.getClassForName(className);
-        if (cls != null)
-            setImageForClass(cls, image);
-    }
-
-    /**
      * Called when user selects NewSubclassMenuItem.
      */
     private void handleNewSubclassMenuItem(ViewEvent anEvent)
@@ -301,10 +290,10 @@ public class ClassesPane extends ViewOwner {
         if (actionListener != null)
             actionListener.listenEvent(anEvent);
 
-        // If image, set in new class
+        // If image was selected, set for new class
         Image image = imagePicker.getSelImage();
         if (image != null)
-            runDelayed(() -> setImageForClassName(newClassName, image), 2000);
+            setImageForClassName(newClassName, image);
     }
 
     /**

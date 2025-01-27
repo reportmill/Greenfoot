@@ -137,12 +137,12 @@ public class GreenfootProject extends PropObject {
     }
 
     /**
-     * Sets the image name for class.
+     * Sets the image name for class name.
      */
-    public void setImageNameForClass(Class<?> aClass, String aName)
+    public void setImageNameForClassName(String className, String imageName)
     {
-        String imageKey = "class." + aClass.getSimpleName() + ".image";
-        getProperties().put(imageKey, aName);
+        String imageKey = "class." + className + ".image";
+        getProperties().put(imageKey, imageName);
     }
 
     /**
