@@ -1,8 +1,10 @@
 package greenfoot;
 import snap.props.PropObject;
 import snap.util.Convert;
+import snap.util.ListUtils;
+import snap.view.ViewUtils;
 import snap.web.WebFile;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -18,6 +20,9 @@ public class GreenfootProject extends PropObject {
 
     // The root class node
     private ClassNode _rootClassNode;
+
+    // A runnable to save file
+    private Runnable _saveFileRun;
 
     // Constants for properties
     public static final String RootClassNode_Prop = "RootClassNode";
@@ -41,37 +46,7 @@ public class GreenfootProject extends PropObject {
     protected Map<String, String> getProperties()
     {
         if (_props != null) return _props;
-        return _props = getPropertiesImpl();
-    }
-
-    /**
-     * Returns the project properties map.
-     */
-    private Map<String, String> getPropertiesImpl()
-    {
-        // Create map
-        Map<String,String> props = new HashMap<>();
-
-        // Get project file
-        WebFile projectFile = getProjectFile();
-        if (projectFile == null)
-            return props;
-
-        // Get project file lines
-        String text = projectFile.getText();
-        String[] lines = text != null ? text.split("\\n") : null;
-        if (lines == null)
-            return props;
-
-        // Iterate over lines and get key/value for each
-        for (String line : lines) {
-            String[] parts = line.split("=");
-            if (parts.length > 1)
-                props.put(parts[0].trim(), parts[1].trim());
-        }
-
-        // Return
-        return props;
+        return _props = readFile();
     }
 
     /**
@@ -81,6 +56,15 @@ public class GreenfootProject extends PropObject {
     {
         Map<String,String> properties = getProperties();
         return properties.get(aKey);
+    }
+
+    /**
+     * Sets a property.
+     */
+    private void setProperty(String aKey, String aValue)
+    {
+        getProperties().put(aKey, aValue);
+        saveFileLater();
     }
 
     /**
@@ -142,7 +126,66 @@ public class GreenfootProject extends PropObject {
     public void setImageNameForClassName(String className, String imageName)
     {
         String imageKey = "class." + className + ".image";
-        getProperties().put(imageKey, imageName);
+        setProperty(imageKey, imageName);
+    }
+
+    /**
+     * Saves the file.
+     */
+    public void saveFileLater()
+    {
+        if (_saveFileRun == null)
+            ViewUtils.runLater(_saveFileRun = this::writeFile);
+    }
+
+    /**
+     * Reads the file.
+     */
+    private Map<String, String> readFile()
+    {
+        // Create map
+        Map<String,String> props = new LinkedHashMap<>();
+
+        // Get project file
+        WebFile projectFile = getProjectFile();
+        if (projectFile == null)
+            return props;
+
+        // Get project file lines
+        String text = projectFile.getText();
+        String[] lines = text != null ? text.split("\\n") : null;
+        if (lines == null)
+            return props;
+
+        // Iterate over lines and get key/value for each
+        for (String line : lines) {
+            String[] parts = line.split("=");
+            if (parts.length > 1)
+                props.put(parts[0].trim(), parts[1].trim());
+        }
+
+        // Return
+        return props;
+    }
+
+    /**
+     * Writes the file.
+     */
+    private void writeFile()
+    {
+        // Get properties string
+        String propertiesText = ListUtils.mapToStringsAndJoin(getProperties().entrySet(),
+                entry -> entry.getKey() + "=" + entry.getValue(), "\n");
+
+        // Get project file
+        WebFile projectFile = getProjectFile();
+        if (projectFile == null)
+            return;
+
+        // Set text and save
+        projectFile.setText(propertiesText);
+        projectFile.save();
+        _saveFileRun = null;
     }
 
     /**
