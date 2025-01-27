@@ -422,8 +422,14 @@ public class GreenfootEnv extends PropObject {
     {
         // If world current set, return that class
         World world = getWorld();
-        if (world != null)
-            return world.getClass();
+        if (world != null) {
+            Class<? extends World> worldClass = world.getClass();
+            GreenfootProject greenfootProject = getGreenfootProject();
+            Class<? extends World> worldClass2 = (Class<? extends World>) greenfootProject.getClassForName(worldClass.getName());
+            if (worldClass2 != null)
+                return worldClass2;
+            return worldClass;
+        }
 
         // Return
         return _worldClass;
