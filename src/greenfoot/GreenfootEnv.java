@@ -292,6 +292,15 @@ public class GreenfootEnv extends PropObject {
     }
 
     /**
+     * Returns a resource url for given name.
+     */
+    public WebURL getResourceForName(String aName)
+    {
+        Class<?> worldClass = getWorldClass();
+        return WebURL.getURL(worldClass, aName);
+    }
+
+    /**
      * Returns the greenfoot project.
      */
     public GreenfootProject getGreenfootProject()
@@ -299,11 +308,10 @@ public class GreenfootEnv extends PropObject {
         if (_greenfootProject != null) return _greenfootProject;
 
         // Get project file url for given world class
-        Class<?> worldClass = getWorldClass();
-        WebURL projectUrl = WebURL.getURL(worldClass, "project.greenfoot");
+        WebURL projectUrl = getResourceForName("project.greenfoot");
         WebFile projectFile = projectUrl != null ? projectUrl.getFile() : null;
         if (projectFile == null) {
-            System.err.println("Couldn't find Greenfoot project file for class: " + worldClass.getName());
+            System.err.println("GreenfootEnv: Couldn't find Greenfoot project file");
             return null;
         }
 
@@ -354,19 +362,17 @@ public class GreenfootEnv extends PropObject {
         if (image != null)
             return image;
 
-        // Get world class
-        Class<?> worldClass = getWorldClass();
-        if (worldClass == null)
-            return null;
-
-        // Get image for name
-        image = Image.getImageForClassResource(worldClass, "images/" + aName);
-        if (image == null)
-            image = Image.getImageForClassResource(worldClass, aName);
-        if (image == null) {
+        // Get image url for name
+        WebURL imageUrl = getResourceForName("images/" + aName);
+        if (imageUrl == null)
+            imageUrl = getResourceForName(aName);
+        if (imageUrl == null) {
             System.err.println("GreenfootEnv.getImageForName: Image not found: " + aName);
             return MISSING_IMAGE;
         }
+
+        // Get image
+        image = Image.getImageForSource(imageUrl);
 
         // Wait for image load, since GF apps regularly use image info (or do image transform) immediately after loading
         if (!image.isLoaded())
@@ -395,8 +401,12 @@ public class GreenfootEnv extends PropObject {
         if (soundClip != null)
             return soundClip;
 
-        Class<?> cls = getWorldClass();
-        soundClip = SoundClip.get(cls, "sounds/" + aName);
+        // Get Sound URL and SoundClip
+        WebURL soundUrl = getResourceForName("sounds/" + aName);
+        if (soundUrl != null)
+            soundClip = SoundClip.get(soundUrl);
+
+        // Set and return
         _soundClipCache.put(aName, soundClip);
         return soundClip;
     }
@@ -423,6 +433,8 @@ public class GreenfootEnv extends PropObject {
         // If world current set, return that class
         World world = getWorld();
         if (world != null) {
+
+            // Get latest version of class
             Class<? extends World> worldClass = world.getClass();
             GreenfootProject greenfootProject = getGreenfootProject();
             Class<? extends World> worldClass2 = (Class<? extends World>) greenfootProject.getClassForName(worldClass.getName());
