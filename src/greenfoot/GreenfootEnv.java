@@ -297,6 +297,8 @@ public class GreenfootEnv extends PropObject {
     public WebURL getResourceForName(String aName)
     {
         Class<?> worldClass = getWorldClass();
+        if (worldClass == null)
+            return null;
         return WebURL.getURL(worldClass, aName);
     }
 
