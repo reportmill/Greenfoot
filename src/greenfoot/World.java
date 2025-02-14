@@ -241,7 +241,7 @@ public class World {
      */
     protected <T> T getActorAt(Actor anActor, double aX, double aY, Class<T> aClass)
     {
-        View[] actorViews = _worldView.getChildren();
+        ViewList actorViews = _worldView.getChildren();
 
         for (View actorView : actorViews) {
             Actor actor = getActorForView(actorView);
@@ -262,7 +262,7 @@ public class World {
      */
     protected <T> List<T> getActorsAt(Actor anActor, double aX, double aY, Class<T> aClass)
     {
-        View[] worldViews = _worldView.getChildren();
+        ViewList worldViews = _worldView.getChildren();
         List<T> hitList = new ArrayList<>();
 
         for (View child : worldViews) {
@@ -288,7 +288,7 @@ public class World {
     {
         // Get actor bounds in world coords and all actor views
         Shape actorBoundsInWorld = anActor.getBoundsInWorld();
-        View[] actorViews = _worldView.getChildren();
+        ViewList actorViews = _worldView.getChildren();
 
         // Iterate over all actor views and if any is intersecting and instance of given class, return actor
         for (View otherView : actorViews) {
@@ -307,7 +307,7 @@ public class World {
     {
         // Get actor view, actor bounds in world coords and all actor views
         Shape actorBoundsInWorld = aShape != null ? aShape : anActor.getBoundsInWorld();
-        View[] actorViews = _worldView.getChildren();
+        ViewList actorViews = _worldView.getChildren();
         List<T> intersectingActors = new ArrayList<>();
 
         // Iterate over all actor views and if any is intersecting and instance of given class, add actor to list

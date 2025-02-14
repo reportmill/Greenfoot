@@ -196,7 +196,7 @@ public class WorldView extends ChildView {
 
         // If childrenInPaintOrder not set, set
         if (_childrenInPaintOrder == null) {
-            _childrenInPaintOrder = getChildren().clone();
+            _childrenInPaintOrder = getChildrenArray().clone();
             Arrays.sort(_childrenInPaintOrder, (o1,o2) -> Integer.compare(getPaintRanking(o1), getPaintRanking(o2)));
         }
 
