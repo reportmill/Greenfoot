@@ -214,7 +214,7 @@ public class ImagePicker extends ViewOwner {
         // Get and configure CategoryListView
         _categoryListView = getView("CategoryListView", ListView.class);
         _categoryListView.setCellPadding(new Insets(5));
-        _categoryListView.setItemsList(getCategoryNames());
+        _categoryListView.setItems(getCategoryNames());
 
         // Get and configure ImageListView
         _imageListColView = getView("ImageListColView", ColView.class);

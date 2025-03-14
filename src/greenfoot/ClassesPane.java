@@ -107,7 +107,7 @@ public class ClassesPane extends ViewOwner {
 
         // Get RootClassNode and reset treeview
         ClassNode rootClassNode = getRootClassNode();
-        _treeView.setItemsList(rootClassNode.getChildNodes());
+        _treeView.setItems(rootClassNode.getChildNodes());
         _treeView.expandAll();
 
         // Reset SelClassNode
