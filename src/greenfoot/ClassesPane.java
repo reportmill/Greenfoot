@@ -1,9 +1,8 @@
 package greenfoot;
 import snap.gfx.Image;
-import snap.util.ArrayUtils;
+import snap.util.ListUtils;
 import snap.view.*;
 import snap.web.WebFile;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -307,9 +306,8 @@ public class ClassesPane extends ViewOwner {
         if (imageDir == null)
             return null;
 
-        WebFile[] imageFiles = imageDir.getFiles();
-        Image[] images = ArrayUtils.mapNonNull(imageFiles, file -> _greenfootEnv.getImageForName(file.getName()), Image.class);
-        return Arrays.asList(images);
+        List<WebFile> imageFiles = imageDir.getFiles();
+        return ListUtils.mapNonNull(imageFiles, file -> _greenfootEnv.getImageForName(file.getName()));
     }
 
     /**
