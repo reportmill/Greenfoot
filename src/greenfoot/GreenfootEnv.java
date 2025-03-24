@@ -6,7 +6,7 @@ import snap.props.PropChange;
 import snap.props.PropChangeListener;
 import snap.props.PropObject;
 import snap.util.Convert;
-import snap.util.SnapUtils;
+import snap.util.SnapEnv;
 import snap.view.View;
 import snap.view.ViewTimer;
 import snap.viewx.DialogBox;
@@ -423,7 +423,7 @@ public class GreenfootEnv extends PropObject {
 
         // Show PlayerPane window
         PlayerPane playerPane = getPlayerPane();
-        playerPane.getWindow().setMaximized(SnapUtils.isWebVM);
+        playerPane.getWindow().setMaximized(SnapEnv.isWebVM);
         playerPane.setWindowVisible(true);
     }
 
