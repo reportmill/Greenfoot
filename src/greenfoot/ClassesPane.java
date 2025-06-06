@@ -280,8 +280,9 @@ public class ClassesPane extends ViewOwner {
 
         // Create NewClassString
         Class<?> selClass = getSelClass();
-        String selClassName = selClass != null ? selClass.getName() : "Object";
-        _newClassString = NEW_SUBCLASS_TEMPLATE.replaceAll("@Class@", newClassName);
+        String newClassTemplate = getClassTemplateForClass(selClass);
+        String selClassName = selClass != null ? selClass.getSimpleName() : "Object";
+        _newClassString = newClassTemplate.replaceAll("@Class@", newClassName);
         _newClassString = _newClassString.replace("@Superclass@", selClassName);
 
         // Call actionListener
@@ -335,13 +336,23 @@ public class ClassesPane extends ViewOwner {
      */
     protected Menu createContextMenu()
     {
-        // Create MenuItems
         ViewBuilder<MenuItem> menuBuilder = new ViewBuilder<>(MenuItem.class);
-        String newInstanceText = "New " + getSelClass().getSimpleName() + "()";
-        menuBuilder.name("NewInstanceMenuItem").text(newInstanceText).save();
-        menuBuilder.save(); // Separator
-        menuBuilder.name("SetImageMenuItem").text("Set Image...").save();
-        menuBuilder.save(); // Separator
+
+        // If not World, add NewInstanceMenuItem, SetImageMenuItem
+        Class<?> selClass = getSelClass();
+        if (selClass != World.class && selClass != Actor.class) {
+
+            // Add NewInstanceMenuItem
+            String newInstanceText = "New " + getSelClass().getSimpleName() + "()";
+            menuBuilder.name("NewInstanceMenuItem").text(newInstanceText).save();
+            menuBuilder.save(); // Separator
+
+            // Add SetImageMenuItem
+            menuBuilder.name("SetImageMenuItem").text("Set Image...").save();
+            menuBuilder.save(); // Separator
+        }
+
+        // Add NewSubclassMenuItem
         menuBuilder.name("NewSubclassMenuItem").text("New Subclass...").save();
 
         // Create context menu
@@ -415,24 +426,122 @@ public class ClassesPane extends ViewOwner {
         public String getText(ClassNode anItem)  { return ""; }
     }
 
+    /**
+     * Returns the class template for given class.
+     */
+    private static String getClassTemplateForClass(Class<?> aClass)
+    {
+        if (World.class == aClass)
+            return NEW_WORLD_SUBCLASS_TEMPLATE;
+        if (World.class.isAssignableFrom(aClass))
+            return NEW_WORLD_SUBCLASS_TEMPLATE2;
+        if (Actor.class.isAssignableFrom(aClass))
+            return NEW_ACTOR_SUBCLASS_TEMPLATE;
+        return NEW_OBJECT_SUBCLASS_TEMPLATE;
+    }
+
     // Template for new subclass
-    private String NEW_SUBCLASS_TEMPLATE = "import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)\n" +
-            "\n" +
-            "/**\n" +
-            " * Write a description of class @Class@ here.\n" +
-            " * \n" +
-            " * @author (your name) \n" +
-            " * @version (a version number or a date)\n" +
-            " */\n" +
-            "public class @Class@ extends @Superclass@\n" +
-            "{\n" +
-            "    /**\n" +
-            "     * Act - do whatever the @Class@ wants to do. This method is called whenever\n" +
-            "     * the 'Act' or 'Run' button gets pressed in the environment.\n" +
-            "     */\n" +
-            "    public void act()\n" +
-            "    {\n" +
-            "        // Add your action code here.\n" +
-            "    }\n" +
-            "}\n";
+    private static String NEW_WORLD_SUBCLASS_TEMPLATE = """
+        import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+        
+        /**
+         * Write a description of class @Class@ here.
+         *
+         * @author (your name)
+         * @version (a version number or a date)
+         */
+        public class @Class@ extends World
+        {
+        
+            /**
+             * Constructor for objects of class @Class@.
+             *
+             */
+            public @Class@()
+            {
+                // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
+                super(600, 400, 1);
+            }
+        }
+        """;
+
+    // Template for new subclass
+    private static String NEW_WORLD_SUBCLASS_TEMPLATE2 = """
+        import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+        
+        /**
+         * Write a description of class @Class@ here.
+         *
+         * @author (your name)
+         * @version (a version number or a date)
+         */
+        public class @Class@ extends @Superclass@
+        {
+        
+            /**
+             * Constructor for objects of class @Class@.
+             *
+             */
+            public @Class@()
+            {
+            }
+        }
+        """;
+
+    // Template for new subclass
+    private static String NEW_ACTOR_SUBCLASS_TEMPLATE = """
+        import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+        
+        /**
+         * Write a description of class @Class@ here.
+         *
+         * @author (your name)
+         * @version (a version number or a date)
+         */
+        public class @Class@ extends @Superclass@
+        {
+            /**
+             * Act - do whatever the @Class@ wants to do. This method is called whenever
+             * the 'Act' or 'Run' button gets pressed in the environment.
+             */
+            public void act()
+            {
+                // Add your action code here.
+            }
+        }
+        """;
+
+    // Template for new subclass
+    private static String NEW_OBJECT_SUBCLASS_TEMPLATE = """
+        /**
+         * Write a description of class @Class@ here.
+         *
+         * @author (your name)
+         * @version (a version number or a date)
+         */
+        public class @Class@ extends @Superclass@
+        {
+            // instance variables - replace the example below with your own
+            private int x;
+        
+            /**
+             * Constructor for objects of class @Class@
+             */
+            public @Class@()
+            {
+            }
+        
+            /**
+             * An example of a method - replace this comment with your own
+             *
+             * @param  y   a sample parameter for a method
+             * @return     the sum of x and y
+             */
+            public int sampleMethod(int y)
+            {
+                // put your code here
+                return x + y;
+            }
+        }
+        """;
 }
