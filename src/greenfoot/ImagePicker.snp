@@ -16,7 +16,7 @@
       <Label Margin="2" Text="Image Categories:" />
       <ListView Name="CategoryListView" PrefWidth="220" PrefHeight="400" GrowHeight="true" />
     </ColView>
-    <ColView Margin="5" GrowWidth="true">
+    <ColView Margin="5" GrowWidth="true" GrowHeight="true">
       <Label Margin="2" Text="Library Images:" />
       <ScrollView PrefWidth="280" PrefHeight="400" GrowWidth="true" GrowHeight="true" FillWidth="true">
         <ColView Name="ImageListColView" FillWidth="true" Fill="#FF" />
