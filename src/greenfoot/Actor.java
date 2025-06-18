@@ -292,7 +292,15 @@ public class Actor {
             _world.removeObject(obj);
     }
 
-    public boolean isAtEdge()  { return false; }
+    /**
+     * Returns True if actor is at or beyond edge cell of the world, and false otherwise.
+     */
+    public boolean isAtEdge()
+    {
+        failIfNotInWorld();
+        int cellSize = _world.getCellSize();
+        return (_x <= 0 || _y <= 0 || _x >= _world.getWidth() * cellSize - cellSize || _y >= _world.getHeight() * cellSize - cellSize);
+    }
 
     /**
      * The Act method.
@@ -313,4 +321,13 @@ public class Actor {
      * Notification for when actor is added to a world.
      */
     protected void addedToWorld(World aWorld)  { }
+
+    /**
+     * Throws an exception if the actor is not in a world.
+     */
+    private void failIfNotInWorld()
+    {
+        if (_world == null)
+            throw new IllegalStateException("Actor has not been added to the world");
+    }
 }
