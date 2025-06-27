@@ -309,21 +309,9 @@ public class GreenfootImage {
      */
     public void setColorAt(int aX, int aY, Color aColor)
     {
-        // Paint 1 pixel rect with color
-        if (aColor.getAlpha() == 255) {
-            setColor(aColor);
-            fillRect(aX, aY, 1, 1);
-        }
-
-        // If color with alpha, paint in mode SRC_IN
-        else {
-            Painter pntr = _image.getPainter();
-            pntr.setComposite(Painter.Composite.SRC_IN);
-            pntr.setColor(aColor.getColorObject());
-            pntr.fillRect(aX, aY, 1, 1);
-            pntr.setComposite(Painter.Composite.SRC_OVER);
-            imagePainted();
-        }
+        snap.gfx.Color color = aColor.getColorObject();
+        _image.setRGB(aX, aY, color.getRGBA());
+        imagePainted();
     }
 
     /**
