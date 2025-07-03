@@ -125,7 +125,7 @@ public class ImagePicker extends ViewOwner {
     private File[] getImageFilesImpl()
     {
         // Path to the input file containing UNIX paths
-        WebURL indexFileUrl = WebURL.getURL(INDEX_FILE_URL);
+        WebURL indexFileUrl = WebURL.getUrl(INDEX_FILE_URL);
         if (indexFileUrl == null)
             return new File[0];
 
@@ -274,7 +274,7 @@ public class ImagePicker extends ViewOwner {
     private ImageView createImageViewForFile(File imageFile)
     {
         String imageFileAddr = IMAGE_ROOT + imageFile.getPath();
-        WebURL imageFileUrl = WebURL.getURL(imageFileAddr);
+        WebURL imageFileUrl = WebURL.getUrl(imageFileAddr);
         ImageView imageView = new ImageView(imageFileUrl);
         imageView.setAlign(Pos.CENTER);
         imageView.setPadding(5, 5, 5, 5);

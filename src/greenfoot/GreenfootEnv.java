@@ -299,7 +299,7 @@ public class GreenfootEnv extends PropObject {
         Class<?> worldClass = getWorldClass();
         if (worldClass == null)
             return null;
-        return WebURL.getURL(worldClass, aName);
+        return WebURL.getResourceUrl(worldClass, aName);
     }
 
     /**
