@@ -237,14 +237,13 @@ public class GreenfootImage {
     /**
      * Scales the image.
      */
-    public void scale(int aW, int aH)
+    public void scale(int newW, int newH)
     {
-        Image img = _image;
-        _image = Image.getImageForSize(aW, aH, true);
-        Painter pntr = _image.getPainter();
+        Image resizedImage = Image.getImageForSize(newW, newH, true);
+        Painter pntr = resizedImage.getPainter();
         pntr.setImageQuality(0);
-        pntr.drawImage(img, 0, 0, aW, aH);
-        pntr.setImageQuality(1);
+        pntr.drawImage(_image, 0, 0, newW, newH);
+        _image = resizedImage;
         imageChanged();
     }
 
@@ -253,14 +252,7 @@ public class GreenfootImage {
      */
     public void mirrorHorizontally()
     {
-        Image img = _image;
-        int w = getWidth(), h = getHeight();
-        _image = Image.getImageForSize(w, h, true);
-        Painter pntr = _image.getPainter();
-        pntr.translate(w / 2, 0);
-        pntr.scale(-1, 1);
-        pntr.translate(-w / 2, 0);
-        pntr.drawImage(img, 0, 0);
+        _image = _image.copyflippedX();
         imageChanged();
     }
 
@@ -269,14 +261,7 @@ public class GreenfootImage {
      */
     public void mirrorVertically()
     {
-        Image img = _image;
-        int w = getWidth(), h = getHeight();
-        _image = Image.getImageForSize(w, h, true);
-        Painter pntr = _image.getPainter();
-        pntr.translate(0, h / 2);
-        pntr.scale(1, -1);
-        pntr.translate(0, -h / 2);
-        pntr.drawImage(img, 0, 0);
+        _image = _image.copyflippedY();
         imageChanged();
     }
 
@@ -285,14 +270,7 @@ public class GreenfootImage {
      */
     public void rotate(int theDeg)
     {
-        Image img = _image;
-        int w = getWidth(), h = getHeight();
-        _image = Image.getImageForSize(w, h, true);
-        Painter pntr = _image.getPainter();
-        pntr.translate(w / 2, h / 2);
-        pntr.rotate(theDeg);
-        pntr.translate(-w / 2, -h / 2);
-        pntr.drawImage(img, 0, 0);
+        _image = _image.copyRotatedBy(theDeg);
         imageChanged();
     }
 
