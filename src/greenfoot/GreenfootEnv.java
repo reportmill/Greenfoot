@@ -384,7 +384,7 @@ public class GreenfootEnv extends PropObject {
         if (image.getWidth() != image.getPixWidth()) {
             int imageW = image.getPixWidth();
             int imageH = image.getPixHeight();
-            image = image.cloneForSizeAndDpiScale(imageW, imageH, 1);
+            image = image.copyForSizeAndDpiScale(imageW, imageH, 1);
         }
 
         // Add to image cache

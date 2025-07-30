@@ -56,7 +56,7 @@ public class GreenfootImage {
      */
     public GreenfootImage(GreenfootImage anImage)
     {
-        _image = anImage._image.cloneForScale(1);
+        _image = anImage._image.copyForScale(1);
     }
 
     /**

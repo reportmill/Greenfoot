@@ -381,7 +381,7 @@ public class ClassesPane extends ViewOwner {
         Image classImage = _greenfootEnv.getImageForClass(dragClass);
         if (classImage != null) {
             if (classImage.getWidth() > 400 && classImage.getHeight() > 400)
-                classImage = classImage.cloneForScale(.5);
+                classImage = classImage.copyForScale(.5);
             clipboard.setDragImage(classImage);
         }
 
