@@ -1,7 +1,7 @@
 package greenfoot;
 import snap.util.ListUtils;
-import snap.util.ObjectArray;
 import snap.web.WebFile;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class ClassNode implements Comparable<ClassNode> {
     private WebFile _nodeFile;
 
     // The child nodes
-    protected ObjectArray<ClassNode> _childNodes = new ObjectArray<>(ClassNode.class, 0);
+    protected List<ClassNode> _childNodes = new ArrayList<>(0);
 
     /**
      * Constructor.
@@ -49,7 +49,7 @@ public class ClassNode implements Comparable<ClassNode> {
     /**
      * Returns the child nodes.
      */
-    public ObjectArray<ClassNode> getChildNodes()  { return _childNodes; }
+    public List<ClassNode> getChildNodes()  { return _childNodes; }
 
     /**
      * Returns a child node for given class.
@@ -95,7 +95,8 @@ public class ClassNode implements Comparable<ClassNode> {
         ClassNode classNode = new ClassNode(nodeClass, nodeFile);
         classNode._parentNode = this;
         int insertIndex = -Collections.binarySearch(_childNodes, classNode) - 1;
-        _childNodes.add(insertIndex, classNode);
+        if (insertIndex >= 0)
+            _childNodes.add(insertIndex, classNode);
         return classNode;
     }
 
