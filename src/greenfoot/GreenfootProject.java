@@ -194,14 +194,14 @@ public class GreenfootProject extends PropObject {
     public static GreenfootProject getGreenfootProjectForDir(WebFile projDir)
     {
         // If project already set in dir, just return
-        GreenfootProject greenfootProject = (GreenfootProject) projDir.getProp(GreenfootProject.class.getName());
+        GreenfootProject greenfootProject = (GreenfootProject) projDir.getMetadataForKey(GreenfootProject.class.getName());
         if (greenfootProject != null)
             return greenfootProject;
 
         // Try to create greenfoot project for dir
         greenfootProject = createGreenfootProjectForDir(projDir);
         if (greenfootProject != null)
-            projDir.setProp(GreenfootProject.class.getName(), greenfootProject);
+            projDir.setMetadataForKey(GreenfootProject.class.getName(), greenfootProject);
 
         // Return
         return greenfootProject;
