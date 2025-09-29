@@ -20,7 +20,7 @@ public class GreenfootImage {
     protected Image _image;
 
     // The current color
-    private Color _color;
+    private Color _color = Color.BLACK;
 
     // The current font
     private Font _font = new Font("Arial", false, false, 12); //Font.Arial12;
