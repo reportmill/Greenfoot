@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * This tool class shows the project source files in class hierarchy.
  */
-public class ClassesPane extends ViewOwner {
+public class ClassesPane extends ViewController {
 
     // The Greenfoot Env
     private GreenfootEnv _greenfootEnv;
@@ -357,7 +357,7 @@ public class ClassesPane extends ViewOwner {
 
         // Create context menu
         Menu contextMenu = menuBuilder.buildMenu("ContextMenu", null);
-        contextMenu.setOwner(this);
+        contextMenu.setController(this);
 
         // Return
         return contextMenu;

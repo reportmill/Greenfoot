@@ -4,9 +4,9 @@ import snap.props.PropChange;
 import snap.view.*;
 
 /**
- * A ViewOwner for Greenfoot to create wrapper UI and show manage worlds.
+ * A view controller for Greenfoot to create wrapper UI and show manage worlds.
  */
-public class PlayerPane extends ViewOwner {
+public class PlayerPane extends ViewController {
 
     // The Greenfoot Env
     private GreenfootEnv _greenfootEnv;

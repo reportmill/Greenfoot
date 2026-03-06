@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 /**
  * This class shows the Greenfoot image picker.
  */
-public class ImagePicker extends ViewOwner {
+public class ImagePicker extends ViewController {
 
     // The image files listed in index file
     private File[] _imageFiles;
