@@ -179,7 +179,8 @@ public class ClassesPane extends ViewController {
         // Create label for node class
         Class<?> nodeClass = classNode.getNodeClass();
         Label label = new Label(nodeClass.getSimpleName());
-        label.setPropsString("Fill:#F5CC9B; Border:#66 1; MinWidth:60; MinHeight:24; Padding:2,4,2,8; BorderRadius:2;");
+        label.setStyleString("Fill:#F5CC9B; Border:#66 1; Padding:2,4,2,8; BorderRadius:2;");
+        label.setMinSize(60, 24);
 
         // If image available for class, add to label
         Image classImage = _greenfootEnv.getImageForClass(nodeClass);
