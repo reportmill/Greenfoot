@@ -252,7 +252,7 @@ public class GreenfootImage {
      */
     public void mirrorHorizontally()
     {
-        _image = _image.copyflippedX();
+        _image = _image.copyFlippedX();
         imageChanged();
     }
 
@@ -261,7 +261,7 @@ public class GreenfootImage {
      */
     public void mirrorVertically()
     {
-        _image = _image.copyflippedY();
+        _image = _image.copyFlippedY();
         imageChanged();
     }
 
