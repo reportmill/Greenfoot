@@ -2,7 +2,7 @@
 <SplitView DividerSpan="1">
   <ColView Font="Arial 12" GrowWidth="true" FillWidth="true">
     <ScaleBox Name="ScaleBox" Margin="8" GrowHeight="true">
-      <BoxView Name="WorldViewBox" Border="#00 1">
+      <BoxView Name="WorldViewBox" Border="#00">
         <Label PrefWidth="500" PrefHeight="400" Align="CENTER" Fill="#FF" Font="Arial Bold Italic 42" Text="Building Project..." />
       </BoxView>
     </ScaleBox>
