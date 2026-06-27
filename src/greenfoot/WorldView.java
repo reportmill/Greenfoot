@@ -47,8 +47,8 @@ public class WorldView extends ChildView {
         setPrefSize(width, height);
         setOverflow(Overflow.Clip);
         setFill(Color.WHITE);
-        enableEvents(MouseEvents);
-        enableEvents(KeyEvents);
+        addEventHandler(this::handleMouseEvent, MouseEvents);
+        addEventHandler(this::handleKeyEvent, KeyEvents);
         setFocusable(true);
         setFocusWhenPressed(true);
     }
@@ -76,32 +76,33 @@ public class WorldView extends ChildView {
     }
 
     /**
+     * Called when mouse is pressed.
+     */
+    private void handleMouseEvent(ViewEvent anEvent)
+    {
+        if (anEvent.isMousePress())
+            _mouseDown = anEvent;
+        else if (anEvent.isMouseRelease())
+            _mouseDown = null;
+        else if (anEvent.isMouseClick())
+            _mouseClicked = anEvent;
+        _mx = anEvent.getX();
+        _my = anEvent.getY();
+    }
+
+    /**
      * Process event.
      */
-    @Override
-    protected void processEvent(ViewEvent anEvent)
+    private void handleKeyEvent(ViewEvent anEvent)
     {
-        // Handle MouseEvent
-        if (anEvent.isMouseEvent()) {
-            if (anEvent.isMousePress())
-                _mouseDown = anEvent;
-            else if (anEvent.isMouseRelease())
-                _mouseDown = null;
-            else if (anEvent.isMouseClick())
-                _mouseClicked = anEvent;
-            _mx = anEvent.getX();
-            _my = anEvent.getY();
-        }
-
         // Handle KeyEvent: Update KeyDowns and KeyClicks for event
-        else if (anEvent.isKeyEvent()) {
-            int kcode = anEvent.getKeyCode();
-            if (anEvent.isKeyPress()) {
-                _keyDowns.add(kcode);
-                _keyClicks.add(kcode);
-            }
-            else if (anEvent.isKeyRelease()) _keyDowns.remove(kcode);
+        int kcode = anEvent.getKeyCode();
+        if (anEvent.isKeyPress()) {
+            _keyDowns.add(kcode);
+            _keyClicks.add(kcode);
         }
+        else if (anEvent.isKeyRelease())
+            _keyDowns.remove(kcode);
     }
 
     /**
