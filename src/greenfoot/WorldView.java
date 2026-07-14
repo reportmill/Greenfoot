@@ -71,7 +71,7 @@ public class WorldView extends ChildView {
      */
     public boolean isKeyDown(String aKey)
     {
-        int kp = KeyCode.get(aKey.toUpperCase());
+        int kp = KeyCode.getKeyCodeForName(aKey.toUpperCase());
         return _keyDowns.contains(kp);
     }
 
