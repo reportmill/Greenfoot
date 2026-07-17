@@ -221,7 +221,7 @@ public class World {
     public void showText(String aString, int textX, int textY)
     {
         String key = textX + "x" + textY;
-        if (aString != null && aString.length() > 0)
+        if (aString != null && !aString.isEmpty())
             _text.put(key, aString);
         else _text.remove(key);
     }
@@ -249,7 +249,7 @@ public class World {
                 continue;
             if (aClass == null || aClass.isInstance(actor)) {
                 Point point = actorView.parentToLocal(aX, aY);
-                if (actorView.contains(point.getX(), point.getY()))
+                if (actorView.contains(point.x, point.y))
                     return (T) actor;
             }
         }
@@ -273,7 +273,7 @@ public class World {
 
             if (aClass == null || aClass.isInstance(actor)) {
                 Point point = child.parentToLocal(aX, aY);
-                if (child.contains(point.getX(), point.getY()))
+                if (child.contains(point.x, point.y))
                     hitList.add((T) actor);
             }
         }
