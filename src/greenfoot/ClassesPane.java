@@ -168,7 +168,7 @@ public class ClassesPane extends ViewController {
         if (classNode == null) return;
 
         Label classNodeLabel = createLabelForClassNode(classNode);
-        classTreeCell.setGraphicAfter(classNodeLabel);
+        classTreeCell.setTailGraphic(classNodeLabel);
     }
 
     /**
@@ -188,7 +188,7 @@ public class ClassesPane extends ViewController {
             ImageView classImageView = new ImageView(classImage);
             classImageView.setKeepAspect(true);
             classImageView.setPrefSize(40, 18);
-            label.setGraphicAfter(classImageView);
+            label.setTailGraphic(classImageView);
         }
 
         // Return
