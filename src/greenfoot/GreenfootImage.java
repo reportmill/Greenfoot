@@ -361,7 +361,7 @@ public class GreenfootImage {
             textArea.getTextModel().setDefaultTextColor(foregroundColor.getColorObject());
         textArea.setText(aString);
         textArea.setSizeToBestSize();
-        return ViewUtils.getImageForScale(textArea, 1);
+        return ViewUtils.getImageForDpiScale(textArea, 1);
     }
 
     /**
